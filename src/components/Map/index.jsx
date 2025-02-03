@@ -1484,13 +1484,15 @@ const Map = forwardRef(
                         {RegulationImages &&
                             RegulationImages.length > 0 &&
                             RegulationImages.map((item, index) => {
-                                {
-                                    /* let invertY = Math.pow(2, z) - 1 - y; */
-                                }
+                                console.log('>>>Check item: ', item);
                                 return (
                                     <TileLayer
                                         key={index}
-                                        url={`${item.link_quyhoach}/{z}/{x}/{y}`} // Link for the tile layer
+                                        url={`${item.link_quyhoach}/{z}/{x}/{y}`}
+                                        // url={(x, y, z) => {
+                                        //     console.log(">>>Check x,y,z: ",x,"-",y,"-",z)
+                                        //     return `${item.link_quyhoach}/${z}/${x}/${y}`;
+                                        // }}
                                         pane="overlayPane"
                                         minNativeZoom={item.min_zoom ? item.min_zoom : 12}
                                         maxNativeZoom={item.zoom ? item.zoom : 18}
