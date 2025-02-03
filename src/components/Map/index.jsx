@@ -1297,7 +1297,11 @@ const Map = forwardRef(
                 setMarkers(dodacParams);
             }
         }, []);
-
+        //get url
+        const getLinkUrl = (baseUrl, x, y, z) => {
+            let newY = Math.pow(z, 2) - 1 - y;
+            return `${baseUrl}/${z}/${x}/${newY}.png`;
+        };
         return (
             <>
                 {contextHolder}
@@ -1484,15 +1488,11 @@ const Map = forwardRef(
                         {RegulationImages &&
                             RegulationImages.length > 0 &&
                             RegulationImages.map((item, index) => {
-                                console.log('>>>Check item: ', item);
                                 return (
                                     <TileLayer
                                         key={index}
-                                        url={`${item.link_quyhoach}/{z}/{x}/{y}`}
-                                        // url={(x, y, z) => {
-                                        //     console.log(">>>Check x,y,z: ",x,"-",y,"-",z)
-                                        //     return `${item.link_quyhoach}/${z}/${x}/${y}`;
-                                        // }}
+                                        url={getLinkUrl(item.link_quyhoach, 'x', 'y', 'z')}
+                                        // url={`${item.link_quyhoach}/{z}/{x}/{y}.png`}
                                         pane="overlayPane"
                                         minNativeZoom={item.min_zoom ? item.min_zoom : 12}
                                         maxNativeZoom={item.zoom ? item.zoom : 18}

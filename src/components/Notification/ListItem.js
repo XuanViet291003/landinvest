@@ -14,7 +14,7 @@ const ListItem = (props) => {
                         <div className="container my-3 mt-2" style={{ backgroundColor: '#343a40' }} key={item.id}>
                             <div className="card mb-2r project-card shadow rounded" style={{ border: 'none' }}>
                                 <div className="row" style={{ backgroundColor: '#343a40' }}>
-                                    <div className="col-md-5 overflow-hidden img-list">
+                                    <div className="col-md-4 overflow-hidden img-list">
                                         <Link
                                             to={`/detail_du_an/${item.id}`}
                                             state={{ image: item.image }}
@@ -29,7 +29,7 @@ const ListItem = (props) => {
                                         </Link>
                                     </div>
 
-                                    <div className="col-md-7">
+                                    <div className="col-md-8">
                                         <div className="card-body card-body-container">
                                             <span className={`badge ${badgeName} ms-auto bd-highlight fw-500 mb-2`}>
                                                 {item.trangThai}
