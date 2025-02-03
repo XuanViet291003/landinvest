@@ -1,0 +1,148 @@
+.post-news {
+    background-color: #2c353d;
+    border-radius: 10px;
+    &__title {
+        color: white;
+        background-color: #262d34;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding: 10px;
+    }
+    &__content {
+        color: white;
+        text-align: justify;
+        margin: 0 20px;
+        &::first-letter {
+            margin-left: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        img {
+            display: block;
+            height: 200px;
+            margin: 10px;
+        }
+    }
+}
+.avatar-username {
+    height: 50px;
+    border-radius: 3px;
+    margin-right: 10px;
+}
+.list-comment {
+    width: 95%;
+    margin: auto;
+    &__item {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 20px;
+    }
+}
+.comment-content {
+    background-color: #262d34;
+    border-radius: 5px;
+    overflow: hidden;
+    flex: 1;
+    &__info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    &__time {
+        color: white;
+        font-style: italic;
+        opacity: 0.75;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+    &__username {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 10px 0 20px 20px;
+        a {
+            text-decoration: none;
+            color: white;
+            opacity: 1;
+            transition: all 0.1s linear;
+            &:hover {
+                opacity: 0.75;
+            }
+        }
+    }
+    &__text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #949699;
+        margin: 10px 10px 20px 20px;
+    }
+}
+.ant-image:has(.image-view) {
+    border-radius: 3px;
+    margin: 10px 0 20px 20px;
+}
+.add-post {
+    display: flex;
+    margin-bottom: 20px;
+    .content-post {
+        flex: 1;
+        border-radius: 5px;
+        background-color: #262d34;
+        padding-bottom: 20px;
+        margin-right: 15px;
+        &__username {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 10px 0 10px 20px;
+        }
+    }
+}
+.custom-upload.ant-upload-wrapper {
+    margin-left: 25px;
+    margin-top: 15px;
+}
+.custom-button.ant-btn {
+    float: right;
+    margin-right: 15px;
+    background-color: #009a1f;
+}
+
+.custom-button.ant-btn:hover {
+    color: #fff !important;
+    transform: scale(1.05) !important;
+    background-color: rgb(0, 154, 31, 0.7) !important;
+}
+.comment-reply {
+    width: 90%;
+    overflow: hidden;
+    margin: auto;
+    background-color: #2c353d;
+    padding: 10px;
+    border-radius: 5px;
+    &__header {
+        display: flex;
+        align-items: center;
+        color: white;
+        p {
+            margin-left: 4px;
+        }
+    }
+    &__content {
+        width: 100%;
+        color: white;
+        opacity: 0.75;
+        font-size: 15px;
+        img {
+            height: 100px;
+            display: block;
+            margin: 10px;
+        }
+    }
+}
+.text-secondary {
+    img {
+        height: 100px;
+        display: block;
+        margin: 10px;
+    }
+}
