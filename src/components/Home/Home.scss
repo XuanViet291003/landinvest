@@ -129,7 +129,11 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
         cursor: pointer;
         width: 100%;
         max-width: 300px;
+        @media (max-width:$sm) {
+            max-width: 201px;
+        }
     }
+    
     .plan-list-item {
         background-color: #fff;
         border-radius: 10px;
@@ -490,6 +494,7 @@ body {
     }
     @media (max-width: $md) {
         font-size: 10px;
+        padding: 5px 16px;  
     }
 }
 
