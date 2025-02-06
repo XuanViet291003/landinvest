@@ -76,7 +76,7 @@ $icon-size: 44px;
 /* Styles for icon wrapper */
 .icon-wrapper-regulation {
     padding: 7px;
-    z-index: 1001;
+    z-index: 990;
     width: $icon-size;
     background-color: #fff !important;
     position: fixed;
@@ -112,8 +112,8 @@ $icon-size: 44px;
     }
 
     .icon-wrapper-regulation {
-        top: 108px;
-        right: 65px;
+        top: 196px;
+        left: 12px;
     }
 }
 

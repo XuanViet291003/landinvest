@@ -138,6 +138,7 @@ const Login = () => {
                             style={{
                                 height: '40px',
                                 width: '120px',
+                                left:'74px',
                             }}
                             type="primary"
                             htmlType="Đăng nhập"
@@ -150,7 +151,7 @@ const Login = () => {
                             style={{
                                 height: '40px',
                                 width: '120px',
-                                marginLeft: '40px',
+                                marginLeft: '74px',
                             }}
                             htmlType="Đăng nhập"
                             onClick={() => {
