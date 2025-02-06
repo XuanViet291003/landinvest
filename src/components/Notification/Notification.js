@@ -5,7 +5,7 @@ import './Notification.scss';
 import PaginateList from './PaginateList';
 const Notification = () => {
     return (
-        <div>
+        <div className="">
             <div className="container">
                 <Carousel style={{ marginTop: '15px' }} infinite interval={5000}>
                     {arrayBannerImage

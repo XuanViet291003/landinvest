@@ -5,7 +5,6 @@ import { CiLocationOn } from 'react-icons/ci';
 import { useParams } from 'react-router-dom';
 import { getAllDetail } from '../../../services/api';
 import './Detail.scss';
-
 const Detail = () => {
     const [detailData, setDetailData] = useState({});
     const [dataPosition, setDataPosition] = useState('');
@@ -15,13 +14,20 @@ const Detail = () => {
 
     const handleConvert = (string) => {
         if (!string) return '';
-        return string
-            .replaceAll('[img]', '<br> <img src="')
-            .replaceAll('[/img]', '"/> <br>')
-            .replaceAll('[', '<')
-            .replaceAll(']', '>')
-            .replaceAll('{', `<br> -`)
-            .replaceAll('}', `<br>`);
+
+        return (
+            string
+                // Chuyển đổi [img]URL[/img] -> <img src="URL" />
+                .replace(/\[img\](.*?)\[\/img\]/g, '</br> <img src="$1" /> </br>')
+
+                // Chuyển đổi { -> <div> và } -> </div>
+                .replace(/{/g, '<div>')
+                .replace(/}/g, '</div>')
+
+                // Chuyển đổi "text: value" nhưng KHÔNG thay đổi dấu ":" trong URL
+                .replace(/(^|\n)([^.\n]+):\s*(?!\/\/)/g, '$1<b> $2</b>: ')
+        );
+        // .replaceAll(':', ': ');
     };
 
     useEffect(() => {
@@ -136,16 +142,12 @@ const Detail = () => {
 
                                 <div className="detail-content-location">
                                     <h2 className="content-location-name">Vị trí</h2>
-                                    <div>
-                                        <p style={{ color: '#fff' }}>{parse(handleConvert(dataPosition))}</p>
-                                    </div>
+                                    <div className="location-content">{parse(handleConvert(dataPosition))}</div>
                                 </div>
 
                                 <div className="extension-container">
                                     <h2 className="extension-name">Tiện ích</h2>
-                                    <div>
-                                        <p style={{ color: '#fff' }}>{parse(handleConvert(dataExtension))}</p>
-                                    </div>
+                                    <div style={{ color: '#fff' }}>{parse(handleConvert(dataExtension))}</div>
                                 </div>
                             </div>
                         </div>

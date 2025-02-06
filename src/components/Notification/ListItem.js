@@ -8,13 +8,13 @@ const ListItem = (props) => {
         <>
             {listItems &&
                 listItems.length > 0 &&
-                listItems.slice(0, visibleItems).map((item) => {
+                listItems.map((item) => {
                     let badgeName = item.trangThai === 'Đã bàn giao' ? 'bg-success' : 'bg-primary';
                     return (
-                        <div className="container my-3 mt-2" style={{ backgroundColor: '#343a40' }} key={item.id}>
+                        <div className="container my-3 mt-4" style={{ backgroundColor: '#343a40' }} key={item.id}>
                             <div className="card mb-2r project-card shadow rounded" style={{ border: 'none' }}>
                                 <div className="row" style={{ backgroundColor: '#343a40' }}>
-                                    <div className="col-md-4 overflow-hidden img-list">
+                                    <div className="col-md-3 overflow-hidden img-list">
                                         <Link
                                             to={`/detail_du_an/${item.id}`}
                                             state={{ image: item.image }}
@@ -29,7 +29,7 @@ const ListItem = (props) => {
                                         </Link>
                                     </div>
 
-                                    <div className="col-md-8">
+                                    <div className="col-md-9">
                                         <div className="card-body card-body-container">
                                             <span className={`badge ${badgeName} ms-auto bd-highlight fw-500 mb-2`}>
                                                 {item.trangThai}
@@ -58,12 +58,12 @@ const ListItem = (props) => {
                                                     {item.loaiHinh}
                                                 </small>
                                             </p>
-                                            <p className="card-text mt-1">
+                                            {/* <p className="card-text mt-1">
                                                 <small className="">
                                                     <span>Diện tích: </span>
                                                     {item.dienTich}
                                                 </small>
-                                            </p>
+                                            </p> */}
                                             {/* <p className="card-text mt-1">
                                                 <small className="fw-bold">Mật độ xây dựng: {item.matDoXayDung}</small>
                                             </p>
@@ -99,13 +99,13 @@ const ListItem = (props) => {
                     );
                 })}
 
-            {listItems.length > visibleItems && (
+            {/* {listItems.length > visibleItems && (
                 <div className="text-center mt-3">
                     <button onClick={props.loadMoreItems} className="btn btn-primary">
                         Xem thêm...
                     </button>
                 </div>
-            )}
+            )} */}
         </>
     );
 };
