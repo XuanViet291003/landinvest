@@ -1,0 +1,61 @@
+.land-administration {
+    position: fixed;
+    bottom: 14%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    width: 36vw;
+    z-index: 999;
+    padding: 8px 10px;
+    .land-administration__close {
+        position: absolute;
+        top: 0;
+        right: 2px;
+        padding: 4px;
+        z-index: 3;
+        cursor: pointer;
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+    .land-administration__land {
+        font-weight: 600;
+        margin-top: 6px;
+
+        & strong {
+            color: #22c55e;
+        }
+    }
+    .land-administration__location {
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+    .land-administration__location--detail {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .land-administration--desc {
+        margin-top: 10px;
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+    .land-administration__loading {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        .land-administration__loading--icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        &.loading {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+}

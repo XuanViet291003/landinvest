@@ -1,0 +1,145 @@
+.ant-drawer-body-tile-layer-wrapper {
+    position: relative;
+    margin-top: 20px;
+    background-color: #f1f3f4;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ant-drawer-body-tile-layer-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #dcdfe1;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.ant-drawer-body-tile-layer-wrapper button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto;
+}
+
+.ant-drawer-body-tile-layer-wrapper button:hover {
+    background-color: #ff1744;
+}
+
+.ant-tooltip-inner {
+    background-color: #1a73e8;
+    color: white;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .ant-drawer-body img,
+    .ant-drawer-body-tile-layer-wrapper button {
+        display: none;
+    }
+
+    .ant-drawer-body-tile-layer-wrapper {
+        padding: 0;
+    }
+
+    .ant-drawer-body-function {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: nowrap; /* Ensures items stay on a single row */
+        width: 100%;
+    }
+
+    .ant-drawer-body-function-item-wrapper {
+        flex: 1 1 33%; /* Each item takes up 1/3 of the width */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ant-drawer-body-function-item-text {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ant-drawer-body-tile-layer-img {
+        height: 130px;
+    }
+
+    .ant-drawer-body-function-item-wrapper {
+        flex: 1 1 33%;
+    }
+
+    .ant-drawer-body-function {
+        flex-direction: row;
+        gap: 10px;
+        justify-content: space-between;
+    }
+}
+/* .ant-drawer-content-wrapper:has(.desktop) {
+    width: 300px !important;
+} */
+.auction-list {
+    padding: 8px;
+}
+.auction-card {
+    border: 2px solid #28a745; /* Màu viền xanh lá */
+    padding: 10px;
+    border-radius: 5px;
+    color: #333;
+    margin-top: 6px;
+}
+
+.auction-card p {
+    margin: 5px 0;
+    line-height: 1.5;
+}
+
+.auction-card .link {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.auction-card .date-info {
+    margin-top: 10px;
+}
+
+.auction-card .date-info p {
+    margin: 3px 0;
+}
+
+.auction-card .date-info span {
+    font-weight: bold;
+}
+.limited-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.5em;
+}
+
+.auction-list-pagination {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auction-list-pagination .ant-pagination {
+    display: flex;
+    align-items: baseline;
+}
