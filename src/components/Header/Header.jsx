@@ -484,7 +484,7 @@ const Header = () => {
                                     <img src={icons.landCostIcon} alt="" width={30} height={30} />
                                 </NavLink>
                                 <NavLink to="/about-us" className="nav-link">
-                                    <InfoCircleOutlined style={{fontSize: 20}} />
+                                    <InfoCircleOutlined style={{ fontSize: 20 }} />
                                 </NavLink>
                             </Nav>
                             <form
