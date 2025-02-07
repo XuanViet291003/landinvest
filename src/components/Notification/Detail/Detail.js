@@ -1,7 +1,7 @@
 import parse from 'html-react-parser';
 import 'leaflet/dist/leaflet.css';
 import React, { useEffect, useState } from 'react';
-import { CiLocationOn } from 'react-icons/ci';
+import { CiCircleMinus, CiLocationOn } from 'react-icons/ci';
 import { useParams } from 'react-router-dom';
 import { getAllDetail } from '../../../services/api';
 import './Detail.scss';
@@ -11,23 +11,33 @@ const Detail = () => {
     const [dataImageRepresent, setDataImageRepresent] = useState('');
     const [dataExtension, setDataExtension] = useState('');
     const { projectId } = useParams(); // Get project ID from URL params
-
+    const [imageHeader, setImageHeader] = useState('');
+    const iconText = () => {
+        return <CiCircleMinus />;
+    };
     const handleConvert = (string) => {
         if (!string) return '';
 
         return (
             string
                 // Chuyển đổi [img]URL[/img] -> <img src="URL" />
-                .replace(/\[img\](.*?)\[\/img\]/g, '</br> <img src="$1" /> </br>')
-
+                .replace(/\[img\](.*?)\[\/img\]/g, '<div className="image-container"><img src="$1"/> </div>')
                 // Chuyển đổi { -> <div> và } -> </div>
-                .replace(/{/g, '<div>')
+                .replace(/{/g, `<div className="icon-container"> - `)
                 .replace(/}/g, '</div>')
-
                 // Chuyển đổi "text: value" nhưng KHÔNG thay đổi dấu ":" trong URL
                 .replace(/(^|\n)([^.\n]+):\s*(?!\/\/)/g, '$1<b> $2</b>: ')
         );
         // .replaceAll(':', ': ');
+    };
+
+    const handleConvertExtension = (string) => {
+        if (!string) return '';
+        return string
+            .replace(/\[img\](.*?)\[\/img\]/g, '<div className="extention-image-container"><img src="$1"/> </div>')
+            .replace(/{/g, `<div className=""> - `)
+            .replace(/}/g, '</div>')
+            .replace(/(^|\n)([^.\n]+):\s*(?!\/\/)/g, '$1<b> $2</b>: ');
     };
 
     useEffect(() => {
@@ -41,10 +51,12 @@ const Detail = () => {
             setDataExtension(res.data.tienIch || '');
             setDataPosition(res.data.viTriDesc || '');
             setDataImageRepresent(res.data.images || '');
+            setImageHeader(res.data.images);
         } else {
             setDetailData({});
             setDataPosition('');
             setDataImageRepresent('');
+            setImageHeader('');
         }
     };
 
@@ -147,7 +159,9 @@ const Detail = () => {
 
                                 <div className="extension-container">
                                     <h2 className="extension-name">Tiện ích</h2>
-                                    <div style={{ color: '#fff' }}>{parse(handleConvert(dataExtension))}</div>
+                                    <div className="extension-content" style={{ color: '#fff' }}>
+                                        {parse(handleConvertExtension(dataExtension))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
