@@ -41,9 +41,11 @@ const UserProfile = ({user}) => {
 
 const InfoItem = ({ label, value, icon }) => (
   <div className="info-item">
-    <span className="icon">{icon}</span>
-    <span className="label">{label}:</span>
-    <span className="value">{value}</span>
+    <div className="label-container">
+      <span className="icon">{icon}</span>
+      <span className="label">{label}:</span>
+    </div>
+    <div className="value">{value}</div>
   </div>
 );
 
