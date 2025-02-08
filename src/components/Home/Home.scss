@@ -104,7 +104,7 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     transform: translateX(-50%);
     display: flex;
     gap: 15px;
-    z-index: 1001;
+    z-index: 990;
     top: 11%;
     width: 100vw;
     justify-content: center;
@@ -114,9 +114,12 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     }
     @media (max-width: $sm) {
         display: flex;
-        flex-direction: column;
-        top: 120px;
-        left: 67%;
+        top:100px; 
+        overflow-x: auto; 
+        white-space: nowrap; 
+        padding: 10px;
+        with: 260px;
+
     }
     .slider-list-item {
         background-color: #fff;
@@ -129,7 +132,12 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
         cursor: pointer;
         width: 100%;
         max-width: 300px;
+        @media (max-width:$sm) {
+            max-width: 201px;
+            font-size: 10px;
+        }
     }
+    
     .plan-list-item {
         background-color: #fff;
         border-radius: 10px;
@@ -153,7 +161,11 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
             align-items: center;
         }
         @media (max-width: $sm) {
-            max-width: 202px;
+            max-width: 201px;
+            font-size: 10px;
+            margin-right: 1px;
+
+
         }
     }
 }
@@ -490,6 +502,7 @@ body {
     }
     @media (max-width: $md) {
         font-size: 10px;
+        padding: 5px 16px;  
     }
 }
 
@@ -507,6 +520,7 @@ body {
     }
     @media (max-width: $md) {
         font-size: 10px;
+        padding: 5px 5px 5px 20px;  
     }
 }
 

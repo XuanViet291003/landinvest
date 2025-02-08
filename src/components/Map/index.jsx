@@ -16,7 +16,7 @@ import {
     ZoomControl,
 } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
 import { formatToVND } from '../../function/formatToVND';
 import ResetCenterView from '../../function/resetCenterView';
@@ -174,6 +174,8 @@ const Map = forwardRef(
             dientich: 0,
         });
         const [isLandAdministrationLoading, setIsLandAdministationLoading] = useState(false);
+
+        const navigate = useNavigate();
 
         const handleUpdateDistance = useCallback((markers) => {
             if (markers.length > 1) {
@@ -843,7 +845,7 @@ const Map = forwardRef(
 
         const MapEventArea = () => {
             useMapEvents({
-                click: async (e) => {
+                dblclick: async (e) => {
                     setIsShowModalArea(true);
                     const newLocation = e.latlng;
                     setLocation([newLocation.lat, newLocation.lng]);
@@ -1326,6 +1328,14 @@ const Map = forwardRef(
             });
         };
 
+        const handleWikiClick = async (location) => {
+          if (location && location.length > 0) {
+            // Gọi Api lấy thông tin thành phố
+            const res = await getLocationInBoudingBox(location[0], location[1]);
+            navigate(`/administrative-maps/${res.district}`);
+          }
+        }
+
         return (
             <>
                 {contextHolder}
@@ -1625,6 +1635,7 @@ const Map = forwardRef(
                         handleShareClick={handleShareClick} // Truyền hàm này vào Sidebar
                         handleItemClick={handleItemClick}
                         RegulationsImagesList={RegulationsImagesList}
+                        handleWikiClick={handleWikiClick}
                     />
                     <DrawerLandUsePlan />
                     {/* {polygonSessionStorage.length > 0 &&
