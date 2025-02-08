@@ -1,11 +1,11 @@
-import { Modal, Select } from 'antd';
-import React, { forwardRef, memo, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { LOCATION_KEYS } from '../../constants/commonKey';
-import { calculateLocation } from '../../function/calculateLocation';
+import {Modal, Select} from 'antd';
+import React, {forwardRef, memo, useEffect, useState} from 'react';
+import {useDispatch} from 'react-redux';
+import {LOCATION_KEYS} from '../../constants/commonKey';
+import {calculateLocation} from '../../function/calculateLocation';
 import fetchProvinceName from '../../function/findProvince';
-import { getPolygonsQuanHuyen, getPolygonsTinh } from '../../function/getPolygonByName';
-import { doSearch } from '../../redux/search/searchSlice';
+import {getPolygonsQuanHuyen, getPolygonsTinh} from '../../function/getPolygonByName';
+import {doSearch} from '../../redux/search/searchSlice';
 import {
     getAllDistrictInProvince,
     getAllProvinces,
@@ -14,7 +14,7 @@ import {
 } from '../../services/api';
 import '../../styles/selectLocationModal.scss';
 
-const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose }, mapRef) => {
+const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef) => {
     const [allProvinces, setAllProvinces] = useState([]);
     const [allDistricts, setAllDistricts] = useState([]);
     const [allWards, setAllWards] = useState([]);
@@ -184,9 +184,30 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose }, mapRe
         })();
     }, []);
 
+    const removeVietnameseTones = (str) => {
+        return str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d").replace(/Đ/g, "D");
+    };
+
+    const isVietnamese = (str) => {
+        return /[àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]/.test(str);
+    };
+
+    const filterLocation = (input, option) => {
+        if (isVietnamese(input)) {
+            // Nếu người dùng nhập có dấu, so sánh trực tiếp
+            return option.label.toLowerCase().includes(input.toLowerCase());
+        }
+        // Nếu không có dấu, so sánh với chuỗi đã loại bỏ dấu
+        return removeVietnameseTones(option.label.toLowerCase()).includes(removeVietnameseTones(input.toLowerCase()));
+    };
+
     return (
-        <Modal width={600} footer={<></>} open={isOpen} onOk={handleOk} onCancel={handleClose}>
+        <Modal width={600} footer={null} open={isOpen} onOk={handleOk} onCancel={handleClose}>
             <div className="select-location__modal">
+                {/* Chọn tỉnh / thành phố */}
                 <div className="select-location__modal--wrapper">
                     <div className="select-location__modal__label">
                         <span className="select-location__modal__label--location">Tỉnh</span>{' '}
@@ -198,12 +219,14 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose }, mapRe
                         placeholder="Chọn tỉnh thành phố"
                         optionFilterProp="label"
                         onChange={onChangeProvince}
-                        // onSearch={onSearch}
                         defaultValue={defaultSelectProvince}
                         className="select-location__modal--select"
-                        options={allProvinces?.map((item) => ({ label: item.ProvinceName, value: item.ProvinceID }))}
+                        filterOption={filterLocation}
+                        options={allProvinces?.map((item) => ({label: item.ProvinceName, value: item.ProvinceID}))}
                     />
                 </div>
+
+                {/* Chọn quận / huyện */}
                 <div className="select-location__modal--wrapper">
                     <div className="select-location__modal__label">
                         <span className="select-location__modal__label--location">Quận</span>{' '}
@@ -215,13 +238,14 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose }, mapRe
                         placeholder="Chọn quận huyện"
                         optionFilterProp="label"
                         onChange={onChangeDistrict}
-                        // onSearch={onSearch}
                         value={defaultSelectDistrict}
                         className="select-location__modal--select"
-                        options={allDistricts?.map((item) => ({ label: item.DistrictName, value: item.DistrictID }))}
+                        filterOption={filterLocation}
+                        options={allDistricts?.map((item) => ({label: item.DistrictName, value: item.DistrictID}))}
                     />
                 </div>
 
+                {/* Chọn xã / phường */}
                 <div className="select-location__modal--wrapper">
                     <div className="select-location__modal__label">
                         <span className="select-location__modal__label--location">Xã</span>{' '}
@@ -233,12 +257,14 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose }, mapRe
                         placeholder="Chọn phường xã"
                         optionFilterProp="label"
                         onChange={onChangeWard}
-                        // onSearch={onSearch}
                         value={defaultSelectWard}
                         className="select-location__modal--select"
-                        options={allWards?.map((item) => ({ label: item.WandName, value: item.WandID }))}
+                        filterOption={filterLocation}
+                        options={allWards?.map((item) => ({label: item.WandName, value: item.WandID}))}
                     />
                 </div>
+
+                {/* Nút hành động */}
                 <div className="select-location__modal--wrapper-btn">
                     <div className="select-location__modal--btn-warning" onClick={handleReset}>
                         Đặt lại
