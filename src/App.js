@@ -57,7 +57,7 @@ import AdministrativeMap from './pages/AdministrativeMap/AdministrativeMap.jsx';
 import DetailAdministrativeMap from './pages/AdministrativeMap/DetailAdministrativeMap/DetailAdministrativeMap.jsx';
 const Layout = () => {
     return (
-        <div className="App" style={{ position: 'relative', height: '100vh', width: '100%' }}>
+        <div className="App" style={{ position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
             <div className="app-header">
                 <Header />
             </div>
