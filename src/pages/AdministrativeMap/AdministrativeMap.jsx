@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import "./AdministrativeMap.scss";
 
@@ -79,10 +79,24 @@ const AdministrativeMap = () => {
               }
             }
 
+            // Kiểm tra xem HOOK_ID có phải đang ở dạng Json không
+            if (typeof res.HOOK_ID === "string") {
+              try {
+                res.HOOK_ID = JSON.parse(res.HOOK_ID);
+              } catch (error) {
+                console.error("Lỗi parse JSON:", error);
+
+                // Nếu lỗi, gán giá trị là object rỗng
+                res.HOOK_ID = {};
+              }
+            }
+
             data.push(res);
+
+            // Chỉ lấy tối đa 10 bản ghi
+            if (data.length === 10) break;
           }
           if (data && data.length > 0) {
-            console.log(data)
             setDuLieu(data);
           }
         }
@@ -115,32 +129,36 @@ const AdministrativeMap = () => {
 
   return (
     <Container>
-      {dulieu ? (
-        dulieu.map((item, index) => (
-          <div className="map-list" key={index}>
-            <div className="map-list__item">
-              <img
-                src={item.images && item.images[0]}
-                alt="Bản đồ Tỉnh Gia Lai"
-                className="map-list__item-image"
-              />
-              <div className="map-list__item-info">
-                <h3 className="map-list__item-title">{item.title}</h3>
-                <p className="map-list__item-description">
-                  {item.sections}
-                </p>
-                <div className="map-list__item-date-created">🕑 {convertToVietnamTime(item.updated_at)}</div>
-                <a href="#" className="map-list__item-link">Xem chi tiết</a>
+      <div style={{ marginBottom: "100px" }}>
+        {dulieu ? (
+          dulieu.map((item, index) => (
+            <div className="map-list" key={index}>
+              <div className="map-list__item">
+                <img
+                  src={item.images && item.images[0]}
+                  alt="Bản đồ Tỉnh Gia Lai"
+                  className="map-list__item-image"
+                />
+                <div className="map-list__item-info">
+                  <h3 className="map-list__item-title">{item.title}</h3>
+                  <p className="map-list__item-description">
+                    {item.sections}
+                  </p>
+                  <div className="map-list__item-date-created">🕑 {convertToVietnamTime(item.updated_at)}</div>
+                  <Link to={`/administrative-maps/${item.HOOK_ID.DistrictID}`} className="map-list__item-link">
+                    Xem chi tiết
+                  </Link>
+
+                </div>
               </div>
             </div>
+          ))
+        ) : (
+          <div style={{ color: "white" }}>
+            Không có dữ liệu
           </div>
-        ))
-      ) : (
-        <div style={{ color: "white" }}>
-          Không có dữ liệu
-        </div>
-      )}
-
+        )}
+      </div>
     </Container>
   );
 };

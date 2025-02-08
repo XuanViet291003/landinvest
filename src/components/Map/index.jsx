@@ -845,7 +845,7 @@ const Map = forwardRef(
 
         const MapEventArea = () => {
             useMapEvents({
-                click: async (e) => {
+                dblclick: async (e) => {
                     setIsShowModalArea(true);
                     const newLocation = e.latlng;
                     setLocation([newLocation.lat, newLocation.lng]);
@@ -1332,8 +1332,7 @@ const Map = forwardRef(
           if (location && location.length > 0) {
             // Gọi Api lấy thông tin thành phố
             const res = await getLocationInBoudingBox(location[0], location[1]);
-            // navigate(`/administrative-maps/${res.district}`);
-            navigate(`administrative-maps/?provinceId=${res.provinces}`)
+            navigate(`/administrative-maps/${res.district}`);
           }
         }
 
