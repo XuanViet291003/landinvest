@@ -177,7 +177,7 @@ function PostNews() {
     return (
         <div className="post-news">
             <h4 className="post-news__title">{detail?.Title}</h4>
-            <p className="post-news__content">{parse(hanleCovert(detail.Content))}</p>
+            <p className="post-news__content">{parse(hanleCovert(detail?.Content || ''))}</p>
             {totalPage > 0 && (
                 <ReactPaginate
                     containerClassName="pagination-news"
