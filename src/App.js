@@ -56,7 +56,7 @@ import AboutUs from './pages/AboutUs/AboutUs.jsx';
 
 const Layout = () => {
     return (
-        <div className="App" style={{ position: 'relative', height: '100vh', width: '100%' }}>
+        <div className="App" style={{ position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
             <div className="app-header">
                 <Header />
             </div>
