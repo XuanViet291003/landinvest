@@ -59,9 +59,9 @@ const PaginateList = () => {
         setCurrentPage(selectedPage);
     };
 
-    const loadMoreItems = () => {
-        setVisibleItems((prev) => prev + 5);
-    };
+    // const loadMoreItems = () => {
+    //     setVisibleItems((prev) => prev + 5);
+    // };
 
     return (
         <>
@@ -107,7 +107,7 @@ const PaginateList = () => {
                 )}
 
                 {/* Hiển thị danh sách */}
-                <ListItem listItems={itemsToDisplay} loadMoreItems={loadMoreItems} visibleItems={visibleItems} />
+                <ListItem listItems={itemsToDisplay} visibleItems={visibleItems} />
 
                 {/* Phân trang dưới */}
                 {!searchTerm && (

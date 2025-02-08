@@ -27,9 +27,12 @@ $fontSize: 16px;
             }
         }
         .img-list {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             .image-card {
-                height: 320px;
-                width: 100%;
+                height: 250px;
+                width: 300px;
             }
         }
     }

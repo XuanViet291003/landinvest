@@ -16,7 +16,7 @@ import {
     ZoomControl,
 } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
 import { formatToVND } from '../../function/formatToVND';
 import ResetCenterView from '../../function/resetCenterView';
@@ -174,8 +174,6 @@ const Map = forwardRef(
             dientich: 0,
         });
         const [isLandAdministrationLoading, setIsLandAdministationLoading] = useState(false);
-
-        const navigate = useNavigate();
 
         const handleUpdateDistance = useCallback((markers) => {
             if (markers.length > 1) {
@@ -1300,42 +1298,31 @@ const Map = forwardRef(
             }
         }, []);
 
-        // Hàm tính toán lại giá trị Y
         const getTileUrl = (baseUrl, x, y, z) => {
-            let flippedY = Math.pow(2, z) - 1 - y;
-            return `${baseUrl}/${z}/${x}/${flippedY}`;
+            // const newY = Math.pow(2, z) - 1 - y; // Công thức tính giá trị y
+            return `${baseUrl}/${z}/${x}/${y}.png`; // Trả về URL
         };
 
-        // // Hàm render các TileLayer
+        // Đoạn render TileLayer
         const renderTileLayers = () => {
-            if (!RegulationImages || RegulationImages.length === 0) {
-                return <div></div>;
-            }
-
             return RegulationImages.map((item, index) => {
+                // Tính toán URL trước khi render
+                const tileUrl = getTileUrl(item.link_quyhoach, 'x', 'y', 'z'); // Sử dụng placeholder cho {x}, {y}, {z}
+
                 return (
                     <TileLayer
                         key={index}
-                        url={getTileUrl(item.link_quyhoach, '{x}', '{y}', '{z}')} // Gọi hàm với x, y, z từ tileCoords
+                        url={tileUrl}
                         pane="overlayPane"
                         minNativeZoom={item.min_zoom ? item.min_zoom : 12}
                         maxNativeZoom={item.zoom ? item.zoom : 18}
                         minZoom={item.min_zoom ? item.min_zoom - 2 : 9}
                         maxZoom={25}
-                        opacity={opacity}
+                        opacity={opacity} // Dynamic opacity
                     />
                 );
             });
         };
-
-        const handleWikiClick = async (location) => {
-          if (location && location.length > 0) {
-            // Gọi Api lấy thông tin thành phố
-            const res = await getLocationInBoudingBox(location[0], location[1]);
-            // navigate(`/administrative-maps/${res.district}`);
-            navigate(`administrative-maps/?provinceId=${res.provinces}`)
-          }
-        }
 
         return (
             <>
@@ -1521,9 +1508,8 @@ const Map = forwardRef(
                                     />
                                 );
                             })}
-
-                        {renderTileLayers()}
-                        {/* {RegulationImages &&
+                        {/* {RegulationImages && RegulationImages.length > 0 && renderTileLayers()} */}
+                        {RegulationImages &&
                             RegulationImages.length > 0 &&
                             RegulationImages.map((item, index) => (
                                 <TileLayer
@@ -1537,7 +1523,7 @@ const Map = forwardRef(
                                     maxZoom={25}
                                     opacity={opacity} // Dynamic opacity
                                 />
-                            ))} */}
+                            ))}
                     </Pane>
                     {/* {currentLocation && currentLocation.lat && currentLocation.lon && (
                     <Marker position={[currentLocation.lat, currentLocation.lon]} icon={customIcon}>
@@ -1636,7 +1622,6 @@ const Map = forwardRef(
                         handleShareClick={handleShareClick} // Truyền hàm này vào Sidebar
                         handleItemClick={handleItemClick}
                         RegulationsImagesList={RegulationsImagesList}
-                        handleWikiClick={handleWikiClick}
                     />
                     <DrawerLandUsePlan />
                     {/* {polygonSessionStorage.length > 0 &&

@@ -9,6 +9,7 @@ import { getUrlMapLayer } from '../../services/api';
 import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistrictProvinces.jsx';
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
+import { FaWikipediaW } from "react-icons/fa";
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -21,6 +22,7 @@ const LocationInfoSidebar = ({
     setIsShowModalUpload,
     RegulationsImagesList,
     handleItemClick,
+    handleWikiClick
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -87,16 +89,6 @@ const LocationInfoSidebar = ({
         }
     }, [location]);
 
-    useEffect(() => {
-        (async () => {
-            const provincePlans = quyhoachByProvince.find((item) => Number(item.id_tinh) === Number(provinceId));
-            if (provincePlans) {
-                const provincePlansArray = provincePlans.link_image.split('/');
-                // set province plan id
-                setProvincePlansId(provincePlansArray[provincePlansArray.length - 1]);
-            }
-        })();
-    }, [location, landCostprovinceId, districtId]);
 
     // useEffect(() => {
     //     const formData = new FormData();
@@ -191,6 +183,17 @@ const LocationInfoSidebar = ({
                                 </div>
                                 <span className="ant-drawer-body-function-item-text">Upload ảnh</span>
                             </div>
+
+                            <div
+                                className="ant-drawer-body-function-item-wrapper"
+                                onClick={() => handleWikiClick(location)}
+                            >
+                                <div className="ant-drawer-body-function-item">
+                                    <FaWikipediaW color="#1d4ed8" />
+                                </div>
+                                <span className="ant-drawer-body-function-item-text">Wiki</span>
+                            </div>   
+
                             <div
                                 className="ant-drawer-body-function-item-wrapper"
                                 onClick={() => setIsShowMore(!isShowMore)}

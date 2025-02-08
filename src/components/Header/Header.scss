@@ -1,6 +1,12 @@
 // @tailwind base;
 // @tailwind components;
 // @tailwind utilities;
+
+.app-header{
+  position: relative;
+  z-index: 1000;
+}
+
 .header-container {
     background-color: #262d34;
 

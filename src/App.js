@@ -53,10 +53,11 @@ import 'reactjs-windows/dist/index.css';
 import LandUsePlan from './pages/LandPlan/LandUsePlan.jsx';
 import LandUsePlanDetail from './pages/LandPlan/LandPlanDetail/LandPlanDetail.jsx';
 import AboutUs from './pages/AboutUs/AboutUs.jsx';
-
+import AdministrativeMap from './pages/AdministrativeMap/AdministrativeMap.jsx';
+import DetailAdministrativeMap from './pages/AdministrativeMap/DetailAdministrativeMap/DetailAdministrativeMap.jsx';
 const Layout = () => {
     return (
-        <div className="App" style={{ position: 'relative', height: '100vh', width: '100%' }}>
+        <div className="App" style={{ position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
             <div className="app-header">
                 <Header />
             </div>
@@ -214,6 +215,14 @@ function App() {
                 {
                     path: '/land-cost',
                     element: <LandCost />,
+                },
+                {
+                  path: '/administrative-maps',
+                  element: <AdministrativeMap />
+                },
+                {
+                  path: '/administrative-maps/:id',
+                  element: <DetailAdministrativeMap />
                 },
             ],
         },
