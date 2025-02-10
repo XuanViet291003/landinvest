@@ -1284,6 +1284,8 @@ const Map = forwardRef(
             }
         }
 
+        const antDrawOpen = document.querySelector(".ant-drawer-open");
+
         return (
             <>
                 {contextHolder}
@@ -1308,16 +1310,19 @@ const Map = forwardRef(
             </Modal> */}
 
                 {/* show bounding box data button */}
-                <div
+                {!antDrawOpen && (
+                  <div
                     className={`image-list-open bg-white ${!isShowBtnOpen ? 'close' : ''}`}
                     onClick={() => {
                         onOpenImageList();
                         onCloseBtnImageList();
                     }}
-                >
-                    {/* <img src={icons.mapIcon} alt="Ảnh danh sách quy hoạch" className="image-list-icon" /> */}
-                    <FaMapMarkedAlt className="image-list-icon"/>
-                </div>
+                  >
+                      {/* <img src={icons.mapIcon} alt="Ảnh danh sách quy hoạch" className="image-list-icon" /> */}
+                      <FaMapMarkedAlt className="image-list-icon"/>
+                  </div>
+                )}
+
                 <div>
                     <FaList
                         className="icon-wrapper-regulation"

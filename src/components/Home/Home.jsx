@@ -467,7 +467,7 @@ function Home() {
 
     const LandUsePlan = useSelector(state => state.landUsePlan.LandUsePlan);
 
-    if(!LandUsePlan?.list_kehoach.length > 0){
+    if(!LandUsePlan || LandUsePlan && LandUsePlan?.list_kehoach?.length === 0){
       dispatch(onChangeDrawer(false));
     }
 
@@ -608,7 +608,7 @@ function Home() {
                     >
                         Danh sách quy hoạch
                     </div>
-                    {LandUsePlan?.list_kehoach.length > 0 && (
+                    {(LandUsePlan && LandUsePlan?.list_kehoach?.length > 0)  && (
                       <div
                         onClick={() => dispatch(onChangeDrawer(!isOpenDrawerLandPlan))}
                         ref={buttonRef}
