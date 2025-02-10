@@ -595,8 +595,8 @@ export const getLatestNew = async (page) => {
     const res = await instance.get(`api/forum/get_list_new_post?page=${page}`);
     return res.data;
 };
-export const getListNewUser = async () => {
-    const res = await instance.get('api/list_new_user');
+export const getListNewUser = async (page = 1) => {
+    const res = await instance.get(`api/list_new_user?page=${page}`);
     return res.data;
 };
 export const getListOnlineUser = async () => {

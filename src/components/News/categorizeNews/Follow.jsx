@@ -1,9 +1,10 @@
-import { message, Radio } from 'antd';
+import { message, Radio, Spin } from 'antd';
 import '../News.scss';
 import { useEffect, useState } from 'react';
 import { getListAllUser, getListNewUser, getListOnlineUser } from '../../../services/api';
 import img from '../../../assets/default-image-user.png';
 import { Col, Row } from 'antd';
+import ReactPaginate from 'react-paginate';
 const options = [
     {
         label: 'Người dùng mới',
@@ -30,6 +31,18 @@ function Follow() {
     const [listOnlineUser, setListOnlineUser] = useState([]);
     const [listAllUser, setListAllUser] = useState([]);
     const [option, setOption] = useState(1);
+    const [totalPage, setTotalPage] = useState();
+    const [loading, setLoading] = useState(false);
+    const handleChangePage = async (e) => {
+        setLoading(true);
+        try {
+            const newUser = await getListNewUser(e.selected + 1);
+            setListNewUser(newUser.data);
+        } catch {
+            message.error('Đã có lỗi xảy ra !');
+        }
+        setLoading(false);
+    };
     useEffect(() => {
         (async () => {
             try {
@@ -37,6 +50,7 @@ function Follow() {
                 const onlineUser = await getListOnlineUser();
                 const allUser = await getListAllUser();
                 setListNewUser(newUser.data);
+                setTotalPage(Math.ceil(newUser.total_page));
                 setListOnlineUser(onlineUser.OnlineUsers);
                 setListAllUser(allUser);
             } catch {
@@ -59,25 +73,40 @@ function Follow() {
                 onChange={handleChange}
             />
             {option == 1 && (
-                <table class="table table-striped table-dark" style={{ width: '90%', margin: '20px auto' }}>
-                    <thead>
-                        <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Họ tên</th>
-                            <th scope="col">Ngày hoạt động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {option == 1 &&
-                            ListNewUser.map((item, index) => (
-                                <tr span={6} key={'user-new' + item.userid}>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{item.FullName}</td>
-                                    <td>{convertTime(item.LastActivityTime)}</td>
+                <>
+                    <ReactPaginate
+                        containerClassName="pagination-news mt-3"
+                        previousLabel="< Trước"
+                        nextLabel="Sau >"
+                        breakLabel="..."
+                        pageCount={totalPage}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={3}
+                        onPageChange={handleChangePage}
+                        activeClassName="pagination-news--active"
+                    />
+                    <Spin size="large" spinning={loading}>
+                        <table class="table table-striped table-dark" style={{ width: '90%', margin: '5px auto' }}>
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Họ tên</th>
+                                    <th scope="col">Ngày hoạt động</th>
                                 </tr>
-                            ))}
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                {option == 1 &&
+                                    ListNewUser.map((item, index) => (
+                                        <tr span={6} key={'user-new' + item.userid}>
+                                            <th scope="row">{index + 1}</th>
+                                            <td>{item.FullName}</td>
+                                            <td>{convertTime(item.LastActivityTime)}</td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </Spin>
+                </>
             )}
             <Row className="list-user" gutter={[20, 20]}>
                 {option == 3 &&
