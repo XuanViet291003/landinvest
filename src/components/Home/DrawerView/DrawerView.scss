@@ -73,6 +73,11 @@
     color: #fff;
     font-weight: bold;
 
+    h4 {
+      color: #22C578;
+      font-weight: bolder;
+    }
+
     @media (max-width: 780px) {
       background-color: #fff !important;
       color: #000;
@@ -89,8 +94,10 @@
       }
 
       .ant-drawer-close {
-        color: #fff;
+        color: #FF4D4F;
         float: right;
+        margin-top: 20px;
+        font-weight: bolder;
 
         @media (max-width: 768px) {
           color: #000;
@@ -176,7 +183,15 @@
       background-color: #fff !important;
     }
 
-    h4,
+    h4{
+      color: #22C578;
+      font-weight: bolder ;
+
+      @media (max-width: 768px) {
+        color: #000;
+      }
+    }
+
     p {
       color: #fff;
 
@@ -260,7 +275,7 @@
 }
 
 .ant-drawer-content-wrapper {
-  padding-top: 60px;
+  padding-top: 50px;
 
   @media (max-width: 780px) {
     height: 40% !important;

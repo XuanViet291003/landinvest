@@ -779,7 +779,7 @@ const Map = forwardRef(
             const clickTimeout = useRef(null);
 
             useMapEvents({
-                click: (e) => {
+                click: async (e) => {
                     clickCountRef.current += 1;
                     const map = e.target;
 
@@ -788,6 +788,11 @@ const Map = forwardRef(
                     clickTimeout.current = setTimeout(() => {
                         clickCountRef.current = 0; // Reset sau khi xử lý
                     }, 400);
+
+                    setIsLocationInfoOpen(true);
+
+                    const newLocation = e.latlng;
+                    setLocation([newLocation.lat, newLocation.lng]);
                 },
 
                 dblclick: async (e) => {
