@@ -64,6 +64,7 @@ import LandAdministrationModal from '../LandAdministrationModal/LandAdministrati
 import ListRegulations from '../ListRegulations/ListRegulations';
 import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
+import CustomTileLayer from '../CustomLayer';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -1469,21 +1470,11 @@ const Map = forwardRef(
                             })}
 
                         {renderTileLayers()}
-                        {/* {RegulationImages &&
-                            RegulationImages.length > 0 &&
-                            RegulationImages.map((item, index) => (
-                                <TileLayer
-                                    key={index}
-                                    url={`${item.link_quyhoach}/{z}/{x}/{y}`} // Link for the tile layer
-                                    pane="overlayPane"
-                                    minNativeZoom={item.min_zoom ? item.min_zoom : 12}
-                                    maxNativeZoom={item.zoom ? item.zoom : 18}
-                                    // set min zoom = item.min_zoom is avoid leaflet map lag
-                                    minZoom={item.min_zoom ? item.min_zoom - 2 : 9}
-                                    maxZoom={25}
-                                    opacity={opacity} // Dynamic opacity
-                                />
-                            ))} */}
+                        {RegulationImages &&
+                          RegulationImages.length > 0 &&
+                          RegulationImages.map((item, index) => (
+                              <CustomTileLayer key={index} item={item} opacity={opacity}/>
+                          ))}
                     </Pane>
                     {/* {currentLocation && currentLocation.lat && currentLocation.lon && (
                     <Marker position={[currentLocation.lat, currentLocation.lon]} icon={customIcon}>
