@@ -52,19 +52,6 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
             <ReactWindow title="Bảng giá đất" onClose={handleCancel}>
                 <>
                     {contextHolder}
-                    {/* <Modal
-                        zIndex={9999}
-                        closable={false}
-                        mask={false}
-                        maskClosable={false}
-                        width={'60vw'}
-                        footer={<></>}
-                        // closeIcon={<FaCircleMinus color="#fff" fontSize={16} />}
-                        open={isLandCostModalOpen}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        className="land-cost-area"
-                    > */}
                     <div className="land-cost-area__wrapper">
                         <div className="land-cost-area__wrapper__header">
                             <span className="land-cost-area__wrapper__header--title">
@@ -110,7 +97,6 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                             <LandCostTable searchValue={debouncedInputSearch} tableType={MAP_TABLE_TYPE.ON_MAP} />
                         </div>
                     </div>
-                    {/* </Modal> */}
                 </>
             </ReactWindow>
         )
