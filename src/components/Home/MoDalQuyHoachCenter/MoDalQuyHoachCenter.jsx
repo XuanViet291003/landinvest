@@ -11,7 +11,8 @@ function ModalQuyHoachCenter({ isShowModalQuyHoachCenter, setIsShowModalQuyHoach
     const [isShowLoginModal, setIsShowLoginModal] = useState(false);
 
     const handleSetItem = (item) => {
-        if (!isAuthenticated) {
+        const buttonActive = document.querySelector(".button-item.active");
+        if (!isAuthenticated && buttonActive.getAttribute("button-type") !== '3') {
             setIsShowLoginModal(true);
             return;
         }

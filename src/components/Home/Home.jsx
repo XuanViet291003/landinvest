@@ -467,7 +467,6 @@ function Home() {
 
     const LandUsePlan = useSelector(state => state.landUsePlan.LandUsePlan);
 
-    console.log(LandUsePlan)
     if(!LandUsePlan.list_kehoach.length > 0){
       dispatch(onChangeDrawer(false));
     }
@@ -624,6 +623,7 @@ function Home() {
                         <div
                             key={button.type}
                             className={`button-item ${selectedButton === button.type ? 'active' : ''}`}
+                            button-type={button.type}
                             onClick={() => {
                                 if (button.type !== 7) {
                                     handleButtonClick(button.type);
