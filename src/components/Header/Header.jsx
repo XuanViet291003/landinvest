@@ -4,8 +4,9 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/channels4_profile.jpg';
 
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { usePayOS } from '@payos/payos-checkout';
-import { Avatar, Button, Card, Dropdown, List, message, Modal, notification, Space, Spin, Tooltip } from 'antd';
+import { Avatar, Button, Card, Dropdown, List, message, Modal, notification, Space, Tooltip } from 'antd';
 import axios from 'axios';
 import { memo, useEffect, useRef, useState } from 'react';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
@@ -23,6 +24,7 @@ import { generateHMAC } from '../../function/Payment/generateHMAC';
 import { toVndCurrency } from '../../function/Payment/toVndCurrency';
 import useWindowSize from '../../hooks/useWindowSise';
 import { doLogoutAction, getCoins } from '../../redux/account/accountSlice';
+import { searchDefault, searchNews } from '../../redux/checkSearch/checkSearchSlice';
 import { doSearch } from '../../redux/search/searchSlice';
 import {
     callLogout,
@@ -32,14 +34,10 @@ import {
     fetchAccount,
     getCheckoutInfo,
     getWardPolygon,
-    searchPost,
 } from '../../services/api';
 import ModalNotification from '../Auth/ModalNotification';
 import { ActionIcon, HomeIcon, NewsIcon, NotificationIcon, SearchIcon, SearchNavbarIcon } from '../Icons';
 import './Header.scss';
-import { searchDefault, searchNews } from '../../redux/checkSearch/checkSearchSlice';
-import ReactPaginate from 'react-paginate';
-import { InfoCircleOutlined } from '@ant-design/icons';
 
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search?';
 const SEARCH_BASE_URL = 'https://api.quyhoach.xyz/search_diachi';
@@ -484,7 +482,7 @@ const Header = () => {
                                     <img src={icons.landCostIcon} alt="" width={30} height={30} />
                                 </NavLink>
                                 <NavLink to="/about-us" className="nav-link">
-                                    <InfoCircleOutlined style={{fontSize: 20}} />
+                                    <InfoCircleOutlined style={{ fontSize: 20 }} />
                                 </NavLink>
                             </Nav>
                             <form
@@ -674,7 +672,7 @@ const Header = () => {
                         <NavLink to="/" className="nav-link">
                             <HomeIcon />
                         </NavLink>
-                        <NavLink to="/notifications" className="nav-link">
+                        <NavLink to="/list_all_du_an" className="nav-link">
                             <NotificationIcon />
                         </NavLink>
                         <NavLink to="/news" className="nav-link">
