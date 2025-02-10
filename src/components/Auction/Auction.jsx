@@ -11,6 +11,7 @@ import './Auction.scss';
 import AuctionSearch from './AuctionSearch';
 import { setDistrictId, setProvinceId } from '../../redux/landCostSlice/landCostSlice';
 import { arrayBannerImage, banner } from '../../assets/banner/image';
+import Banner from '../Banner';
 
 const Auction = () => {
     const [formData, setFormData] = useState({
@@ -151,15 +152,7 @@ const Auction = () => {
 
     return (
         <Container className="auction-container">
-            <Carousel style={{ marginTop: '15px' }} controls={false} interval={5000}>
-                {arrayBannerImage.map((image, index) => (
-                    <Carousel.Item key={index}>
-                        <div>
-                            <img className="image-banner" src={image} alt="" />
-                        </div>
-                    </Carousel.Item>
-                ))}
-            </Carousel>
+            <Banner />
             <div className="auction-container-form">
                 <div className=" text-auction">
                     <span className="icon-auction">
