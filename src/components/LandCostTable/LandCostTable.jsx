@@ -63,19 +63,23 @@ export const LandCostTable = ({ tableType, searchValue }) => {
                 }}
             >
                 <Table
-                    columns={columns}
+                    columns={columns.filter(col => {
+                        if (col.dataIndex === 'address') {
+                            return landCostData?.some(item => item.WardName);
+                        }
+                        return true;
+                    })}
                     loading={allLandCostStatus === THUNK_API_STATUS.PENDING}
                     rowKey="id"
                     dataSource={landCostData?.map((item, index) => ({
                         key: item.id,
                         STT: (currentPage - 1) * pageSize + index + 1,
                         district: item.DistrictName,
+                        description: item.RoadName,
                         address: item.WardName,
                         locationCost: item.vi_tri,
                         landType: item.Type,
-                        description: item.RoadName?.trim() ? item.RoadName : undefined, // Ẩn nếu không có dữ liệu
                     }))}
-
                     pagination={{
                         current: currentPage,
                         pageSize: pageSize,

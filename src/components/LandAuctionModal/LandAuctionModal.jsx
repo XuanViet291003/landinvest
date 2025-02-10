@@ -1,5 +1,4 @@
 import { message, Modal } from 'antd';
-import Search from 'antd/es/input/Search';
 import React from 'react';
 import { FaCircleMinus } from 'react-icons/fa6';
 import { useSelector } from 'react-redux';
@@ -9,6 +8,8 @@ import LandAuctionTable from '../LandAuctionTable/LandAuctionTable';
 import { LAND_AUCTION_KEYS } from '../../constants/LandAuctionKey';
 import { CiShare2 } from 'react-icons/ci';
 import ReactWindow from 'reactjs-windows';
+
+const isMobile = window.innerWidth <= 768;
 
 const LandAuctionModal = ({ isLandAuctionModalOpen, handleOk, handleCancel }) => {
     const currentLocation = useSelector((state) => state.searchQuery.searchResult);
@@ -38,52 +39,48 @@ const LandAuctionModal = ({ isLandAuctionModalOpen, handleOk, handleCancel }) =>
     return (
         <>
             {isLandAuctionModalOpen && (
-                
-                <ReactWindow
-                    title="Danh sách đấu giá"
-                    onClose={handleCancel}
-                   
-                >
-                    {contextHolder}
-                    <div className="land_modal__wrapper">
-                        <div className="land-cost-area__wrapper">
-                            <div className="land-cost-area__wrapper__header">
-                                <span className="land-cost-area__wrapper__header--title">
-                                    *Bảng giá đấu giá tại vị trí hiện tại bạn đang xem ở{' '}
-                                    <span className="land-cost-area__wrapper__header--bold">
-                                        {currentLocation.districtName}{' '}
-                                        <span className="land-cost-area__wrapper__header-dash">-</span>{' '}
-                                        {currentLocation.provinceName}.
-                                    </span>
-                                    <span
-                                        className="land-cost-area__wrapper__header--share"
-                                        onClick={handleShareLocation}
-                                    >
-                                        <CiShare2 size={16} />
-                                        Chia sẻ
-                                    </span>
-                                </span>
-                                <FaCircleMinus
-                                    color="#fff"
-                                    fontSize={26}
-                                    className="land-cost-area__wrapper__header--icon"
-                                    onClick={handleCancel}
-                                />
-                            </div>
-                            <p className="land-cost__container--notice" style={{
-                                marginTop:"13px"
-                            }}>
-                                Modal này có thể chỉnh kích thước được.
+                isMobile ? (
+                    <Modal title="Danh sách đấu giá" open={isLandAuctionModalOpen} onCancel={handleCancel} footer={null}>
+                        {contextHolder}
+                        <div>
+                            <p>
+                                *Bảng giá đấu giá tại vị trí hiện tại bạn đang xem ở{' '}
+                                <strong>
+                                    {currentLocation.districtName} - {currentLocation.provinceName}.
+                                </strong>
                             </p>
-                            <p className="land-cost__container--notice">
-                                Giữ shift + lăn chuột để xem các cột tiếp theo
+                            <p onClick={handleShareLocation} style={{ cursor: 'pointer', color: 'blue' }}>
+                                <CiShare2 size={16} /> Chia sẻ
                             </p>
-                            <div>
+                            <LandAuctionTable tableType={MAP_TABLE_TYPE.ON_MAP} handleClose={handleCancel} />
+                        </div>
+                    </Modal>
+                ) : (
+                    <ReactWindow title="Danh sách đấu giá" onClose={handleCancel}>
+                        {contextHolder}
+                        <div className="land_modal__wrapper">
+                            <div className="land-cost-area__wrapper">
+                                <div className="land-cost-area__wrapper__header">
+                                    <span className="land-cost-area__wrapper__header--title">
+                                        *Bảng giá đấu giá tại vị trí hiện tại bạn đang xem ở{' '}
+                                        <span className="land-cost-area__wrapper__header--bold">
+                                            {currentLocation.districtName} - {currentLocation.provinceName}.
+                                        </span>
+                                        <span className="land-cost-area__wrapper__header--share" onClick={handleShareLocation}>
+                                            <CiShare2 size={16} /> Chia sẻ
+                                        </span>
+                                    </span>
+                                    <FaCircleMinus color="#fff" fontSize={26} className="land-cost-area__wrapper__header--icon" onClick={handleCancel} />
+                                </div>
+                                <p className="land-cost__container--notice" style={{ marginTop: '13px' }}>
+                                    Modal này có thể chỉnh kích thước được.
+                                </p>
+                                <p className="land-cost__container--notice">Giữ shift + lăn chuột để xem các cột tiếp theo</p>
                                 <LandAuctionTable tableType={MAP_TABLE_TYPE.ON_MAP} handleClose={handleCancel} />
                             </div>
                         </div>
-                    </div>
-                </ReactWindow>
+                    </ReactWindow>
+                )
             )}
         </>
     );

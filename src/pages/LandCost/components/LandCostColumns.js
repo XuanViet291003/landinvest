@@ -8,7 +8,7 @@ export const columns = [
         dataIndex: 'STT',
         key: 'STT',
         render: (_, item) => <LandCostDetail item={item}/>,
-        width: '50px',
+        width: '30px',
     },
     {
         title: <span className="table-title">Quận Huyện</span>,
@@ -25,19 +25,24 @@ export const columns = [
         ),
         dataIndex: 'address',
         key: 'address',
-        render: (text) => text ? (
-            <span className="land-cost-address">
-            <LandCostDescription description={text} oneLine/>
-        </span>
-        ) : null,
+        render: (text) => (
+            text ? (
+                <span className="land-cost-address">
+                <LandCostDescription description={text} oneLine/>
+            </span>
+            ) : null
+        ),
         width: '200px',
+        onCell: (record) => ({
+            style: !record.address ? {display: 'none'} : {}
+        })
     },
     {
         title: <span className="table-title">Mô tả chi tiết</span>,
         key: 'description',
         dataIndex: 'description',
         render: (description) => <LandCostDescription description={description} oneLine/>,
-        width: '200px',
+        width: '150px',
     },
     {
         title: <span className="table-title">VT1</span>,
@@ -50,7 +55,7 @@ export const columns = [
 
             return <span>{VT1}</span>;
         },
-        width: '150px',
+        width: '100px',
     },
     {
         title: <span className="table-title">VT2</span>,
@@ -62,7 +67,7 @@ export const columns = [
                 : `${locationCost[1][`VT2`]}₫`;
             return <span>{VT2}</span>;
         },
-        width: '150px',
+        width: '120px',
     },
     {
         title: <span className="table-title">VT3</span>,
@@ -74,7 +79,7 @@ export const columns = [
                 : `${locationCost[2][`VT3`]}₫`;
             return <span>{VT3}</span>;
         },
-        width: '150px',
+        width: '120px',
     },
     {
         title: <span className="table-title">VT4</span>,
@@ -86,7 +91,7 @@ export const columns = [
                 : `${locationCost[3][`VT4`]}₫`;
             return <span>{VT4}</span>;
         },
-        width: '150px',
+        width: '120px',
     },
     {
         title: <span className="table-title">VT5</span>,
@@ -98,13 +103,13 @@ export const columns = [
                 : `${locationCost[4][`VT5`]}₫`;
             return <span>{VT5}</span>;
         },
-        width: '150px',
+        width: '120px',
     },
     {
         title: <span className="table-title">Loại BDS</span>,
         key: 'landType',
         dataIndex: 'landType',
         render: (text) => <span className="land-cost-landType">{text}</span>,
-        width: '100px',
+        width: '80px',
     },
 ];
