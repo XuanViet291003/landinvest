@@ -8,34 +8,43 @@ import { columns } from '../../pages/LandCost/components/LandCostColumns';
 
 export const LandCostTable = ({ tableType, searchValue }) => {
     const dispatch = useDispatch();
-    const allLandCost = useSelector((state) => state.landCost.allLandCost) || [];
     const allLandCostStatus = useSelector((state) => state.landCost.allLandCostStatus);
-    const page = useSelector((state) => state.landCost.page);
-    const pageSize = useSelector((state) => state.landCost.pageSize);
     const districtId = useSelector((state) => state.landCost.districtId);
     const [landCostData, setLandCostData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10; // Số lượng dòng trên mỗi trang
+    const [totalRecords, setTotalRecords] = useState(0);
 
-    // const handleChange = (paginate) => {
-    //     const { current } = paginate;
-    //     dispatch(setCurrentPage(current));
-    // };
-
-    useEffect(() => {
-        if (tableType && tableType === MAP_TABLE_TYPE.ON_MAP) {
-            dispatch(getAllLandCostApi({ id: districtId, type: LAND_COST_KEY.DISTRICT }));
+    // Hàm gọi API lấy dữ liệu theo trang
+    const fetchLandCostData = async (page) => {
+        try {
+            const response = await fetch(`https://api.quyhoach.xyz/bang_gia_dat_district/${districtId}?page=${page}`);
+            const data = await response.json();
+            setLandCostData(data.results);
+            setTotalRecords(data.total || 100); // Giả định tổng số bản ghi là 100 nếu API không có
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu:', error);
         }
-    }, [districtId]);
+    };
 
+    // Gọi API khi districtId hoặc currentPage thay đổi
+    useEffect(() => {
+        if (districtId) {
+            fetchLandCostData(currentPage);
+        }
+    }, [districtId, currentPage]);
+
+    // Xử lý tìm kiếm
     useEffect(() => {
         if (searchValue) {
-            const landCostsFiltered = allLandCost?.filter((item) =>
+            const landCostsFiltered = landCostData?.filter((item) =>
                 item?.DistrictName?.toLowerCase().includes(searchValue?.toLowerCase()),
             );
             setLandCostData(landCostsFiltered);
         } else {
-            setLandCostData(allLandCost);
+            fetchLandCostData(currentPage);
         }
-    }, [allLandCost, searchValue]);
+    }, [searchValue]);
 
     return (
         <div className="land-cost__container-table">
@@ -54,33 +63,30 @@ export const LandCostTable = ({ tableType, searchValue }) => {
                 }}
             >
                 <Table
-                    columns={columns}
+                    columns={columns.filter(col => {
+                        if (col.dataIndex === 'address') {
+                            return landCostData?.some(item => item.WardName);
+                        }
+                        return true;
+                    })}
                     loading={allLandCostStatus === THUNK_API_STATUS.PENDING}
                     rowKey="id"
                     dataSource={landCostData?.map((item, index) => ({
                         key: item.id,
-                        STT: index + 1,
+                        STT: (currentPage - 1) * pageSize + index + 1,
                         district: item.DistrictName,
                         description: item.RoadName,
                         address: item.WardName,
                         locationCost: item.vi_tri,
                         landType: item.Type,
                     }))}
-                    pagination={false}
-                    // pagination={{
-                    //     pageSize: 5,
-                    // }}
-                    // pagination={{
-                    //     pageSize,
-                    //     current: page,
-                    //     defaultCurrent: page,
-                    //     defaultPageSize: 5,
-                    //     total: allLandCost.length,
-                    //     onShowSizeChange: (_, size) => {
-                    //         dispatch(setCurrentPageSize(size));
-                    //     },
-                    // }}
-                    // // onChange={handleChange}
+                    pagination={{
+                        current: currentPage,
+                        pageSize: pageSize,
+                        total: totalRecords,
+                        onChange: (page) => setCurrentPage(page),
+                        showSizeChanger: false,
+                    }}
                     scroll={{
                         scrollToFirstRowOnChange: true,
                         x: 'max-content',

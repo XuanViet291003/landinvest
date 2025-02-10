@@ -17,6 +17,7 @@ import {
     setCurrentPage,
     setFilterSeletecd,
 } from '../../redux/landCostSlice/landCostSlice';
+import Banner from '../../components/Banner';
 
 const LandCost = () => {
     const dispatch = useDispatch();
@@ -123,15 +124,7 @@ const LandCost = () => {
 
     return (
         <Container>
-            <Carousel style={{ marginTop: '15px' }} controls={false} interval={5000}>
-                    {arrayBannerImage.map((image, index) => (
-                        <Carousel.Item key={index}>
-                            <div>
-                                <img className='image-banner' src={image} alt="" />
-                            </div>
-                        </Carousel.Item>
-                    ))}
-                </Carousel>
+            <Banner />
             <div className="land-cost__container">
                 <div className="land-cost__container-select">
                     <Select

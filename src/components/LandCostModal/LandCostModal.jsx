@@ -1,6 +1,6 @@
 import { message, Modal } from 'antd';
 import Search from 'antd/es/input/Search';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CiShare2 } from 'react-icons/ci';
 import { FaCircleMinus } from 'react-icons/fa6';
 import { useSelector } from 'react-redux';
@@ -15,10 +15,20 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
     const provinceId = useSelector((state) => state.landCost.provinceId);
     const districtId = useSelector((state) => state.landCost.districtId);
     const [messageApi, contextHolder] = message.useMessage();
-    const [isSearchLoading, setIsSearchLoading] = useState();
-    const [searchValue, setSearchValue] = useState();
+    const [isSearchLoading, setIsSearchLoading] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const [debouncedInputSearch] = useDebounce(searchValue, 500);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleShareLocation = () => {
         const sharingUrl = `${window.location.href}&province=${provinceId}&district=${districtId}&share-type=${LAND_COST_KEY.SHARING}&ups=${ACTIONS.SHARING}`;
@@ -47,74 +57,54 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
         }, 1000);
     };
 
-    return (
-        isLandCostModalOpen && (
-            <ReactWindow title="Bảng giá đất" onClose={handleCancel}>
-                <>
-                    {contextHolder}
-                    {/* <Modal
-                        zIndex={9999}
-                        closable={false}
-                        mask={false}
-                        maskClosable={false}
-                        width={'60vw'}
-                        footer={<></>}
-                        // closeIcon={<FaCircleMinus color="#fff" fontSize={16} />}
-                        open={isLandCostModalOpen}
-                        onOk={handleOk}
-                        onCancel={handleCancel}
-                        className="land-cost-area"
-                    > */}
-                    <div className="land-cost-area__wrapper">
-                        <div className="land-cost-area__wrapper__header">
-                            <span className="land-cost-area__wrapper__header--title">
-                                *Bảng giá tại vị trí hiện tại bạn đang xem ở{' '}
-                                <span className="land-cost-area__wrapper__header--bold">
-                                    {currentLocation.districtName}{' '}
-                                    <span className="land-cost-area__wrapper__header-dash">-</span>{' '}
-                                    {currentLocation.provinceName}.
-                                </span>
-                                <span className="land-cost-area__wrapper__header--share" onClick={handleShareLocation}>
-                                    <CiShare2 size={16} />
-                                    Chia sẻ
-                                </span>
-                            </span>
-                            <div className="land-cost-area__wrapper__header--search">
-                                <Search
-                                    placeholder="Tìm kiếm quận huyện..."
-                                    allowClear
-                                    value={searchValue}
-                                    onSearch={handleSearch}
-                                    loading={isSearchLoading}
-                                    size="middle"
-                                    onChange={(e) => setSearchValue(e.target.value)}
-                                />
-                            </div>
-                            <FaCircleMinus
-                                color="#fff"
-                                fontSize={26}
-                                className="land-cost-area__wrapper__header--icon"
-                                onClick={handleCancel}
-                            />
-                        </div>
-                        <span className="land-cost-area__wrapper__header--subtitle">
-                            *Bảng giá đất 2024 do chính phủ ban hành.
+    const modalContent = (
+        <div style={{ backgroundColor: '#0b0a0a', color: '#eae5e5', padding: '20px', borderRadius: '8px' }}>
+            {contextHolder}
+            <div className="land-cost-area__wrapper">
+                <div className="land-cost-area__wrapper__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="land-cost-area__wrapper__header--title">
+                        Bảng giá tại vị trí bạn đang xem ở
+                        <strong> {currentLocation.districtName} - {currentLocation.provinceName}.</strong>
+                        <span className="land-cost-area__wrapper__header--share" onClick={handleShareLocation} style={{ marginLeft: '10px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                            <CiShare2 size={16} /> Chia sẻ
                         </span>
-                        <p className="land-cost__container--notice">
-                            Chú thích: Vị trí 1 là mặt tiền đường; Ví trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m
-                            - 5m; Vị trí 4 là hẻm rộng dưới 3m.
-                        </p>
-                        <p className="land-cost__container--notice">Modal này có thể chỉnh kích thước được.</p>
-                        <p className="land-cost__container--notice">Giữ shift + lăn chuột để xem các cột tiếp theo</p>
-                        <div>
-                            <LandCostTable searchValue={debouncedInputSearch} tableType={MAP_TABLE_TYPE.ON_MAP} />
-                        </div>
-                    </div>
-                    {/* </Modal> */}
-                </>
+                    </span>
+                    <FaCircleMinus
+                        color="#fff"
+                        fontSize={24}
+                        className="land-cost-area__wrapper__header--icon"
+                        onClick={handleCancel}
+                        style={{ cursor: 'pointer' }}
+                    />
+                </div>
+                <Search
+                    placeholder="Tìm kiếm quận huyện..."
+                    allowClear
+                    value={searchValue}
+                    onSearch={handleSearch}
+                    loading={isSearchLoading}
+                    size="middle"
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    style={{ margin: '10px 0', width: '100%' }}
+                />
+                <p>*Bảng giá đất 2024 do chính phủ ban hành.</p>
+                <p>Chú thích: Vị trí 1 là mặt tiền đường; Vị trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m - 5m; Vị trí 4 là hẻm rộng dưới 3m.</p>
+                <LandCostTable searchValue={debouncedInputSearch} tableType={MAP_TABLE_TYPE.ON_MAP} />
+            </div>
+        </div>
+    );
+
+    return isLandCostModalOpen ? (
+        isMobile ? (
+            <Modal title={<span style={{ color: '#171616' }}>Bảng giá đất</span>} visible={isLandCostModalOpen} onCancel={handleCancel} footer={null} width="80vw" bodyStyle={{ backgroundColor: '#fffdfd', color: '#100e0e' }}>
+                {modalContent}
+            </Modal>
+        ) : (
+            <ReactWindow title="Bảng giá đất" onClose={handleCancel} width={500} height={400} style={{ backgroundColor: '#100f0f', color: '#131313' }}>
+                {modalContent}
             </ReactWindow>
         )
-    );
+    ) : null;
 };
 
 export default LandCostModal;

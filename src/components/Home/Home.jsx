@@ -465,6 +465,12 @@ function Home() {
         setButtonMoRong(button);
     };
 
+    const LandUsePlan = useSelector(state => state.landUsePlan.LandUsePlan);
+
+    if(!LandUsePlan?.list_kehoach.length > 0){
+      dispatch(onChangeDrawer(false));
+    }
+
     return (
         <>
             {contextHolder}
@@ -602,19 +608,22 @@ function Home() {
                     >
                         Danh sách quy hoạch
                     </div>
-                    <div
+                    {LandUsePlan?.list_kehoach.length > 0 && (
+                      <div
                         onClick={() => dispatch(onChangeDrawer(!isOpenDrawerLandPlan))}
                         ref={buttonRef}
                         className={`slider-list-item`}
-                    >
-                        KHSDD 2025
-                    </div>
+                      >
+                          KHSDD 2025
+                      </div>
+                    )}
                 </div>
                 <div className="container-buttons">
                     {buttonLabels.map((button) => (
                         <div
                             key={button.type}
                             className={`button-item ${selectedButton === button.type ? 'active' : ''}`}
+                            button-type={button.type}
                             onClick={() => {
                                 if (button.type !== 7) {
                                     handleButtonClick(button.type);

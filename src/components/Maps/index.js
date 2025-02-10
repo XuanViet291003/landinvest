@@ -391,40 +391,6 @@ const Map = forwardRef(
                         setisShowListRegulation(false);
                     }
                 },
-
-                //     async (e) => {
-                //         const { lat, lng } = e?.latlng;
-                //         // const mapCenter = map.getCenter();
-
-                //         console.log(lat, lng);
-
-                //         map.setView([lat, lng]);
-                //         setSelectedPosition({ lat, lng });
-
-                //         try {
-                //             // Call API province
-                //             // const info = await getLocationInBoudingBox(lat, lng);
-                //             const info = await fetchProvinceName(lat, lng);
-                //             // Update position info
-                //             dispatch(
-                //                 setCurrentLocation({
-                //                     lat,
-                //                     lon: lng,
-                //                     provinceName: info.provinceName,
-                //                     districtName: info.districtName,
-                //                 }),
-                //             );
-                //             // Call API district
-
-                //             res ? setIdDistrict(res.district) : setIdDistrict(null);
-                //             setListenDblClick(Math.random());
-                //         } catch (error) {
-                //             setIdDistrict(null);
-                //         }
-                //     },
-                //     500,
-                //     { leading: false, trailing: true },
-                // ),
                 zoomend: async () => {
                     const zoom = map.getZoom();
                     if (zoom < 10) {
@@ -441,27 +407,6 @@ const Map = forwardRef(
                         setPressTimer(timer);
                     }
                 },
-                // click(event) {
-                //     const { lat, lng } = event.latlng;
-                //     if (isLocationInfoOpen) {
-                //         setLocation([lat, lng]);
-                //     }
-                // },
-                // mouseup(event) {
-                //     if (!isLongClick && isLocationInfoOpen) return;
-                //     const { lat, lng } = event.latlng;
-                //     if (!isLongClick) {
-                //         clearTimeout(pressTimer);
-                //     } else {
-                //         setLocation([lat, lng]);
-                //         onOpenLocationInfo();
-                //         setIsLongClick(false);
-                //     }
-                // },
-                // contextmenu(event) {
-                //     event.preventDefault(); // Chặn menu ngữ cảnh mặc định
-                //     console.log('Chuột phải bị block trên bản đồ');
-                // },
                 click(event) {
                     const { lat, lng } = event.latlng;
                     const map = ref.current;
@@ -475,12 +420,6 @@ const Map = forwardRef(
                                 setIsLongClick(true);
                                 onOpenLocationInfo();
 
-                                // if (!marker) {
-                                //     const newMarker = L.marker([lat, lng]).addTo(map);
-                                //     setMarker(newMarker);
-                                // } else {
-                                //     marker.setLatLng([lat, lng]);
-                                // }
                             }, 400);
                             setPressTimer(timer);
                         } else {
@@ -488,13 +427,6 @@ const Map = forwardRef(
                                 onOpenLocationInfo();
                                 setIsLongClick(false);
                             }
-
-                            // if (!marker) {
-                            //     const newMarker = L.marker([lat, lng]).addTo(map);
-                            //     setMarker(newMarker);
-                            // } else {
-                            //     marker.setLatLng([lat, lng]);
-                            // }
                         }
                     }
                 },

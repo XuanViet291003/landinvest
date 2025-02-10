@@ -186,7 +186,7 @@ const Register = () => {
 
                     <Form.Item wrapperCol={{ span: 24 }} style={{ marginTop: '30px' }}>
                         <Button
-                            style={{ height: '40px', width: '120px' }}
+                            style={{ height: '40px', width: '120px', left:'74px' }}
                             type="primary"
                             htmlType="submit"
                             loading={isSubmit}
@@ -194,12 +194,12 @@ const Register = () => {
                             Đăng ký
                         </Button>
 
-                        <Button
+                        {/* <Button
                             style={{ height: '40px', width: '120px', marginLeft: '40px' }}
                             onClick={() => form.resetFields()}
                         >
                             Quên mật khẩu
-                        </Button>
+                        </Button> */}
                     </Form.Item>
 
                     <p style={{ textAlign: 'center' }}>

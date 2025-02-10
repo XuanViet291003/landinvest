@@ -11,6 +11,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 import { arrayBannerImage } from '../../assets/banner/image';
 import { getTimeLeft } from '../../function/getTimeLeft';
+import Banner from '../../components/Banner';
 
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
@@ -204,15 +205,7 @@ const BiddingPage = () => {
     return (
         <div className="bidding-container">
             <Container className="Planning-container">
-                <Carousel style={{ marginTop: '15px' }} controls={false} interval={5000}>
-                    {arrayBannerImage.map((image, index) => (
-                        <Carousel.Item key={index}>
-                            <div>
-                                <img className="image-banner" src={image} alt="" />
-                            </div>
-                        </Carousel.Item>
-                    ))}
-                </Carousel>
+                <Banner />
                 <button
                     onClick={() => navigate('/bidding/procurement?page=1&limit=10')}
                     style={{ marginTop: '15px', backgroundColor: 'rgb(73 , 97 , 70)' }}

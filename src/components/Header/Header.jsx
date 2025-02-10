@@ -684,6 +684,9 @@ const Header = () => {
                         <NavLink to="/auctions" className="nav-link">
                             <ActionIcon />
                         </NavLink>
+                        <NavLink to="/land-cost" className="nav-link">
+                          <img src={icons.landCostIcon} alt="" width={30} height={30} />
+                        </NavLink>
                         <NavLink to="/" className="nav-link">
                             <IoIosNotifications style={{ color: 'white' }} />
                         </NavLink>

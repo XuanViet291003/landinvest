@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import img from '../../assets/default-thumbnail.jpg';
 import { Carousel } from 'react-bootstrap';
 import { arrayBannerImage, banner } from '../../assets/banner/image';
+import Banner from '../Banner';
 // import { notification } from "antd";
 
 //avatar defaul
@@ -43,15 +44,7 @@ const News = (props) => {
     return (
         <>
             <Container className="news-container">
-                <Carousel style={{ marginTop: '15px' }} controls={false} interval={5000}>
-                    {arrayBannerImage.map((image, index) => (
-                        <Carousel.Item key={index}>
-                            <div>
-                                <img className="image-banner" src={image} alt="" />
-                            </div>
-                        </Carousel.Item>
-                    ))}
-                </Carousel>
+                <Banner />
                 <Row className="news-row">
                     <Col className="news-col-left d-none d-sm-block" xl={3} xxl={3}>
                         <div className="news-hot">

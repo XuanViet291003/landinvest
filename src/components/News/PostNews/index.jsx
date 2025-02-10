@@ -28,7 +28,6 @@ const hanleCovert = (string) => {
     return temp;
 };
 function PostNews() {
-    console.log('ok');
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const [totalPage, setTotalPage] = useState(0);
@@ -45,6 +44,7 @@ function PostNews() {
             searchParam.set('page', e.selected + 1);
             setSearchParam(searchParam);
             const res = await getCommentsByIdPost(id, e.selected + 1);
+            console.log(res);
             const newData = res.data.map((item) => {
                 const content = item.content.split('[/QUOTE]');
                 const time = item.actionAt;
@@ -177,7 +177,7 @@ function PostNews() {
     return (
         <div className="post-news">
             <h4 className="post-news__title">{detail?.Title}</h4>
-            <p className="post-news__content">{parse(hanleCovert(detail.Content))}</p>
+            <p className="post-news__content">{parse(hanleCovert(detail?.Content || ''))}</p>
             {totalPage > 0 && (
                 <ReactPaginate
                     containerClassName="pagination-news"
