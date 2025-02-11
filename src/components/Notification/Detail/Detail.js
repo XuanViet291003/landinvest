@@ -1,7 +1,7 @@
 import parse from 'html-react-parser';
 import 'leaflet/dist/leaflet.css';
 import React, { useEffect, useState } from 'react';
-import { CiCircleMinus, CiLocationOn } from 'react-icons/ci';
+import { CiLocationOn } from 'react-icons/ci';
 import { useParams } from 'react-router-dom';
 import { getAllDetail } from '../../../services/api';
 import './Detail.scss';
@@ -12,9 +12,7 @@ const Detail = () => {
     const [dataExtension, setDataExtension] = useState('');
     const { projectId } = useParams(); // Get project ID from URL params
     const [imageHeader, setImageHeader] = useState('');
-    const iconText = () => {
-        return <CiCircleMinus />;
-    };
+    const [results, setResults] = useState([]);
     const handleConvert = (string) => {
         if (!string) return '';
 
@@ -33,17 +31,44 @@ const Detail = () => {
 
     const handleConvertExtension = (string) => {
         if (!string) return '';
+
         return string
             .replace(/\[img\](.*?)\[\/img\]/g, '<div className="extention-image-container"><img src="$1"/> </div>')
-            .replace(/{/g, `<div className=""> - `)
-            .replace(/}/g, '</div>')
+            .replace(/{([^}]+)}/g, (match, content) => {
+                // Nếu nội dung chứa "Ảnh thực tế ..." hoặc "Phối cảnh của ...", căn giữa và bỏ gạch đầu dòng
+                if (/^(Ảnh thực tế|Phối cảnh)/.test(content.trim())) {
+                    return `<div className="center-text">${content.trim()}</div>`;
+                }
+                return `<div className=""> - ${content.trim()}</div>`;
+            })
             .replace(/(^|\n)([^.\n]+):\s*(?!\/\/)/g, '$1<b> $2</b>: ');
     };
 
-    useEffect(() => {
-        fetchDetailData(); // Fetch data when `projectId` changes
-    }, [projectId]);
+    const convertData = (dataExtension) => {
+        if (!dataExtension) return;
 
+        const pattern = /\[img\](.*?)\[\/img\]\s*\{(.*?)\}/g;
+        let matches;
+        let extractedResults = [];
+
+        while ((matches = pattern.exec(dataExtension)) !== null) {
+            extractedResults.push({
+                image: matches[1],
+                content: matches[2],
+            });
+        }
+
+        setResults(extractedResults); // Cập nhật state sau khi xử lý xong
+    };
+
+    useEffect(() => {
+        fetchDetailData(); // Fetch data khi `projectId` thay đổi
+        convertData(dataExtension);
+    }, [projectId, dataExtension]); // Chỉ lắng nghe `projectId` và `dataExtension`
+
+    useEffect(() => {
+        console.log('>>> Check data: ', JSON.stringify(results));
+    }, [results]); // Log kết quả mỗi khi `results` thay đổi
     const fetchDetailData = async () => {
         const res = await getAllDetail(projectId);
         if (res && res.data) {
@@ -93,7 +118,7 @@ const Detail = () => {
     };
 
     const imageRepresent = dataImageRepresent ? processDataRepresent(dataImageRepresent) : [];
-    const contentHeader = imageRepresent.find((_, index) => index === +projectId);
+    const contentHeader = imageRepresent.find((_, index) => index === +projectId + 5);
 
     return (
         <div style={{ backgroundColor: '#343a40' }}>
