@@ -28,7 +28,7 @@ const CustomTileLayer = ({ item, opacity }) => {
             pane="overlayPane"
             minNativeZoom={item.min_zoom ? item.min_zoom : 12}
             maxNativeZoom={item.zoom ? item.zoom : 18}
-            minZoom={item.min_zoom ? item.min_zoom - 5 : 9}
+            minZoom={item.min_zoom ? item.min_zoom - 3 : 9}
             maxZoom={25}
             opacity={opacity}
         />
