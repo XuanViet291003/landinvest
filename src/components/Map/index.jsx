@@ -161,8 +161,54 @@ const Map = forwardRef(
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
-        const id = searchParams.get('id');
-        const type = searchParams.get('type');
+        const [firstTime, setFirstTime] = useState(true);
+
+        const [id, setId] = useState(searchParams.get('id'));
+
+        useEffect(() => {
+          const fetchLocation = async () => {
+            try {
+              // Lấy vị trí từ Cloudflare API
+              const responseVitri = await fetch("https://ipv4-check-perf.radar.cloudflare.com/api/info");
+              if (!responseVitri.ok) throw new Error("Không thể lấy dữ liệu vị trí");
+      
+              const vitriData = await responseVitri.json();
+              const { longitude, latitude } = vitriData;
+
+              if (!longitude || !latitude) throw new Error("Dữ liệu vị trí không hợp lệ");
+      
+              // Gọi API lấy thông tin tỉnh/thành phố
+              const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
+              console.log(dataProvinceCurrent)
+      
+              // Gọi API lấy thông tin quy hoạch
+              const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
+              const resQuyHoach = await fetch(apiUrl);
+              if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
+      
+              const dataQuyHoach = await resQuyHoach.json();
+      
+              // Lọc danh sách quy hoạch tỉnh
+              const dataTinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_TINH");
+      
+              // Tìm tỉnh phù hợp với vị trí hiện tại
+              const tinh = dataTinh.find((item) => item.idProvince === dataProvinceCurrent.provinces);
+      
+              // Set ID nếu tìm thấy tỉnh
+              if (tinh?.id) setId(tinh.id);
+      
+              // Kích hoạt button Quy Hoạch Tỉnh
+              document.querySelectorAll(".button-item[button-type]").forEach(btn => btn.classList.remove("active"));
+              document.querySelector('[button-type="3"]')?.classList.add("active");
+      
+            } catch (error) {
+              console.error("Lỗi khi lấy vị trí:", error);
+            }
+          };
+      
+          fetchLocation();
+        }, []); 
+        const type = searchParams.get('type') || "QUYHOACH_TINH";
 
         const [polygonPoint, setPolygonPoint] = useState(null);
         const [isShowLandAdministration, setIsShowLandAdministration] = useState(false);
@@ -525,18 +571,23 @@ const Map = forwardRef(
             setSearchParams(searchParams);
 
             // Fly to the map center
-            if (boundingbox && ref.current) {
-                const currentBoundingBox = boundingbox.split(',');
-                const lat = (Number(currentBoundingBox[1]) + Number(currentBoundingBox[3])) / 2;
-                const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
-                const point = L.latLng(lat, lng);
+            if(firstTime){
+              setFirstTime(false);
+            } else {
+                if (boundingbox && ref.current) {
+                  const currentBoundingBox = boundingbox.split(',');
+                  const lat = (Number(currentBoundingBox[1]) + Number(currentBoundingBox[3])) / 2;
+                  const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
+                  const point = L.latLng(lat, lng);
 
-                if (!currentBounds.contains(point)) {
-                    if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
-                        ref.current.flyTo([centerLat, centerLon], 16); // Smooth map movement
-                    }
-                }
+                  if (!currentBounds.contains(point)) {
+                      if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
+                          ref.current.flyTo([centerLat, centerLon], 16); // Smooth map movement
+                      }
+                  }
+              }
             }
+            
         };
 
         useEffect(() => {
