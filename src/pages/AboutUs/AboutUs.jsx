@@ -5,29 +5,31 @@ import { useNavigate } from 'react-router-dom';
 export default function AboutUs() {
     const navigate = useNavigate();
     const imagesSectionOne = [
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737782390/%C3%B4_3_c6utdc.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737782390/%C3%B4_1_gzqhwb.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737782389/%C3%B4_2_k2uwwl.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737782389/%C3%B4_4_gfupjd.png',
+        'https://github.com/jazminlawson/landinvest/blob/main/462548173_2422635631409866_3741819681650740130_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/462554568_812877120954705_2182766250412692065_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/462563321_1017399586816048_3277932538835288946_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/475402042_968320018587578_1776476748034395664_n.jpg?raw=true',
     ];
     const imagesTeamSection = [
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784292/462560327_597593772678951_8476039846705955411_n_hz6tq9.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784291/462543434_525518443867369_3426750171035081637_n_h83vqj.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784289/462582848_860125936093053_6948682989442901709_n_n8w5wv.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784291/473106937_1140454614092059_6726556338454692327_n_sfohxn.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784290/472292886_577727778500546_4933551119050640698_n_trtskn.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784289/472239324_568355882684092_7720430744313465190_n_io2iqo.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784288/462579633_1746581165883653_3058646124622926554_n_lbzpnf.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784288/462579055_1976878459464139_690626193817936838_n_igaxxe.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784283/462577943_943753241095430_6331102426649600161_n_esfr3p.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784277/462577672_884389663770779_5737372196800546663_n_wx4d2l.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784277/462573490_1565796577456022_5436035398246276009_n_mmhuny.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784277/462577600_560448903648120_5285626304935311053_n_s01kkj.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784276/462561221_1164594658337672_4670947085700116669_n_dudjiv.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784276/462571462_471038182375974_9053863983361285420_n_qa91rf.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784277/462571482_1077465610795246_60312568039578858_n_xr6wae.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784276/462565713_1333583781325966_7412630213846452438_n_zeorsl.png',
-        'https://res.cloudinary.com/dpplfiyki/image/upload/v1737784276/462571373_642060521478697_3135475218826515828_n_antoqf.png',
+        'https://github.com/jazminlawson/landinvest/blob/main/475835630_1154978629354281_3585227260366383937_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/475967500_1336806937447036_2621191500698585203_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476000497_634204968996061_403501202540598514_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476053229_1711148153151714_3469106937230254916_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476069053_638581175252075_5630603145589600003_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476184746_974379804192319_7766163364224751742_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476238198_1633970807224926_2162736303755158441_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476275441_915038790712353_1279839069877411237_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476279093_508631182263133_7371874981684028015_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476280668_550700314686931_5379096997575653810_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476292859_649413800859121_4152777902900764004_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476305465_534118405727367_7039894748134978290_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476308322_1340420140631610_6457554634883049617_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476329097_917307673908855_5295349020705353210_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476429567_2069589983517632_8467278944752221256_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476748616_633421272516138_6368175724351827342_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476896683_1763907131118232_3252345180868815292_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/476911850_1562056747832246_4846692379034396802_n.jpg?raw=true',
+        'https://github.com/jazminlawson/landinvest/blob/main/477192144_3818291271817460_2319231062356568871_n.jpg?raw=true',
     ];
     const handleClickStart = () => {
         navigate('/bidding?page=1&limit=10');
@@ -122,9 +124,9 @@ export default function AboutUs() {
             </section>
             <section className="section_five">
                 <h1 style={{ textAlign: 'center', fontWeight: 700 }}>Đội ngũ của chúng tôi</h1>
-                <div className='team-images'>
+                <div className="team-images">
                     {imagesTeamSection.map((item, index) => (
-                        <img src={item} key={index} alt={item}></img>
+                        <img src={item} key={index} alt={item} className="image-about" />
                     ))}
                 </div>
             </section>
