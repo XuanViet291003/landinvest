@@ -1,0 +1,47 @@
+.detailInvestor-container{
+  margin-bottom: 150px;
+
+  .head-title{
+    color: #fff;
+    padding-top: 15px;
+    padding-bottom: 40px;
+  }
+}
+
+.info-table {
+  background: white;
+  border-radius: 8px;
+  padding: 0; 
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+  overflow: hidden;
+
+  h2 {
+    font-size: 16px;
+    color: #262626;
+    font-weight: bold;
+    background: #f8f9fa; 
+    padding: 15px 15px; 
+    border-bottom: 1px solid #ddd;
+    margin: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    tr{
+      font-size: 14px;
+      color: #262626;
+    }
+
+    td {
+      padding: 18px 15px;
+      border-bottom: 1px solid #F0F0F0;
+    }
+
+    .label {
+      width: 30%;
+    }
+  }
+}

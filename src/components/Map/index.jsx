@@ -166,6 +166,36 @@ const Map = forwardRef(
         const [id, setId] = useState(searchParams.get('id'));
 
         useEffect(() => {
+          // Hàm lấy thông tin hệ điều hành
+          const detectOs = (userAgent) => {
+            if (/Windows NT/i.test(userAgent)) {
+              return "Windows";
+            } else if (/Mac OS X/i.test(userAgent)) {
+                return "macOS";
+            } else if (/iPhone|iPad/i.test(userAgent)) {
+                return "iOS";
+            } else if (/Android/i.test(userAgent)) {
+                return "Android";
+            } else if (/Linux/i.test(userAgent)) {
+                return "Linux";
+            }
+            return "Unknown OS";
+          }
+
+          // Hàm lấy thông tin thiết bị
+          const detectDevice = (userAgent) => {
+            let device = "Unknown";
+            if (/Mobi|Android/i.test(userAgent)) {
+                return "Mobile";
+            } else if (/Tablet|iPad/i.test(userAgent)) {
+                device = "Tablet";
+            } else {
+                device = "Laptop";
+            }
+
+            return device;
+          }
+
           const fetchLocation = async () => {
             try {
               // Lấy vị trí từ Cloudflare API
@@ -173,13 +203,31 @@ const Map = forwardRef(
               if (!responseVitri.ok) throw new Error("Không thể lấy dữ liệu vị trí");
       
               const vitriData = await responseVitri.json();
-              const { longitude, latitude } = vitriData;
+              const { longitude, latitude, ip_address, city } = vitriData;
 
               if (!longitude || !latitude) throw new Error("Dữ liệu vị trí không hợp lệ");
       
               // Gọi API lấy thông tin tỉnh/thành phố
               const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
-              console.log(dataProvinceCurrent)
+
+              const userAgent = navigator.userAgent;
+
+              // Tạo đối tượng FormData
+              const formData = new FormData();
+              formData.append("iplocation", ip_address); 
+              formData.append("city", city);
+              formData.append("lat", latitude);
+              formData.append("lon", longitude);
+              formData.append("device_active", detectDevice(userAgent));
+              formData.append("he_dieu_hanh", detectOs(userAgent)); 
+
+              // Gửi dữ liệu data User bằng fetch API
+              const responseUser = await fetch("https://api.quyhoach.xyz/add_active_user_activity", {
+                  method: "POST",
+                  body: formData
+              })
+              const dataUser = await responseUser.json();
+              console.log("Response:", dataUser); 
       
               // Gọi API lấy thông tin quy hoạch
               const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;

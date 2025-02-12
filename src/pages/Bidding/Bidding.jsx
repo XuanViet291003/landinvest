@@ -206,12 +206,21 @@ const BiddingPage = () => {
         <div className="bidding-container">
             <Container className="Planning-container">
                 <Banner />
-                <button
-                    onClick={() => navigate('/bidding/procurement?page=1&limit=10')}
-                    style={{ marginTop: '15px', backgroundColor: 'rgb(73 , 97 , 70)' }}
-                >
-                    Mua sắm công
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <button
+                      onClick={() => navigate('/bidding/procurement?page=1&limit=10')}
+                      style={{backgroundColor: 'rgb(73 , 97 , 70)' }}
+                  >
+                      Mua sắm công
+                  </button>
+                  <button
+                      onClick={() => navigate(`/investor`)}
+                      style={{backgroundColor: 'rgb(73 , 97 , 70)' }}
+                  >
+                      Danh sách nhà đầu tư →
+                  </button>
+              </div>
+
                 <h5 style={{ color: 'white', marginTop: '15px' }}>Tìm kiếm gói thầu</h5>
                 <div className="Planning-search-vector">
                     <form className="Planning-search">

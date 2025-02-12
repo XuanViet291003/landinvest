@@ -54,6 +54,7 @@ import './styles/landTable.scss';
 import './styles/listRegulation.scss';
 import './styles/map.scss';
 import Investor from './pages/Investor/Investor.jsx';
+import DetailInvestor from './pages/Investor/DetailInvestor/DetailInvestor.jsx';
 const Layout = () => {
     return (
         <div className="App" style={{ position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
@@ -226,7 +227,11 @@ function App() {
                 {
                   path: '/investor',
                   element: <Investor />,
-              },
+                },
+                {
+                  path: '/investor/:orgCode',
+                  element: <DetailInvestor />,
+                },
             ],
         },
         {
