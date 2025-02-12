@@ -4,7 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { getListTag, postNews } from '../../../services/api';
 import Editor from './Editor';
-import { set } from 'lodash';
+import { useSelector } from 'react-redux';
 const props = {
     multiple: true,
     accept: 'image/*',
@@ -19,7 +19,8 @@ function ModalCreateNew({ isShowModalCreate, setIsShowModalCreate, groupId, setA
     const [content, setContent] = useState('');
     const [title, setTitle] = useState('');
     const [fileList, setFileList] = useState([]);
-    const [listTag, setListTag] = useState([]);
+    const dataUser = useSelector((state) => state.account.dataUser);
+    console.log(dataUser);
     const handleCancel = () => {
         setIsShowModalCreate(false);
     };
@@ -39,7 +40,7 @@ function ModalCreateNew({ isShowModalCreate, setIsShowModalCreate, groupId, setA
         formData.append('PostLatitude', location.lat);
         formData.append('PostLongitude', location.lon);
         try {
-            const res = await postNews(formData);
+            const res = await postNews(formData, localStorage.getItem('access_token'));
             if (res) {
                 setArticles((prev) => {
                     const newState = prev.slice(1);
@@ -86,6 +87,7 @@ function ModalCreateNew({ isShowModalCreate, setIsShowModalCreate, groupId, setA
         >
             <Form.Item label="Tiêu đề :" style={{ marginTop: '20px' }}>
                 <Input
+                    style={{ fontSize: '16px' }}
                     value={title}
                     onChange={(e) => {
                         setTitle(e.target.value);

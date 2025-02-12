@@ -485,8 +485,12 @@ export const getGroupByPage = async (id, page) => {
     const res = await instance.get(`api/forum/group/${id}?page=${page}`);
     return res.data;
 };
-export const postNews = async (data) => {
-    const res = await instance.post(`api/forum/add_post`, data);
+export const postNews = async (data, token) => {
+    const res = await instance.post(`api/forum/add_post`, data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return res.data;
 };
 export const editNews = async (PostID, data) => {

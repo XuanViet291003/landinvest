@@ -64,7 +64,6 @@ import LandAdministrationModal from '../LandAdministrationModal/LandAdministrati
 import ListRegulations from '../ListRegulations/ListRegulations';
 import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
-
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
     iconSize: [38, 38],
@@ -174,7 +173,6 @@ const Map = forwardRef(
             dientich: 0,
         });
         const [isLandAdministrationLoading, setIsLandAdministationLoading] = useState(false);
-
         const handleUpdateDistance = useCallback((markers) => {
             if (markers.length > 1) {
                 setDistances((prevDistances) => {
@@ -419,7 +417,6 @@ const Map = forwardRef(
                             const timer = setTimeout(() => {
                                 setIsLongClick(true);
                                 onOpenLocationInfo();
-
                             }, 400);
                             setPressTimer(timer);
                         } else {
