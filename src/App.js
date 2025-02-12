@@ -53,6 +53,7 @@ import './styles/landCost.scss';
 import './styles/landTable.scss';
 import './styles/listRegulation.scss';
 import './styles/map.scss';
+import Investor from './pages/Investor/Investor.jsx';
 const Layout = () => {
     return (
         <div className="App" style={{ position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
@@ -222,6 +223,10 @@ function App() {
                     path: '/administrative-maps/:id',
                     element: <DetailAdministrativeMap />,
                 },
+                {
+                  path: '/investor',
+                  element: <Investor />,
+              },
             ],
         },
         {

@@ -91,7 +91,7 @@ const AdministrativeMap = () => {
               }
             }
 
-            data.push(res);
+            if(res.HOOK_ID) data.push(res);
 
             // Chỉ lấy tối đa 10 bản ghi
             if (data.length === 10) break;
@@ -145,7 +145,7 @@ const AdministrativeMap = () => {
                     {item.sections}
                   </p>
                   <div className="map-list__item-date-created">🕑 {convertToVietnamTime(item.updated_at)}</div>
-                  <Link to={`/administrative-maps/${item.HOOK_ID.DistrictID}`} className="map-list__item-link">
+                  <Link to={`/administrative-maps/${item?.HOOK_ID?.DistrictID}`} className="map-list__item-link">
                     Xem chi tiết
                   </Link>
 
