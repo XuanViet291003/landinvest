@@ -139,8 +139,11 @@ const editorConfig = {
 const initialContent = ``;
 function Editor({ content, setContent, className }) {
     return (
-        <div className={`App ${className}`} style={{ maxWidth: editorConfig.width, margin: '0 auto' }}>
-            <JoditEditor value={content} config={editorConfig} onChange={(value) => setContent(value)} />
+        <div
+            className={`App ${className}`}
+            style={{ maxWidth: editorConfig.width, margin: '0 auto', fontSize: '16px' }}
+        >
+            <JoditEditor value={content} config={editorConfig} onBlur={(value) => setContent(value)} />
         </div>
     );
 }
