@@ -11,7 +11,7 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
         position: relative;
         gap: 15px;
         @media (max-width: $lg) {
-            flex-direction: column;           
+            flex-direction: column;
         }
         &_text {
             width: 100%;
@@ -20,62 +20,64 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
             background-size: fill;
             background-position: 0% 70%;
             background-repeat: no-repeat;
-            
+
             &_content {
-                h1{
+                h1 {
                     font-weight: 700;
                 }
                 padding: 20px;
                 margin-top: 65px;
             }
         }
-        &_image{
+        &_image {
             display: grid;
-            grid-template-columns: 50% 50%; 
+            gap: 10px;
+            grid-template-columns: 50% 50%;
             transform: translateY(-20%);
-            .images-section{
+            .images-section {
+                height: 200px;
+                border-radius: 5px;
                 @media (max-width: $sm) {
                     width: 90%;
                 }
             }
         }
     }
-    .section_two{
-        background-color: #262D34;
+    .section_two {
+        background-color: #262d34;
         display: flex;
         padding: 20px;
         flex-direction: column;
         border-radius: 10px;
         gap: 15px;
     }
-    .section_three{
+    .section_three {
         margin: 35px 0px;
         display: flex;
         gap: 25px;
         align-items: center;
-        &_content{
-            background-color: #262D34;
+        &_content {
+            background-color: #262d34;
             padding: 40px;
             padding-bottom: 50px;
-            border-radius: 193px 0px 0px 50px ;
-            p{
+            border-radius: 193px 0px 0px 50px;
+            p {
                 padding: 5px;
-            
             }
         }
         @media (max-width: $lg) {
             flex-direction: column;
         }
     }
-    .section_four{
+    .section_four {
         margin-top: 25px;
-        background-color: #262D34;
+        background-color: #262d34;
         padding: 20px;
         border-radius: 10px;
     }
-    .section_five{
+    .section_five {
         margin: 45px 0px;
-        .team-images{
+        .team-images {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -85,4 +87,8 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
             }
         }
     }
+}
+.image-about {
+    height: 200px;
+    border-radius: 5px;
 }

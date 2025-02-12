@@ -1,7 +1,7 @@
-import {message, notification, Radio} from 'antd';
+import { message, notification, Radio } from 'antd';
 import L from 'leaflet';
-import React, {forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {FaMapMarkedAlt} from 'react-icons/fa';
+import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FaMapMarkedAlt } from 'react-icons/fa';
 import {
     LayersControl,
     MapContainer,
@@ -15,17 +15,17 @@ import {
     useMapEvents,
     ZoomControl,
 } from 'react-leaflet';
-import {useDispatch, useSelector} from 'react-redux';
-import {Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
-import {formatToVND} from '../../function/formatToVND';
+import { formatToVND } from '../../function/formatToVND';
 import ResetCenterView from '../../function/resetCenterView';
 import useMapParams from '../../hooks/useMapParams';
 import useWindowSize from '../../hooks/useWindowSise';
-import {selectFilteredMarkers} from '../../redux/filter/filterSelector';
-import {setListMarker} from '../../redux/listMarker/listMarkerSllice';
-import {setPlanByProvince, setPlansInfo} from '../../redux/plansSelected/plansSelected';
-import {setCurrentLocation} from '../../redux/search/searchSlice';
+import { selectFilteredMarkers } from '../../redux/filter/filterSelector';
+import { setListMarker } from '../../redux/listMarker/listMarkerSllice';
+import { setPlanByProvince, setPlansInfo } from '../../redux/plansSelected/plansSelected';
+import { setCurrentLocation } from '../../redux/search/searchSlice';
 import {
     fetchListInfo,
     fetQuyHoachByIdDistrict,
@@ -35,24 +35,24 @@ import {
 } from '../../services/api';
 import DrawerView from '../Home/DrawerView';
 // import useGetParams from '../Hooks/useGetParams';
-import {CloseOutlined} from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import * as turf from '@turf/turf';
-import {Tooltip} from 'antd';
+import { Tooltip } from 'antd';
 import axios from 'axios';
 import _ from 'lodash';
 import ReactDOMServer from 'react-dom/server';
-import {FaList, FaLocationDot} from 'react-icons/fa6';
-import {THUNK_API_STATUS} from '../../constants/thunkApiStatus';
-import {areBoundingBoxesDifferent} from '../../function/areBoundingBoxesDifferent';
-import {calculateLocation} from '../../function/calculateLocation';
+import { FaList, FaLocationDot } from 'react-icons/fa6';
+import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
+import { areBoundingBoxesDifferent } from '../../function/areBoundingBoxesDifferent';
+import { calculateLocation } from '../../function/calculateLocation';
 import handleGetLocation from '../../function/handleGetLocation';
 import handleShareLocation from '../../function/handleShareLocation';
-import {setTreeCheckedKey} from '../../redux/apiCache/treePlans';
-import {getBoundingboxData, setCurrentBoundingBox} from '../../redux/boundingMarkerBoxSlice/boundingMarkerBoxSlice';
-import {doGetQuyHoach} from '../../redux/getQuyHoach/getQuyHoachSlice';
-import {getDistrictIdApi} from '../../redux/landCostSlice/landCostSlice';
-import {fetchListRegulations} from '../../redux/ListRegulations/ListRegulationsSlice';
-import {setActiveLayer} from '../../redux/mapLayer/mapLayerSlice';
+import { setTreeCheckedKey } from '../../redux/apiCache/treePlans';
+import { getBoundingboxData, setCurrentBoundingBox } from '../../redux/boundingMarkerBoxSlice/boundingMarkerBoxSlice';
+import { doGetQuyHoach } from '../../redux/getQuyHoach/getQuyHoachSlice';
+import { getDistrictIdApi } from '../../redux/landCostSlice/landCostSlice';
+import { fetchListRegulations } from '../../redux/ListRegulations/ListRegulationsSlice';
+import { setActiveLayer } from '../../redux/mapLayer/mapLayerSlice';
 import GoToLocation from '../_common/GoToLocation';
 import LoadingScreen from '../_common/LoadingScreen';
 import GetBoundingBoxOnFirstRender from '../GetBoundingBoxOnFirstRender/GetBoundingBoxOnFirstRender';
@@ -79,8 +79,8 @@ const dotIcon = new L.DivIcon({
     iconAnchor: [7.5, 7.5],
 });
 const iconHtml = ReactDOMServer.renderToStaticMarkup(
-    <div style={{color: 'red', fontSize: '30px'}}>
-        <FaLocationDot/>
+    <div style={{ color: 'red', fontSize: '30px' }}>
+        <FaLocationDot />
     </div>,
 );
 
@@ -129,7 +129,7 @@ const Map = forwardRef(
         const listRegulations = useSelector((state) => state.listRegulationsSlice.listRegulations);
         const RegulationsImagesList = listRegulations?.list_image;
         const treeCheckedKeys = useSelector((state) => state.treePlans.treeCheckedKeys);
-        const {initialCenter, initialZoom} = useMapParams();
+        const { initialCenter, initialZoom } = useMapParams();
         const windowSize = useWindowSize();
         const [searchPara, setSearchPara] = useSearchParams();
         const closeDrawer = () => setIsDrawerVisible(false);
@@ -146,11 +146,10 @@ const Map = forwardRef(
         const [undoStack, setUndoStack] = useState([]);
         const [redoStack, setRedoStack] = useState([]);
         const [trigger, setTrigger] = useState(false);
-        const [polygonArea, setPolygonArea] = useState({distances: [], polygon: []});
+        const [polygonArea, setPolygonArea] = useState({ distances: [], polygon: [] });
         const [isShowModalArea, setIsShowModalArea] = useState(false);
         const [address, setAddress] = useState('');
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
-
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
         const polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
         // console.log(itemSearch)
@@ -166,49 +165,49 @@ const Map = forwardRef(
         const [id, setId] = useState(searchParams.get('id'));
 
         useEffect(() => {
-          const fetchLocation = async () => {
-            try {
-              // Lấy vị trí từ Cloudflare API
-              const responseVitri = await fetch("https://ipv4-check-perf.radar.cloudflare.com/api/info");
-              if (!responseVitri.ok) throw new Error("Không thể lấy dữ liệu vị trí");
-      
-              const vitriData = await responseVitri.json();
-              const { longitude, latitude } = vitriData;
+            const fetchLocation = async () => {
+                try {
+                    // Lấy vị trí từ Cloudflare API
+                    const responseVitri = await fetch('https://ipv4-check-perf.radar.cloudflare.com/api/info');
+                    if (!responseVitri.ok) throw new Error('Không thể lấy dữ liệu vị trí');
 
-              if (!longitude || !latitude) throw new Error("Dữ liệu vị trí không hợp lệ");
-      
-              // Gọi API lấy thông tin tỉnh/thành phố
-              const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
-              console.log(dataProvinceCurrent)
-      
-              // Gọi API lấy thông tin quy hoạch
-              const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
-              const resQuyHoach = await fetch(apiUrl);
-              if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
-      
-              const dataQuyHoach = await resQuyHoach.json();
-      
-              // Lọc danh sách quy hoạch tỉnh
-              const dataTinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_TINH");
-      
-              // Tìm tỉnh phù hợp với vị trí hiện tại
-              const tinh = dataTinh.find((item) => item.idProvince === dataProvinceCurrent.provinces);
-      
-              // Set ID nếu tìm thấy tỉnh
-              if (tinh?.id) setId(tinh.id);
-      
-              // Kích hoạt button Quy Hoạch Tỉnh
-              document.querySelectorAll(".button-item[button-type]").forEach(btn => btn.classList.remove("active"));
-              document.querySelector('[button-type="3"]')?.classList.add("active");
-      
-            } catch (error) {
-              console.error("Lỗi khi lấy vị trí:", error);
-            }
-          };
-      
-          fetchLocation();
-        }, []); 
-        const type = searchParams.get('type') || "QUYHOACH_TINH";
+                    const vitriData = await responseVitri.json();
+                    const { longitude, latitude } = vitriData;
+
+                    if (!longitude || !latitude) throw new Error('Dữ liệu vị trí không hợp lệ');
+
+                    // Gọi API lấy thông tin tỉnh/thành phố
+                    const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
+
+                    // Gọi API lấy thông tin quy hoạch
+                    const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
+                    const resQuyHoach = await fetch(apiUrl);
+                    if (!resQuyHoach.ok) throw new Error('Không thể lấy dữ liệu quy hoạch');
+
+                    const dataQuyHoach = await resQuyHoach.json();
+
+                    // Lọc danh sách quy hoạch tỉnh
+                    const dataTinh = dataQuyHoach.dulieu.filter((item) => item.type === 'QUYHOACH_TINH');
+
+                    // Tìm tỉnh phù hợp với vị trí hiện tại
+                    const tinh = dataTinh.find((item) => item.idProvince === dataProvinceCurrent.provinces);
+
+                    // Set ID nếu tìm thấy tỉnh
+                    if (tinh?.id) setId(tinh.id);
+
+                    // Kích hoạt button Quy Hoạch Tỉnh
+                    document
+                        .querySelectorAll('.button-item[button-type]')
+                        .forEach((btn) => btn.classList.remove('active'));
+                    document.querySelector('[button-type="3"]')?.classList.add('active');
+                } catch (error) {
+                    console.error('Lỗi khi lấy vị trí:', error);
+                }
+            };
+
+            fetchLocation();
+        }, []);
+        const type = searchParams.get('type') || 'QUYHOACH_TINH';
 
         const [polygonPoint, setPolygonPoint] = useState(null);
         const [isShowLandAdministration, setIsShowLandAdministration] = useState(false);
@@ -347,7 +346,7 @@ const Map = forwardRef(
                         // console.log(southWest);
                         // console.log(northEast);
 
-                        dispatch(getBoundingboxData({southWest: southWest, northEast: northEast}));
+                        dispatch(getBoundingboxData({ southWest: southWest, northEast: northEast }));
 
                         dispatch(
                             setCurrentBoundingBox({
@@ -385,7 +384,7 @@ const Map = forwardRef(
 
         const handleGetDistrict = useCallback(async (lat, lng) => {
             try {
-                dispatch(getDistrictIdApi({lat, lng}));
+                dispatch(getDistrictIdApi({ lat, lng }));
             } catch (error) {
                 console.log(error);
             }
@@ -404,7 +403,7 @@ const Map = forwardRef(
                     const map = e.target;
                     const center = map.getCenter();
                     const zoom = map.getZoom();
-                    const {_northEast, _southWest} = map.getBounds();
+                    const { _northEast, _southWest } = map.getBounds();
 
                     debouncedHandleGetAreaName(center.lat, center.lng);
 
@@ -456,13 +455,14 @@ const Map = forwardRef(
                         setPressTimer(timer);
                     }
                 },
-                dblclick(event) {  // Thay click bằng dblclick
-                    const {lat, lng} = event.latlng;
+                dblclick(event) {
+                    // Thay click bằng dblclick
+                    const { lat, lng } = event.latlng;
                     const map = ref.current;
 
                     if (map.getBounds().contains(event.latlng)) {
                         setLocation([lat, lng]);
-                        dispatch(getDistrictIdApi({lat, lng}));
+                        dispatch(getDistrictIdApi({ lat, lng }));
 
                         if (!isLocationInfoOpen) {
                             const timer = setTimeout(() => {
@@ -516,7 +516,7 @@ const Map = forwardRef(
                     setProcessedRegions((prev) => [...prev, regionKey]);
                     // setisShowListRegulation(true);
                     // Gửi thông tin vùng lên Redux store
-                    dispatch(fetchListRegulations({southWest: _southWest, northEast: _northEast}));
+                    dispatch(fetchListRegulations({ southWest: _southWest, northEast: _northEast }));
                 } catch (error) {
                     console.error('Lỗi khi gọi API:', error);
                 }
@@ -535,59 +535,64 @@ const Map = forwardRef(
             return [];
         };
         // click to bounding box for list regulation
-        const handleItemClick = (item) => {
-            const {boundingbox, type, map_type} = item;
-            const sharing = searchParams.get('ups');
-            const currentBounds = ref?.current?.getBounds();
+        const handleItemClick = (item, checkUser = false) => {
+            if (!checkUser) {
+                const { boundingbox, type, map_type } = item;
+                const sharing = searchParams.get('ups');
+                const currentBounds = ref?.current?.getBounds();
 
-            // Normalize the bounding box
-            const targetBoundingBox = normalizeBoundingBox(boundingbox);
-            if (!targetBoundingBox || targetBoundingBox.length < 4) {
-                return;
+                // Normalize the bounding box
+                const targetBoundingBox = normalizeBoundingBox(boundingbox);
+                if (!targetBoundingBox || targetBoundingBox.length < 4) {
+                    return;
+                }
+                const [minLon, minLat, maxLon, maxLat] = targetBoundingBox;
+                const centerLat = (minLat + maxLat) / 2;
+                const centerLon = (minLon + maxLon) / 2;
+                const targetImage = item;
+
+                if (!targetImage) {
+                    console.warn('No matching regulation image found for:', boundingbox, type);
+                    return;
+                }
+
+                // Update RegulationImages state
+                if (map_type) {
+                    dispatch(setActiveLayer(map_type));
+                }
+                setRegulationImages([targetImage]);
+
+                // Update URL search params (optional)
+                const boundingboxArray = Array.isArray(boundingbox)
+                    ? boundingbox
+                    : boundingbox.split(',').map((item) => parseFloat(item.trim()));
+                if (checkUser) {
+                    // searchParams.set('id', item.id); // Add id to search params
+                    // searchParams.set('type', item.type); // Add type to search params
+                } else {
+                    searchParams.set('type', item.type);
+                    searchParams.set('boundingbox', boundingboxArray.join(','));
+                }
+                setSearchParams(searchParams);
+
+                // Fly to the map center
+                if (firstTime) {
+                    setFirstTime(false);
+                } else {
+                    if (boundingbox && ref.current) {
+                        const currentBoundingBox = boundingbox.split(',');
+                        const lat = (Number(currentBoundingBox[1]) + Number(currentBoundingBox[3])) / 2;
+                        const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
+                        const point = L.latLng(lat, lng);
+
+                        if (!currentBounds.contains(point)) {
+                            if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
+                                ref.current.flyTo([centerLat, centerLon], 16); // Smooth map movement
+                            }
+                        }
+                    }
+                }
             }
-            const [minLon, minLat, maxLon, maxLat] = targetBoundingBox;
-            const centerLat = (minLat + maxLat) / 2;
-            const centerLon = (minLon + maxLon) / 2;
-            const targetImage = item;
-
-            if (!targetImage) {
-                console.warn('No matching regulation image found for:', boundingbox, type);
-                return;
-            }
-
-            // Update RegulationImages state
-            if (map_type) {
-                dispatch(setActiveLayer(map_type));
-            }
-            setRegulationImages([targetImage]);
-
-            // Update URL search params (optional)
-            const boundingboxArray = Array.isArray(boundingbox)
-                ? boundingbox
-                : boundingbox.split(',').map((item) => parseFloat(item.trim()));
-            searchParams.set('boundingbox', boundingboxArray.join(','));
-            searchParams.set('id', item.id); // Add id to search params
-            searchParams.set('type', item.type); // Add type to search params
-            setSearchParams(searchParams);
-
-            // Fly to the map center
-            if(firstTime){
-              setFirstTime(false);
-            } else {
-                if (boundingbox && ref.current) {
-                  const currentBoundingBox = boundingbox.split(',');
-                  const lat = (Number(currentBoundingBox[1]) + Number(currentBoundingBox[3])) / 2;
-                  const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
-                  const point = L.latLng(lat, lng);
-
-                  if (!currentBounds.contains(point)) {
-                      if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
-                          ref.current.flyTo([centerLat, centerLon], 16); // Smooth map movement
-                      }
-                  }
-              }
-            }
-            
         };
 
         useEffect(() => {
@@ -597,14 +602,14 @@ const Map = forwardRef(
                     .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
                     .then((response) => {
                         const data = response.data;
-
+                        console.log('data0', data);
                         if (data && data.dulieu) {
-                            handleItemClick(data.dulieu[0]);
-                            handleItemClick(
-                                data.dulieu[0].boundingbox,
-                                data.dulieu[0].type,
-                                data.dulieu[0].nam_het_han,
-                            );
+                            handleItemClick(data.dulieu[0], true);
+                            // handleItemClick(
+                            //     data.dulieu[0].boundingbox,
+                            //     data.dulieu[0].type,
+                            //     data.dulieu[0].nam_het_han,
+                            // );
                         } else {
                             console.error('No valid data received from API');
                         }
@@ -614,7 +619,6 @@ const Map = forwardRef(
                     });
             }
         }, [id, type]);
-
         useEffect(() => {
             if (itemQuyHoach) {
                 handleItemClick(itemQuyHoach);
@@ -676,7 +680,7 @@ const Map = forwardRef(
                             dispatch(
                                 setTreeCheckedKey([
                                     ...treeCheckedKeys,
-                                    {id: target.id, idProvince: target.idProvince},
+                                    { id: target.id, idProvince: target.idProvince },
                                 ]),
                             );
                             api.destroy();
@@ -824,7 +828,6 @@ const Map = forwardRef(
             }
         };
 
-
         const MapEventArea = () => {
             const clickCountRef = useRef(0);
             const clickTimeout = useRef(null);
@@ -913,7 +916,7 @@ const Map = forwardRef(
                         };
                         setPolygonArea(newPolygonArea);
                     } else {
-                        setPolygonArea({...polygonArea, address: 'Không có dữ liệu ...'});
+                        setPolygonArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
                     }
                 },
             });
@@ -924,7 +927,7 @@ const Map = forwardRef(
         const GetMarkerInboundingBox = () => {
             const map = useMap();
             const zoom = map.getZoom();
-            const {_northEast, _southWest} = map.getBounds();
+            const { _northEast, _southWest } = map.getBounds();
             useEffect(() => {
                 if (zoom >= 1 && boundingboxDataLocation.link_image?.length < 0) {
                     dispatch(getBoundingboxData(_southWest, _northEast));
@@ -987,7 +990,7 @@ const Map = forwardRef(
                         dispatch(
                             setTreeCheckedKey([
                                 ...treeCheckedKeys,
-                                {id: firstPlan.id, idProvince: firstPlan.idProvince},
+                                { id: firstPlan.id, idProvince: firstPlan.idProvince },
                             ]),
                         );
                     } else {
@@ -1113,7 +1116,7 @@ const Map = forwardRef(
                         dispatch(
                             setTreeCheckedKey([
                                 ...treeCheckedKeys,
-                                ...provincePlans.map((item) => ({isProvince: true, idProvince: item.id_tinh})),
+                                ...provincePlans.map((item) => ({ isProvince: true, idProvince: item.id_tinh })),
                             ]),
                         );
                         return;
@@ -1336,18 +1339,18 @@ const Map = forwardRef(
                 // Gọi Api lấy thông tin thành phố
                 const res = await getLocationInBoudingBox(location[0], location[1]);
                 // navigate(`/administrative-maps/${res.district}`);
-                navigate(`administrative-maps/?provinceId=${res.provinces}`)
+                navigate(`administrative-maps/?provinceId=${res.provinces}`);
             }
-        }
+        };
 
-        const antDrawOpen = document.querySelector(".ant-drawer-open");
+        const antDrawOpen = document.querySelector('.ant-drawer-open');
 
         return (
             <>
                 {contextHolder}
                 {contextHolderNoti}
                 {isShowListRegulation && (
-                    <ListRegulations handleItemClick={handleItemClick} RegulationsImagesList={RegulationsImagesList}/>
+                    <ListRegulations handleItemClick={handleItemClick} RegulationsImagesList={RegulationsImagesList} />
                 )}
                 {/* <Modal
                 title="Khu vực này có nhiều quy hoạch, vui lòng chọn quy hoạch để xem!"
@@ -1367,22 +1370,22 @@ const Map = forwardRef(
 
                 {/* show bounding box data button */}
                 {!antDrawOpen && (
-                  <div
-                    className={`image-list-open bg-white ${!isShowBtnOpen ? 'close' : ''}`}
-                    onClick={() => {
-                        onOpenImageList();
-                        onCloseBtnImageList();
-                    }}
-                  >
-                      {/* <img src={icons.mapIcon} alt="Ảnh danh sách quy hoạch" className="image-list-icon" /> */}
-                      <FaMapMarkedAlt className="image-list-icon"/>
-                  </div>
+                    <div
+                        className={`image-list-open bg-white ${!isShowBtnOpen ? 'close' : ''}`}
+                        onClick={() => {
+                            onOpenImageList();
+                            onCloseBtnImageList();
+                        }}
+                    >
+                        {/* <img src={icons.mapIcon} alt="Ảnh danh sách quy hoạch" className="image-list-icon" /> */}
+                        <FaMapMarkedAlt className="image-list-icon" />
+                    </div>
                 )}
 
                 <div>
                     <FaList
                         className="icon-wrapper-regulation"
-                        style={{fontSize: '16px', cursor: 'pointer'}}
+                        style={{ fontSize: '16px', cursor: 'pointer' }}
                         onClick={(event) => {
                             event.stopPropagation(); // Ngừng sự kiện lan truyền
                             toggleList(); // Toggle hiển thị danh sách
@@ -1401,7 +1404,7 @@ const Map = forwardRef(
                             onCloseImageList();
                         }}
                     >
-                        <CloseOutlined className="close-icon"/>
+                        <CloseOutlined className="close-icon" />
                     </div>
                 </ImageList>
                 {/* )} */}
@@ -1452,12 +1455,12 @@ const Map = forwardRef(
                             }}
                         />
                     )} */}
-                    <ZoomControl position="bottomright"/>
-                    <UserLocationMarker/>
-                    {!isSelectedMeasure && <MapEvents/>}
-                    <GoToLocation/>
-                    {currentLocation && <ResetCenterView lat={currentLocation.lat} lon={currentLocation.lon}/>}
-                    <GetBoundingBoxOnFirstRender/>
+                    <ZoomControl position="bottomright" />
+                    <UserLocationMarker />
+                    {!isSelectedMeasure && <MapEvents />}
+                    <GoToLocation />
+                    {currentLocation && <ResetCenterView lat={currentLocation.lat} lon={currentLocation.lon} />}
+                    <GetBoundingBoxOnFirstRender />
                     <LayersControl>
                         {windowSize.windowWidth < 768 && (
                             <LayersControl.BaseLayer checked name="Map vệ tinh">
@@ -1493,7 +1496,7 @@ const Map = forwardRef(
                             />
                         </LayersControl.BaseLayer>
                     </LayersControl>
-                    <Pane name="PaneThai" style={{zIndex: 650}}>
+                    <Pane name="PaneThai" style={{ zIndex: 650 }}>
                         {plansStored &&
                             plansStored.length > 0 &&
                             plansStored.map((item, index) => {
@@ -1532,10 +1535,10 @@ const Map = forwardRef(
 
                         {renderTileLayers()}
                         {RegulationImages &&
-                          RegulationImages.length > 0 &&
-                          RegulationImages.map((item, index) => (
-                              <CustomTileLayer key={index} item={item} opacity={opacity}/>
-                          ))}
+                            RegulationImages.length > 0 &&
+                            RegulationImages.map((item, index) => (
+                                <CustomTileLayer key={index} item={item} opacity={opacity} />
+                            ))}
                     </Pane>
                     {/* {currentLocation && currentLocation.lat && currentLocation.lon && (
                     <Marker position={[currentLocation.lat, currentLocation.lon]} icon={customIcon}>
@@ -1590,8 +1593,8 @@ const Map = forwardRef(
                         <Marker key={marker.id} position={[marker.latitude, marker.longitude]} icon={customIcon}>
                             <Popup>
                                 <div>
-                                    <h3 style={{fontWeight: 600}}>{marker.description}</h3>
-                                    <p style={{fontSize: 20, fontWeight: 400, margin: '12px 0'}}>
+                                    <h3 style={{ fontWeight: 600 }}>{marker.description}</h3>
+                                    <p style={{ fontSize: 20, fontWeight: 400, margin: '12px 0' }}>
                                         Giá/m²: {formatToVND(marker.priceOnM2)}
                                     </p>
                                     <button
@@ -1636,7 +1639,7 @@ const Map = forwardRef(
                         RegulationsImagesList={RegulationsImagesList}
                         handleWikiClick={handleWikiClick}
                     />
-                    <DrawerLandUsePlan/>
+                    <DrawerLandUsePlan />
                     {/* {polygonSessionStorage.length > 0 &&
                     isOverview &&
                     polygonSessionStorage.map((polygon, index) => {
@@ -1688,7 +1691,7 @@ const Map = forwardRef(
                             </TooltipLeaflet>
                         </Polygon>
                     )}
-                    {isSelectedMeasure && <MapClickHandler/>}
+                    {isSelectedMeasure && <MapClickHandler />}
                     {markers.map((position, index) => (
                         <Marker
                             draggable
@@ -1727,7 +1730,7 @@ const Map = forwardRef(
                             <Marker position={middleLatLng} icon={icon}>
                                 <Tooltip key={index} direction="top" offset={[0, -10]} permanent>
                                     {`${distance.distance?.toFixed(2)} m`}
-                                    <Marker position={middleLatLng} icon={icon}/>
+                                    <Marker position={middleLatLng} icon={icon} />
                                 </Tooltip>
                             </Marker>
                         );
@@ -1754,13 +1757,13 @@ const Map = forwardRef(
                         );
                     })}
 
-                    {location.length > 0 && <Marker position={location} icon={iconLocation}/>}
-                    {!isSelectedMeasure && <MapEventArea/>}
+                    {location.length > 0 && <Marker position={location} icon={iconLocation} />}
+                    {!isSelectedMeasure && <MapEventArea />}
                     {polygonArea?.area}
-                    <Polygon positions={polygonArea?.polygon} color="rgb(23,119,255)"/>
+                    <Polygon positions={polygonArea?.polygon} color="rgb(23,119,255)" />
                 </MapContainer>
                 {/* loading */}
-                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen/>}
+                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen />}
                 {/* {isShowLandAdministration && ( */}
                 {isShowLandAdministration && (
                     <LandAdministrationModal
