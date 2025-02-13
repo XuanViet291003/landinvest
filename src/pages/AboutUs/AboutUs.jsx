@@ -33,6 +33,18 @@ export default function AboutUs() {
         'https://quyhoach.xyz/image_public/comment/data-info-congty/23.jpg',
         'https://quyhoach.xyz/image_public/comment/data-info-congty/24.jpg',
         'https://quyhoach.xyz/image_public/comment/data-info-congty/25.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/26.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/27.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/28.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/29.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/30.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/31.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/32.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/33.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/34.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/35.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/36.jpg',
+        'https://quyhoach.xyz/image_public/comment/data-info-congty/37.jpg',
     ];
     const handleClickStart = () => {
         navigate('/bidding?page=1&limit=10');
