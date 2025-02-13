@@ -7,16 +7,16 @@ import Footer from './Footer';
 import ListItem from './ListItem';
 import './Notification.scss';
 import SearchItem from './SearchItem';
+import { useSearchParams } from 'react-router-dom';
 
 const PaginateList = () => {
     const [listItems, setListItems] = useState([]);
     const [totalPage, setTotalPage] = useState(0);
     const [visibleItems, setVisibleItems] = useState(5); // Mặc định hiển thị 5 phần tử
     const [currentPage, setCurrentPage] = useState(1);
-
     const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
     const [searchResults, setSearchResults] = useState([]); // Kết quả tìm kiếm
-
+    const [searchParms, setSearchParam] = useSearchParams();
     useEffect(() => {
         if (!searchTerm) {
             getApi(currentPage);
@@ -56,13 +56,25 @@ const PaginateList = () => {
     const itemsToDisplay = searchTerm ? searchResults : listItems;
     const handlePageClick = (event) => {
         const selectedPage = event.selected + 1;
+        searchParms.set('page', event.selected + 1);
+        setSearchParam(searchParms);
         setCurrentPage(selectedPage);
     };
 
     // const loadMoreItems = () => {
     //     setVisibleItems((prev) => prev + 5);
     // };
-
+    useEffect(() => {
+        (async () => {
+            try {
+                const page = searchParms.get('page');
+                let res = await fetchAllListProject(page || 1);
+                setListItems(res.data);
+            } catch (e) {
+                console.log(e);
+            }
+        })();
+    }, []);
     return (
         <>
             {/* <div style={{ marginBottom: '20px' }}>
@@ -103,6 +115,7 @@ const PaginateList = () => {
                         activeClassName="active"
                         forcePage={currentPage - 1}
                         renderOnZeroPageCount={null}
+                        initialPage={parseInt(searchParms.get('page') || 1) - 1}
                     />
                 )}
 
