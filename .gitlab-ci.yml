@@ -1,0 +1,34 @@
+image: node:22
+
+stages:
+  - build
+  - deploy 
+
+cache:
+  paths:
+    - node_modules/
+
+build-pages:
+  stage: build
+  script:
+    - rm -rf build 
+    - CI=false npm config set legacy-peer-deps true
+    - CI=false npm install
+    - CI=false npm install ajv@^8.0.0 ajv-keywords@^5.0.0 --save
+    - NODE_OPTIONS="--max-old-space-size=4096" CI=false npm run build
+    - rm -rf public
+    - cp build/index.html build/404.html
+    - mv build public
+  artifacts:
+    paths:
+      - public
+
+pages:
+  stage: deploy
+  script:
+    - ls
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'

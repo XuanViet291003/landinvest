@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
+import { useSearchParams } from "react-router-dom";
 
 import "./Investor.scss";
 import InvestorCard from "./components/InvestorCard";
 
 const Investor = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Lấy trang hiện tại từ URL query (nếu không có thì mặc định là 1)
+  const currentPage = parseInt(searchParams.get("page")) || 1;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,7 +20,7 @@ const Investor = () => {
         const result = await response.json();
         setData(result.data);
         if (result.page_numer) {
-          setTotalPages(Math.ceil(parseInt(result.page_numer)));
+          setTotalPages(Math.ceil(result.page_numer));
         }
       } catch (err) {
         console.log(err.message);
@@ -30,7 +34,7 @@ const Investor = () => {
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setData([]);
-      setCurrentPage(page);
+      setSearchParams({ page: page.toString() });
     }
   };
 
@@ -58,17 +62,15 @@ const Investor = () => {
   return (
     <Container>
       <div className="investor-container">
-        {(data && data.length > 0) && (
-          <h3 className="head-title">Danh sách nhà đầu tư được phê duyệt</h3>
-        )}
+        {data.length > 0 && <h3 className="head-title">Danh sách nhà đầu tư được phê duyệt</h3>}
 
-        {(data && data.length > 0) ? (
+        {data.length > 0 ? (
           data.map((item, index) => <InvestorCard key={index} data={item} />)
         ) : (
           <p>Không có dữ liệu</p>
         )}
 
-        {(data && data.length > 0) && (
+        {data.length > 0 && (
           <ul className="pagination">
             <li>
               <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
