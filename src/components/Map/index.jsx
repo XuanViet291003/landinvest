@@ -16,7 +16,7 @@ import {
     ZoomControl,
 } from 'react-leaflet';
 import {useDispatch, useSelector} from 'react-redux';
-import {Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
 import {formatToVND} from '../../function/formatToVND';
 import ResetCenterView from '../../function/resetCenterView';
@@ -68,10 +68,18 @@ import CustomTileLayer from '../CustomLayer';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
+    iconSize: [15, 15],
+    iconAnchor: [7.5, 7.5],
+    popupAnchor: [-3, -38],
+});
+
+const iconDuAn = new L.Icon({
+    iconUrl: require('../../assets/du_an.png'),
     iconSize: [38, 38],
     iconAnchor: [22, 38],
     popupAnchor: [-3, -38],
 });
+
 const dotIcon = new L.DivIcon({
     className: 'custom-dot-icon',
     html: `<div></div>`,
@@ -158,6 +166,7 @@ const Map = forwardRef(
         const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false); // Thông tin vị trí có mở không
         const [isLongClick, setIsLongClick] = useState(false); // Kiểm tra click dài
         const [pressTimer, setPressTimer] = useState(null); // Timer cho click dài
+        const [duAn, setDuAn] = useState([]);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
@@ -467,6 +476,13 @@ const Map = forwardRef(
                     }
                     if (zoom >= 15) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
+                        
+                        const fetchDuan = await fetch(`http://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
+                        const resDuan = await fetchDuan.json();
+
+                        console.log(resDuan?.du_an)
+                        setDuAn(resDuan?.du_an);
+
                         if (!isShowBtnOpen && isShowImagesList) {
                             setIsShowImagesList(true);
                         } else if (!isShowBtnOpen) {
@@ -479,6 +495,8 @@ const Map = forwardRef(
                         if (isShowImagesList) {
                             setIsShowImagesList(false);
                         }
+
+                        setDuAn([]);
                     }
                     if (zoom !== mapZoom) {
                         setMapZoom(zoom);
@@ -1463,6 +1481,32 @@ const Map = forwardRef(
                     ref={ref}
                     zoomControl={false}
                 >
+                    {duAn.map((duAnItem) => {
+                      const [lat, lng] = duAnItem.toaDo.split(",").map(Number); 
+
+                      return (
+                        <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
+                          <Popup>
+                          <div style={{ width: "200px"}}>
+                            <img
+                              src={duAnItem.image}
+                              alt={duAnItem.tenDuAn}
+                              style={{ width: "100%", height: "100px", borderRadius: "5px" }}
+                            />
+                            <h3 style={{ fontSize: "14px", margin: "8px 0" }}>{duAnItem.tenDuAn}</h3>
+                            <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
+                            <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
+                            <p><b>Vị trí:</b> {duAnItem.viTri}</p>
+
+                            <Link to={`/detail_du_an/${duAnItem.id}`} style={{ color: "blue", textDecoration: "underline", display: "block", marginTop: "8px", marginLeft: "auto"}}>
+                              Xem chi tiết
+                            </Link>
+                          </div>
+                          </Popup>
+                        </Marker> 
+                      );
+                    })}
+
                     {markerPosition && (
                         <Marker position={markerPosition} icon={customIcon}>
                             <Popup>
