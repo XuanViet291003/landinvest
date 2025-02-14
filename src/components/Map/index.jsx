@@ -603,7 +603,8 @@ const Map = forwardRef(
             return [];
         };
         // click to bounding box for list regulation
-        const handleItemClick = (item) => {
+        const handleItemClick = async (item) => {
+            const vitri = searchParams.get("vitri").split(",");
             const {boundingbox, type, map_type} = item;
             const sharing = searchParams.get('ups');
             const currentBounds = ref?.current?.getBounds();
@@ -645,9 +646,11 @@ const Map = forwardRef(
               const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
               const point = L.latLng(lat, lng);
 
-              if (!currentBounds.contains(point)) {
+              const res = await getLocationInBoudingBox(vitri[0], vitri[1])
+
+              if (!currentBounds.contains(point) && res.provinces != item.idProvince) {
                   if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
-                      ref.current.flyTo([centerLat, centerLon], 16); // Smooth map movement
+                      ref.current.flyTo([centerLat, centerLon], 16); 
                   }
               }
             }
