@@ -103,7 +103,7 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     right: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 15px;
+    gap: 10px;
     z-index: 990;
     top: 11%;
     width: 100vw;
@@ -123,8 +123,8 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     }
     .slider-list-item {
         background-color: #fff;
-        border-radius: 10px;
-        padding: 0.6rem 0.4rem;
+        border-radius: 20px;
+        padding: 0.4rem 0.3rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -147,8 +147,8 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     }
     .slider-container-location {
         background-color: #fff;
-        border-radius: 10px;
-        padding: 0.6rem 0.4rem;
+        border-radius: 20px;
+        padding: 0.6rem 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
