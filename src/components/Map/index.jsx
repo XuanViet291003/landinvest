@@ -477,7 +477,7 @@ const Map = forwardRef(
                     if (zoom >= 15) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
                         
-                        const fetchDuan = await fetch(`http://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
+                        const fetchDuan = await fetch(`https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
                         const resDuan = await fetchDuan.json();
 
                         console.log(resDuan?.du_an)
