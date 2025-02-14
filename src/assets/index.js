@@ -1,4 +1,4 @@
-import redMarker from './environment.svg';
+import redMarker from './environment.png';
 import demo from './demo.jpg';
 // import mapIcon from './test1.jpg';
 import mapIcon from "./icon-map-gps.svg"
