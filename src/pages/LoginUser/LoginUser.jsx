@@ -37,15 +37,19 @@ const LoginUserPage = () => {
     fetchData("today");
   }, []);
 
+  // Hàm lọc dữ liệu có ipLocation trùng nhau và thêm trường count tăng dần theo số lần xuất hiện bản ghi
   const processUserActivity = (items) => {
-    // Khởi tạo object rỗng
-    const userActivityCount = {};
+    const userActivityMap = new Map();
 
     items.forEach((item) => {
-      // Object có key là item.tplocation tăng lên 1
-      userActivityCount[item.iplocation] = (userActivityCount[item.iplocation] || 0) + 1;
+      if (!userActivityMap.has(item.iplocation)) {
+        userActivityMap.set(item.iplocation, { count: 1, details: item });
+      } else {
+        userActivityMap.get(item.iplocation).count += 1;
+      }
     });
-    return userActivityCount;
+
+    return Array.from(userActivityMap.values());
   };
 
   // Hàm để fetch tất cả các trang của api userToday và userAll
@@ -74,6 +78,7 @@ const LoginUserPage = () => {
   const fetchData = async (key) => {
     setLoading(true);
     setActiveTab(key);
+
     try {
       if (key === "today") {
         const response = await fetch(API_ENDPOINTS[key]);
@@ -82,8 +87,8 @@ const LoginUserPage = () => {
         setCount(result.tong_phan_tu || 0);
       } else {
         const activityData = await fetchAllPages(API_ENDPOINTS[key]);
-        const userActivityCount = processUserActivity(activityData);
-        setData(Object.entries(userActivityCount).map(([ip, count]) => ({ ip, count })));
+        const filteredData = processUserActivity(activityData);
+        setData(filteredData);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -120,7 +125,11 @@ const LoginUserPage = () => {
         ) : (
           data.map((item, index) => (
             <div key={index} className="data-card">
-              <p><strong>IP:</strong> {item.ip}</p>
+              <p><strong>Thành phố:</strong> {item.details?.city}</p>
+              <p><strong>Truy cập gần nhất:</strong> {convertToVietnamTime(item.details?.date_visit)}</p>
+              <p><strong>Thiết bị:</strong> {item.details?.device_active}</p>
+              <p><strong>Hệ điều hành:</strong> {item.details?.he_dieu_hanh}</p>
+              <p><strong>IP:</strong> {item.details?.iplocation}</p>
               <p><strong>Số lần truy cập:</strong> {item.count}</p>
             </div>
           ))
