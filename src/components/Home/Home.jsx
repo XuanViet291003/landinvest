@@ -80,7 +80,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 function Home() {
-    const [opacity, setOpacity] = useState(0.3);
+    const [opacity, setOpacity] = useState(1);
     const [selectedPosition, setSelectedPosition] = useState(null);
     const [activeItem, setActiveItem] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
