@@ -1490,23 +1490,23 @@ const Map = forwardRef(
                       return (
                         <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
                           <Popup>
-                          <div style={{ width: "200px"}}>
-                            <img
-                              src={duAnItem.image}
-                              alt={duAnItem.tenDuAn}
-                              style={{ width: "100%", height: "100px", borderRadius: "5px" }}
-                            />
-                            <h3 style={{ fontSize: "14px", margin: "8px 0" }}>{duAnItem.tenDuAn}</h3>
-                            <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
-                            <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
-                            <p><b>Vị trí:</b> {duAnItem.viTri}</p>
+                            <div className="popup-duan">
+                              <img
+                                src={duAnItem.image}
+                                alt={duAnItem.tenDuAn}
+                                className="popup-duan__image"
+                              />
+                              <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                              <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
+                              <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
+                              <p><b>Vị trí:</b> {duAnItem.viTri}</p>
 
-                            <Link to={`/detail_du_an/${duAnItem.id}`} style={{ color: "blue", textDecoration: "underline", display: "block", marginTop: "8px", marginLeft: "auto"}}>
-                              Xem chi tiết
-                            </Link>
-                          </div>
+                              <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                Xem chi tiết
+                              </Link>
+                            </div>
                           </Popup>
-                        </Marker> 
+                        </Marker>
                       );
                     })}
 

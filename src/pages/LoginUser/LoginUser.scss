@@ -1,0 +1,77 @@
+.loginUser-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  margin-top: 0;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 150px;
+}
+
+h1 {
+  text-align: center;
+  color: white;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f5f5f5;
+    color: #333;
+    font-weight: bold;
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+      padding: 5px 10px;
+    }
+  
+    &:hover {
+      background: #ddd;
+    }
+  
+    &.active {
+      background: #007bff;
+      color: white;
+    }
+  }
+}
+
+.data-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.data-card {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  p {
+    margin: 8px 0;
+    color: #444;
+    font-size: 14px;
+
+    strong {
+      color: #222;
+    }
+  }
+}

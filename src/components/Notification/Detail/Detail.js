@@ -1,10 +1,12 @@
 import parse from 'html-react-parser';
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import React, { useEffect, useState } from 'react';
 import { CiLocationOn } from 'react-icons/ci';
 import { useParams } from 'react-router-dom';
 import { getAllDetail } from '../../../services/api';
 import './Detail.scss';
+
 const Detail = () => {
     const [detailData, setDetailData] = useState({});
     const [dataPosition, setDataPosition] = useState('');
@@ -13,6 +15,7 @@ const Detail = () => {
     const { projectId } = useParams(); // Get project ID from URL params
     const [imageHeader, setImageHeader] = useState('');
     const [results, setResults] = useState([]);
+    
     const handleConvert = (string) => {
         if (!string) return '';
 
@@ -180,6 +183,23 @@ const Detail = () => {
                                 <div className="detail-content-location">
                                     <h2 className="content-location-name">Vị trí</h2>
                                     <div className="location-content">{parse(handleConvert(dataPosition))}</div>
+                                    <MapContainer 
+                                      center={[10.7769, 106.7009]} 
+                                      zoom={19} 
+                                      style={{ height: "300px", width: "100%" }} 
+                                      // attributionControl={false} 
+                                      // zoomControl={false} 
+                                      // doubleClickZoom={false} 
+                                      // scrollWheelZoom={false} 
+                                      // dragging={false} 
+                                      // touchZoom={false}
+                                  >
+                                    <TileLayer
+                                        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        subdomains='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    />
+                                      <Marker position={[10.7769, 106.7009]} />
+                                  </MapContainer>
                                 </div>
 
                                 <div className="extension-container">
