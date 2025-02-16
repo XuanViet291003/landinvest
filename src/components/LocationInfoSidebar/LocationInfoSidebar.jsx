@@ -10,6 +10,7 @@ import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistric
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
 import { FaWikipediaW } from "react-icons/fa";
+import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost.jsx';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -42,6 +43,7 @@ const LocationInfoSidebar = ({
     const districtId = useSelector((state) => state.landCost.districtId);
     const [isLandAuction, setIsLandAuction] = useState(true);
     const [isShowMore, setIsShowMore] = useState(false);
+    const [openHistoryCost, setOpenHistoryCost] = useState(false);
 
     const tileLayer = `https://api.quyhoach.xyz/get_quyhoach_theo_tinh/${provincePlansId}/${mapZoom}/${coordinates.x}/${coordinates.y}`;
 
@@ -106,6 +108,7 @@ const LocationInfoSidebar = ({
 
     return (
         <>
+            {(openHistoryCost && isLocationInfoOpen) && <ChartCostHistory lat={location[0]} lon={location[1]} />}
             {contextHolder}
             <Drawer
                 placement={window.innerWidth < 768 ? 'bottom' : 'left'}
@@ -120,6 +123,9 @@ const LocationInfoSidebar = ({
             >
                 {' '}
                 <div className="ant-drawer-body-wrapper">
+                    <button style={{margin:"20px", marginTop: 0}} onClick={() => setOpenHistoryCost(!openHistoryCost)}>
+                      {openHistoryCost ? "Đóng lịch sử giá đất" : "Mở lịch sử giá đất"}
+                    </button>
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>

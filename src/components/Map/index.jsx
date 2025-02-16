@@ -65,6 +65,7 @@ import ListRegulations from '../ListRegulations/ListRegulations';
 import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
 import CustomTileLayer from '../CustomLayer';
+import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),

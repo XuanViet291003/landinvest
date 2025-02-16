@@ -484,6 +484,9 @@ const Header = () => {
                                 <NavLink to="/about-us" className="nav-link">
                                     <InfoCircleOutlined style={{ fontSize: 20 }} />
                                 </NavLink>
+                                <NavLink className="header-notification" to="/login-user">
+                                    <IoIosNotifications size={24} style={{color: "white"}} />
+                                </NavLink>
                             </Nav>
                             <form
                                 className="header-search"
@@ -537,9 +540,6 @@ const Header = () => {
                             </form>
 
                             <div className="header-right">
-                                <div className="header-notification" onClick={() => navigate("/login-user")}>
-                                    <IoIosNotifications size={24} />
-                                </div>
                                 {!isAuthenticated ? (
                                     <button className="btn" onClick={() => setIsShowModalLogin(true)}>
                                         Đăng nhập

@@ -74,4 +74,14 @@ h1 {
       color: #222;
     }
   }
+
+  &__active-count{
+    color: #1A6F2E !important;
+    font-weight: bold;
+
+    strong {
+      color: #1A6F2E !important;
+      font-weight: bold;
+    }
+  }
 }
