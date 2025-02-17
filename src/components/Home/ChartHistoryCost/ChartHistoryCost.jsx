@@ -31,10 +31,12 @@ const ChartCostHistory = (props) => {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        const uniqueData = result.lich_su_gia.filter(
-          (item, index, self) =>
-            index === self.findIndex((i) => i.area === item.area)
-        );
+        // Lọc các area trùng nhau 
+        const uniqueData = result.lich_su_gia
+          .filter(
+            (item, index, self) =>
+              index === self.findIndex((i) => i.area === item.area)
+          )
         setData(uniqueData);
       } catch (error) {
         console.error(error);
@@ -53,7 +55,7 @@ const ChartCostHistory = (props) => {
           month: item.month ?? new Date(item.endDate).getMonth() + 1, 
           year: item.year ?? new Date(item.endDate).getFullYear(), 
           monthYear: `${item.month ?? new Date(item.endDate).getMonth() + 1}/${item.year ?? new Date(item.endDate).getFullYear()}`
-        }));
+        })).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
         setProcessedData(proData);
       }
     }
