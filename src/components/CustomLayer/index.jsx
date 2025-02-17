@@ -11,10 +11,14 @@ const CustomTileLayer = ({ item, opacity }) => {
                     const newY = Math.pow(2, z) - 1 - y;
                     return `${item.link_quyhoach}/${z}/${x}/${newY}.png`;
                 };
-            } else {
+            } else if(item.type_load_anh === "THUAN") {
                 // Khi trở về THUẬN, đặt lại URL mặc định bằng setUrl()
                 tileLayerRef.current.getTileUrl = function ({ x, y, z }) {
                 return `${item.link_quyhoach}/${z}/${x}/${y}.png`;
+              };
+            } else {
+              tileLayerRef.current.getTileUrl = function ({ x, y, z }) {
+                return `${item.link_quyhoach}/${z}/${x}/${y}`;
               };
             }
             tileLayerRef.current.redraw(); // Vẽ lại các tile

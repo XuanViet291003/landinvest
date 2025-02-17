@@ -481,7 +481,7 @@ const Map = forwardRef(
                         const fetchDuan = await fetch(`https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
                         const resDuan = await fetchDuan.json();
 
-                        console.log(resDuan?.du_an)
+                        // console.log(resDuan?.du_an)
                         setDuAn(resDuan?.du_an);
 
                         if (!isShowBtnOpen && isShowImagesList) {
