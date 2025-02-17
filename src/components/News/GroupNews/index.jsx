@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getGroupByPage } from '../../../services/api';
 import ReactPaginate from 'react-paginate';
 import { FaEye } from 'react-icons/fa';
@@ -21,17 +21,22 @@ function GroupNews() {
     const [isShowModalCreate, setIsShowModalCreate] = useState(false);
     const [isShowModalEdit, setIsShowModalEdit] = useState(false);
     const [news, setNews] = useState({});
-    const handlePageClick = async (e) => {
-        const fetchApi = async () => {
-            try {
-                const res = await getGroupByPage(id, e.selected + 1);
-                setArticles(res.data);
-            } catch {
-                message.error('Đã có lỗi xảy ra !');
-            }
-        };
-        fetchApi();
-    };
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+
+    // const handlePageClick = async (e) => {
+    //     const fetchApi = async () => {
+    //         try {
+    //             const res = await getGroupByPage(id, e.selected + 1);
+    //             setArticles(res.data);
+    //         } catch {
+    //             message.error('Đã có lỗi xảy ra !');
+    //         }
+    //     };
+    //     fetchApi();
+    // };
+
     const handleCreate = () => {
         if (!isAuthenticated) {
             setIsShowModalLogin(true);
@@ -44,26 +49,85 @@ function GroupNews() {
     };
     useLayoutEffect(() => {
         const fetchApi = async () => {
-            const res = await getGroupByPage(id, 1);
+            const res = await getGroupByPage(id, currentPage);
             setArticles(res.data);
             setTotalPage(parseInt(Math.ceil(res.total_page)));
         };
         fetchApi();
     }, []);
-    console.log(dataUser);
+    // console.log(dataUser);
+
+  // Hàm xử lý chuyển trang (dựa trên URL query)
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPage) {
+      setSearchParams({ page: page.toString() });
+    }
+  };
+
+  // Hàm render số trang (1, ... , n)
+  const renderPaginationNumbers = () => {
+      let pages = [];
+      if (totalPage <= 5) {
+        for (let i = 1; i <= totalPage; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        let startPage = Math.max(2, currentPage - 1);
+        let endPage = Math.min(totalPage - 1, currentPage + 1);
+
+        if (startPage > 2) {
+          pages.push("...");
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+          pages.push(i);
+        }
+
+        if (endPage < totalPage - 1) {
+          pages.push("...");
+        }
+        pages.push(totalPage);
+      }
+      return pages;
+    };
+
     return (
         <div className="group-news">
-            <ReactPaginate
-                containerClassName="pagination-news"
-                previousLabel="< Trước"
-                nextLabel="Sau >"
-                breakLabel="..."
-                pageCount={totalPage}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={3}
-                onPageChange={handlePageClick}
-                activeClassName="pagination--active"
-            />
+            <ul className="pagination">
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  «
+                </button>
+              </li>
+              {renderPaginationNumbers().map((page, index) =>
+                page === "..." ? (
+                  <li key={index} className="dots">
+                    ...
+                  </li>
+                ) : (
+                  <li key={index}>
+                    <button
+                      className={currentPage === page ? "active" : ""}
+                      onClick={() => handlePageChange(page)}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                )
+              )}
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPage}
+                >
+                  »
+                </button>
+              </li>
+            </ul>
             <button className=" button-create" onClick={handleCreate}>
                 Tạo bài viết
             </button>
