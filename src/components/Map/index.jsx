@@ -901,6 +901,12 @@ const Map = forwardRef(
                     clickCountRef.current += 1;
                     const map = e.target;
 
+                    const newParams = new URLSearchParams(searchParams);
+
+                    newParams.set("vitri", `${e.latlng.lat},${e.latlng.lng}`);
+
+                    setSearchParams(newParams);
+
                     if (clickTimeout.current) clearTimeout(clickTimeout.current);
 
                     clickTimeout.current = setTimeout(() => {
