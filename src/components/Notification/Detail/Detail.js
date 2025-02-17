@@ -15,6 +15,7 @@ const Detail = () => {
     const { projectId } = useParams(); // Get project ID from URL params
     const [imageHeader, setImageHeader] = useState('');
     const [results, setResults] = useState([]);
+    const [location, setLocation] = useState({});
     
     const handleConvert = (string) => {
         if (!string) return '';
@@ -80,11 +81,17 @@ const Detail = () => {
             setDataPosition(res.data.viTriDesc || '');
             setDataImageRepresent(res.data.images || '');
             setImageHeader(res.data.images);
+            const lat = parseFloat(res.data.toaDo.split(",")[0]);
+            const lon = parseFloat(res.data.toaDo.split(",")[1]);
+            console.log(lat);
+            console.log(lon)
+            setLocation({lat, lon});
         } else {
             setDetailData({});
             setDataPosition('');
             setDataImageRepresent('');
             setImageHeader('');
+            setLocation({});
         }
     };
 
@@ -124,14 +131,14 @@ const Detail = () => {
     const contentHeader = imageRepresent.find((_, index) => index === +projectId + 5);
 
     return (
-        <div style={{ backgroundColor: '#343a40' }}>
+        <div style={{ backgroundColor: '#343a40', paddingBottom: "150px" }}>
             <div className="container-md">
                 <div className="detail-container">
-                    <div className="detail-image">
                         {contentHeader && contentHeader.image && (
-                            <img src={contentHeader.image} alt={contentHeader.description} />
+                            <div className="detail-image">
+                                <img src={contentHeader.image} alt={contentHeader.description} />
+                            </div>
                         )}
-                    </div>
                     {detailData && (
                         <div className="row" key={detailData.id}>
                             <div className="detail-content">
@@ -173,7 +180,23 @@ const Detail = () => {
                                                 </div>
                                                 <div>
                                                     <span className="data-content-title">Loại hình:</span>
-                                                    <span className="red-content">{detailData.loaiHinh}</span>
+                                                    <span className="data-content-text">{detailData.loaiHinh}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="data-content-title">Chủ đầu tư:</span>
+                                                    <span className="data-content-text">{detailData.chuDauTu}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="data-content-title">Công trình công cộng:</span>
+                                                    <span className="data-content-text">{detailData.congTrinhCongCong}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="data-content-title">Diện tích xây dựng:</span>
+                                                    <span className="data-content-text">{detailData.dienTichXayDung}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="data-content-title">Tổng vốn đầu tư:</span>
+                                                    <span className="data-content-text">{detailData.tongVonDauTu}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -183,23 +206,19 @@ const Detail = () => {
                                 <div className="detail-content-location">
                                     <h2 className="content-location-name">Vị trí</h2>
                                     <div className="location-content">{parse(handleConvert(dataPosition))}</div>
-                                    <MapContainer 
-                                      center={[10.7769, 106.7009]} 
-                                      zoom={19} 
-                                      style={{ height: "300px", width: "100%" }} 
-                                      // attributionControl={false} 
-                                      // zoomControl={false} 
-                                      // doubleClickZoom={false} 
-                                      // scrollWheelZoom={false} 
-                                      // dragging={false} 
-                                      // touchZoom={false}
-                                  >
-                                    <TileLayer
-                                        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        subdomains='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                    />
-                                      <Marker position={[10.7769, 106.7009]} />
-                                  </MapContainer>
+                                    {(location.lat && location.lon) && (
+                                      <MapContainer 
+                                          center={[location.lat, location.lon]} 
+                                          zoom={15} 
+                                          style={{ margin: "10px auto", height: "50vh", width: "70%" }} 
+                                      >
+                                        <TileLayer
+                                            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                            subdomains='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                        />
+                                          <Marker position={[location.lat, location.lon]} />
+                                      </MapContainer>
+                                    )}
                                 </div>
 
                                 <div className="extension-container">
@@ -213,7 +232,6 @@ const Detail = () => {
                     )}
                 </div>
             </div>
-            <div className="footer" style={{ height: '200px', background: '#000', marginTop: '20px' }}></div>
         </div>
     );
 };
