@@ -1474,7 +1474,11 @@ const Map = forwardRef(
                 {/* )} */}
 
                 <div>
-                  {(searchParams.get("ups") === "history-cost") && <ChartCostHistory lat={location[0]} lon={location[1]} />}
+                  {(searchParams.get("ups") === "history-cost") && 
+                    <ChartCostHistory 
+                      lat={searchParams.get("vitri").split(",")[0]} 
+                      lon={searchParams.get("vitri").split(",")[1]} 
+                    />}
                 </div>
 
                 <MapContainer
