@@ -1473,6 +1473,10 @@ const Map = forwardRef(
                 </ImageList>
                 {/* )} */}
 
+                <div>
+                  {(searchParams.get("ups") === "history-cost") && <ChartCostHistory lat={location[0]} lon={location[1]} />}
+                </div>
+
                 <MapContainer
                     style={{
                         width: '100vw',
@@ -1730,6 +1734,7 @@ const Map = forwardRef(
                         handleWikiClick={handleWikiClick}
                     />
                     <DrawerLandUsePlan/>
+
                     {/* {polygonSessionStorage.length > 0 &&
                     isOverview &&
                     polygonSessionStorage.map((polygon, index) => {

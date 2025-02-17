@@ -43,7 +43,6 @@ const LocationInfoSidebar = ({
     const districtId = useSelector((state) => state.landCost.districtId);
     const [isLandAuction, setIsLandAuction] = useState(true);
     const [isShowMore, setIsShowMore] = useState(false);
-    const [openHistoryCost, setOpenHistoryCost] = useState(false);
 
     const tileLayer = `https://api.quyhoach.xyz/get_quyhoach_theo_tinh/${provincePlansId}/${mapZoom}/${coordinates.x}/${coordinates.y}`;
 
@@ -91,6 +90,16 @@ const LocationInfoSidebar = ({
         }
     }, [location]);
 
+    const handleHistoryCostClick = () => {
+      const newSearchParams = new URLSearchParams(searchParams);
+      if (newSearchParams.get("ups") === "history-cost") {
+        newSearchParams.delete("ups");
+      } else {
+        newSearchParams.set("ups", "history-cost");
+      }
+      setSearchParams(newSearchParams);
+    }
+
 
     // useEffect(() => {
     //     const formData = new FormData();
@@ -108,7 +117,6 @@ const LocationInfoSidebar = ({
 
     return (
         <>
-            {(openHistoryCost && isLocationInfoOpen) && <ChartCostHistory lat={location[0]} lon={location[1]} />}
             {contextHolder}
             <Drawer
                 placement={window.innerWidth < 768 ? 'bottom' : 'left'}
@@ -123,8 +131,8 @@ const LocationInfoSidebar = ({
             >
                 {' '}
                 <div className="ant-drawer-body-wrapper">
-                    <button style={{margin:"20px", marginTop: 0}} onClick={() => setOpenHistoryCost(!openHistoryCost)}>
-                      {openHistoryCost ? "Đóng lịch sử giá đất" : "Mở lịch sử giá đất"}
+                    <button style={{margin:"20px", marginTop: 0}} onClick={() => handleHistoryCostClick()}>
+                      {searchParams.get("ups") === "history-cost" ? "Đóng lịch sử giá đất" : "Mở lịch sử giá đất"}
                     </button>
                     {isShowMore && (
                         <>
