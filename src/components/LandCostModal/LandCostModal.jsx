@@ -89,18 +89,41 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                 />
                 <p>*Bảng giá đất 2024 do chính phủ ban hành.</p>
                 <p>Chú thích: Vị trí 1 là mặt tiền đường; Vị trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m - 5m; Vị trí 4 là hẻm rộng dưới 3m.</p>
-                <LandCostTable searchValue={debouncedInputSearch} tableType={MAP_TABLE_TYPE.ON_MAP} />
+                <LandCostTable searchValue={debouncedInputSearch} tableType={MAP_TABLE_TYPE.ON_MAP} type="popup" />
             </div>
         </div>
     );
 
     return isLandCostModalOpen ? (
         isMobile ? (
-            <Modal title={<span style={{ color: '#171616' }}>Bảng giá đất</span>} visible={isLandCostModalOpen} onCancel={handleCancel} footer={null} width="80vw" bodyStyle={{ backgroundColor: '#fffdfd', color: '#100e0e' }}>
+            <Modal
+                title={<span style={{ color: '#171616' }}>Bảng giá đất</span>}
+                visible={isLandCostModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+                width="80vw"
+                centered // Căn giữa Modal
+                bodyStyle={{ backgroundColor: '#fffdfd', color: '#100e0e' }}
+            >
                 {modalContent}
             </Modal>
         ) : (
-            <ReactWindow title="Bảng giá đất" onClose={handleCancel} width={500} height={400} style={{ backgroundColor: '#100f0f', color: '#131313' }}>
+            <ReactWindow
+                title="Bảng giá đất"
+                onClose={handleCancel}
+                width={500}
+                height={400}
+                style={{
+                    backgroundColor: '#100f0f',
+                    color: '#131313',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    borderRadius: '8px',
+                    padding: '20px',
+                }}
+            >
                 {modalContent}
             </ReactWindow>
         )

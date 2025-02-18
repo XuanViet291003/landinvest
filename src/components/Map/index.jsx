@@ -171,6 +171,8 @@ const Map = forwardRef(
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
+        const [markerLocation, setMarkerLocation] = useState([]);
+
         // const [firstTime, setFirstTime] = useState(true);
 
         // const [id, setId] = useState(searchParams.get('id'));
@@ -917,6 +919,8 @@ const Map = forwardRef(
 
                     const newLocation = e.latlng;
                     setLocation([newLocation.lat, newLocation.lng]);
+
+                    setMarkerLocation([newLocation.lat, newLocation.lng]);
                 },
 
                 dblclick: async (e) => {
@@ -1112,6 +1116,8 @@ const Map = forwardRef(
                     let center = [];
                     const childrenboundingboxData = [];
                     const firstPlanningIndex = 0;
+
+                    if(sharing) setMarkerLocation([vitri[0], vitri[1]]);
 
                     // dispatch(setInitialBoundingBox())
 
@@ -1415,6 +1421,8 @@ const Map = forwardRef(
 
         const antDrawOpen = document.querySelector(".ant-drawer-open");
 
+        const historyCost = useSelector((state) => state.historyCost.value);
+    
         return (
             <>
                 {contextHolder}
@@ -1480,10 +1488,10 @@ const Map = forwardRef(
                 {/* )} */}
 
                 <div>
-                  {(searchParams.get("ups") === "history-cost") && 
+                  {(markerLocation.length > 0 && historyCost && searchParams.get("zoom") == 19) && 
                     <ChartCostHistory 
-                      lat={searchParams.get("vitri").split(",")[0]} 
-                      lon={searchParams.get("vitri").split(",")[1]} 
+                      lat={markerLocation[0]} 
+                      lon={markerLocation[1]}
                     />}
                 </div>
 
