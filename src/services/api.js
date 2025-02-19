@@ -640,3 +640,7 @@ export const getAllDistrictInProvince = async (id) => {
     const res = await instance.get(`get_tat_ca_huyen_1_tinh/${id}`);
     return res.data;
 };
+export const getListSearchInvestor = async (key, page = 1) => {
+    const res = await instance.get(`list_nhadautu_search/${key}?page=${page}`);
+    return res.data;
+};
