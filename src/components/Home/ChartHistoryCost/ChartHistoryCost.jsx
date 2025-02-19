@@ -176,7 +176,7 @@ const ChartCostHistory = (props) => {
                     <YAxis domain={([min, max]) => [min - 5, max + 10]} />
                     <Tooltip
                       formatter={(value, name, props) => [
-                        `${value} tỉ/m²`,
+                        value > 1000 ? `${(value / 1000).toFixed(2)} tỷ/m²` : `${value} triệu/m²`,
                         name,
                       ]}
                     />
