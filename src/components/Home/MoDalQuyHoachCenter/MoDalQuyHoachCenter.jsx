@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import './MoDalQuyHoachCenter.scss';
 import { doClearQuyHoach, doGetQuyHoach } from '../../../redux/getQuyHoach/getQuyHoachSlice';
 import ModalLogin from '../../Auth/ModalNotification';
+import { useSearchParams } from 'react-router-dom';
 
 function ModalQuyHoachCenter({ isShowModalQuyHoachCenter, setIsShowModalQuyHoachCenter, quyHoachList }) {
     const dispatch = useDispatch();
     const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
     const [isShowLoginModal, setIsShowLoginModal] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleSetItem = (item) => {
         const buttonActive = document.querySelector(".button-item.active");
@@ -16,6 +18,12 @@ function ModalQuyHoachCenter({ isShowModalQuyHoachCenter, setIsShowModalQuyHoach
             setIsShowLoginModal(true);
             return;
         }
+
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete("draw");
+  
+        setSearchParams(newParams);
+        
         dispatch(doGetQuyHoach(item));
         setIsShowModalQuyHoachCenter(false);
     };

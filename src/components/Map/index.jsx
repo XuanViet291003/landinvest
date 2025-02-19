@@ -472,6 +472,46 @@ const Map = forwardRef(
                     searchUrlParams.set('zoom', `${zoom}`);
                     setSearchParams(searchUrlParams);
 
+                    const vitri = searchParams.get("vitri").split(",");
+            
+                    // Gọi API lấy thông tin tỉnh/thành phố
+                    const dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
+
+                    const newParams = new URLSearchParams(searchParams);
+
+                    if (zoom >= 19 && 
+                        (!RegulationImages ||
+                          (RegulationImages[0].idProvince != dataProvinceCurrent.provinces &&
+                            searchParams.get("type") === "QUYHOACH_DIACHINH"
+                          )
+                        )
+                    ){
+                      // Gọi API lấy thông tin quy hoạch
+                      const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
+                      const resQuyHoach = await fetch(apiUrl);
+                      if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
+              
+                      const dataQuyHoach = await resQuyHoach.json();
+              
+                      // Lọc danh sách quy hoạch địa chính
+                      const dataDiaChinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_DIACHINH");
+
+                      // Tìm tỉnh phù hợp với vị trí hiện tại
+                      const tinh = dataDiaChinh.find((item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17);
+
+                      newParams.set("type", "QUYHOACH_DIACHINH");
+                      newParams.set("id", tinh.id);
+                      newParams.set("draw", "auto");
+                      setSearchParams(newParams)
+                    } 
+
+                    if((zoom < 18 || zoom > 22) && newParams.get("draw") === "auto"){
+                      setRegulationImages(null);
+                      newParams.delete("type");
+                      newParams.delete("id");
+                      setSearchParams(newParams)
+                    }
+
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
                     }
@@ -507,42 +547,6 @@ const Map = forwardRef(
                         handleGetListRegulation(_southWest, _northEast);
                     } else {
                         setisShowListRegulation(false);
-                    }
-
-                    if(zoom >= 19 && (!searchParams.get("type") || searchParams.get("type") === "QUYHOACH_DIACHINH")){
-                      const vitri = searchParams.get("vitri").split(",");
-
-                      // Gọi API lấy thông tin quy hoạch
-                      const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
-                      const resQuyHoach = await fetch(apiUrl);
-                      if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
-              
-                      const dataQuyHoach = await resQuyHoach.json();
-              
-                      // Lọc danh sách quy hoạch địa chính
-                      const dataDiaChinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_DIACHINH");
-              
-                      // Gọi API lấy thông tin tỉnh/thành phố
-                      const dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
-
-                      // Tìm tỉnh phù hợp với vị trí hiện tại
-                      const tinh = dataDiaChinh.find((item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17);
-
-                      const newParams = new URLSearchParams(searchParams);
-
-                      if(newParams.get("id") !==  tinh.id){
-                        newParams.set("type", "QUYHOACH_DIACHINH");
-                        newParams.set("id", tinh.id);
-                        newParams.set("draw", "auto")
-                        setSearchParams(newParams)
-                      }
-                    }
-
-                    if(searchParams.get("draw") == "auto" && searchParams.get("zoom") <= 17) {
-                      const newParams = new URLSearchParams(searchParams);
-                      newParams.delete("id");
-                      newParams.delete("draw")
-                      setSearchParams(newParams)
                     }
                 },
                 zoomend: async () => {
@@ -695,8 +699,6 @@ const Map = forwardRef(
 
         useEffect(() => {
             if (id && type) {
-                const newParams = new URLSearchParams(searchParams);
-                newParams.delete("draw")
                 // Gọi API khi có id và type và chưa có itemQuyHoach
                 axios
                     .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
