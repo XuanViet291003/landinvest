@@ -73,7 +73,7 @@ function Home() {
     const { isOpen, handleCloseTableList } = useTableListOpen();
     const myLoca = useGetMyLocation();
     const [messageApi, contextHolder] = message.useMessage();
-    const { districtName, provinceName } = useSelector((state) => state.searchQuery.searchResult);
+    const { districtName, provinceName, lat, lon } = useSelector((state) => state.searchQuery.searchResult);
     const isOpenDrawerLandPlan = useSelector((state) => state.landUsePlan.isDrawerOpen);
     const mapRef = useRef(null);
     const location = useLocation();
@@ -153,7 +153,6 @@ function Home() {
     const handleSelectLocationOk = useCallback(() => {
         setIsOpenBidding(false);
     }, []);
-
     // useEffect(() => {
     //     const searchParams = new URLSearchParams(location.search);
     //     const vitriParam = searchParams.get('vitri');
@@ -465,10 +464,10 @@ function Home() {
         setButtonMoRong(button);
     };
 
-    const LandUsePlan = useSelector(state => state.landUsePlan.LandUsePlan);
+    const LandUsePlan = useSelector((state) => state.landUsePlan.LandUsePlan);
 
-    if(!LandUsePlan || LandUsePlan && LandUsePlan?.list_kehoach?.length === 0){
-      dispatch(onChangeDrawer(false));
+    if (!LandUsePlan || (LandUsePlan && LandUsePlan?.list_kehoach?.length === 0)) {
+        dispatch(onChangeDrawer(false));
     }
 
     return (
@@ -608,14 +607,14 @@ function Home() {
                     >
                         Danh sách quy hoạch
                     </div>
-                    {(LandUsePlan && LandUsePlan?.list_kehoach?.length > 0)  && (
-                      <div
-                        onClick={() => dispatch(onChangeDrawer(!isOpenDrawerLandPlan))}
-                        ref={buttonRef}
-                        className={`slider-list-item`}
-                      >
-                          KHSDD 2025
-                      </div>
+                    {LandUsePlan && LandUsePlan?.list_kehoach?.length > 0 && (
+                        <div
+                            onClick={() => dispatch(onChangeDrawer(!isOpenDrawerLandPlan))}
+                            ref={buttonRef}
+                            className={`slider-list-item`}
+                        >
+                            KHSDD 2025
+                        </div>
                     )}
                 </div>
                 <div className="container-buttons">
@@ -774,6 +773,8 @@ function Home() {
                 handleOk={handleSelectLocationOk}
                 handleClose={handleSelectLocationCancel}
                 ref={mapRef}
+                lat={lat}
+                lon={lon}
             />
         </>
     );
