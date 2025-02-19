@@ -484,6 +484,9 @@ const Header = () => {
                                 <NavLink to="/about-us" className="nav-link">
                                     <InfoCircleOutlined style={{ fontSize: 20 }} />
                                 </NavLink>
+                                <NavLink className="header-notification" to="/login-user">
+                                    <IoIosNotifications size={24} style={{color: "white"}} />
+                                </NavLink>
                             </Nav>
                             <form
                                 className="header-search"
@@ -537,9 +540,6 @@ const Header = () => {
                             </form>
 
                             <div className="header-right">
-                                <div className="header-notification">
-                                    <IoIosNotifications size={24} />
-                                </div>
                                 {!isAuthenticated ? (
                                     <button className="btn" onClick={() => setIsShowModalLogin(true)}>
                                         Đăng nhập
@@ -678,7 +678,7 @@ const Header = () => {
                         <NavLink to="/news" className="nav-link">
                             <NewsIcon />
                         </NavLink>
-                        <NavLink to="/search" className="nav-link">
+                        <NavLink to="/bidding?page=1&limit=10" className="nav-link">
                             <SearchNavbarIcon />
                         </NavLink>
                         <NavLink to="/auctions" className="nav-link">
@@ -687,8 +687,10 @@ const Header = () => {
                         <NavLink to="/land-cost" className="nav-link">
                           <img src={icons.landCostIcon} alt="" width={30} height={30} />
                         </NavLink>
-                        <NavLink to="/" className="nav-link">
-                            <IoIosNotifications style={{ color: 'white' }} />
+                        <NavLink to="/login-user" className="nav-link">
+                            <IoIosNotifications 
+                              style={{ color: 'white', width: '20px', height: '20px' }} 
+                            />
                         </NavLink>
 
                         {!isAuthenticated ? (
@@ -699,6 +701,7 @@ const Header = () => {
                                     background: '#ff571a',
                                     borderRadius: '5px',
                                     border: '1px solid #ff571a',
+                                    fontSize: '12px'
                                 }}
                                 onClick={() => setIsShowModalLogin(true)}
                             >
@@ -707,11 +710,11 @@ const Header = () => {
                         ) : (
                             <Dropdown menu={{ items }} trigger={['click']}>
                                 <button
-                                    style={{ color: '#fff', cursor: 'pointer' }}
+                                    style={{ color: '#fff', cursor: 'pointer', fontSize: '12px' }}
                                     onClick={(e) => e.preventDefault()}
                                 >
                                     <Space>
-                                        <Avatar src={apiUser?.avatarLink || iconAvatar} />
+                                        <Avatar src={apiUser?.avatarLink || iconAvatar} style={{ width: '20px', height: '20px' }} />
                                         {apiUser?.FullName}
                                     </Space>
                                 </button>

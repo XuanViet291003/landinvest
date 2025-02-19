@@ -73,6 +73,10 @@
     color: #fff;
     font-weight: bold !important;
 
+    &:hover {
+      background-color: #262D34 !important;
+    }
+
     h4 {
       color: #22C578;
       font-weight: bolder;
@@ -87,6 +91,7 @@
       display: none;
       background-color: transparent;
       display: flex;
+      padding-top: 0;
 
       @media (max-width: 768px) {
         background-color: #fff;

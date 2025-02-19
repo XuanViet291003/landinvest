@@ -45,6 +45,7 @@ import Checkout from './pages/Payment/Checkout.jsx';
 import OrderCanceled from './pages/Payment/OrderCanceled.jsx';
 import OrderSuccess from './pages/Payment/OrderSuccess.jsx';
 import Profile from './pages/ProfileUser/Profile';
+import LoginUserPage from './pages/LoginUser/LoginUser.jsx';
 import './styles/boundingboxDataList.scss';
 import './styles/checkout.scss';
 import './styles/coin.scss';
@@ -232,6 +233,10 @@ function App() {
                   path: '/investor/:orgCode',
                   element: <DetailInvestor />,
                 },
+                {
+                  path: '/login-user',
+                  element: <LoginUserPage />,
+                }
             ],
         },
         {

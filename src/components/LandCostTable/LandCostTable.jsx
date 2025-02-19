@@ -6,22 +6,27 @@ import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
 import { getAllLandCostApi } from '../../redux/landCostSlice/landCostSlice';
 import { columns } from '../../pages/LandCost/components/LandCostColumns';
 
-export const LandCostTable = ({ tableType, searchValue }) => {
+export const LandCostTable = ({ tableType, searchValue, data, type }) => {
     const dispatch = useDispatch();
     const allLandCostStatus = useSelector((state) => state.landCost.allLandCostStatus);
     const districtId = useSelector((state) => state.landCost.districtId);
-    const [landCostData, setLandCostData] = useState([]);
+    const [landCostData, setLandCostData] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10; // Số lượng dòng trên mỗi trang
     const [totalRecords, setTotalRecords] = useState(0);
+
+    useEffect(() => {
+      if(type !== "popup")
+        setLandCostData(data)
+    }, [data])
 
     // Hàm gọi API lấy dữ liệu theo trang
     const fetchLandCostData = async (page) => {
         try {
             const response = await fetch(`https://api.quyhoach.xyz/bang_gia_dat_district/${districtId}?page=${page}`);
             const data = await response.json();
-            setLandCostData(data.results);
-            setTotalRecords(data.total || 100); // Giả định tổng số bản ghi là 100 nếu API không có
+            setLandCostData(data.dulieu);
+            setTotalRecords(data.tong_so_page || 100); // Giả định tổng số bản ghi là 100 nếu API không có
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu:', error);
         }

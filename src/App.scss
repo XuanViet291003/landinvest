@@ -271,3 +271,35 @@
 .ant-drawer {
     z-index: 1001;
 }
+
+@media (max-width: 768px) { 
+  .leaflet-top.leaflet-right {
+    margin-top: 40px;
+    padding: 0;
+  }
+  
+  .leaflet-control-layers.leaflet-control {
+    background-color: transparent;
+  }
+  
+  .leaflet-touch .leaflet-control-layers-toggle {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .leaflet-control-layers.leaflet-control {
+    margin-right: 0 !important;
+  }
+  
+  .leaflet-control-layers.leaflet-control {
+    border: none !important;
+  }
+
+  .leaflet-control-layers-base {
+    color: white;
+  }
+}
+
+div#Bảng\ giá\ đất {
+  right: 25% !important;
+}

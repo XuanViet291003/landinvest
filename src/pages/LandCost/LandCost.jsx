@@ -24,6 +24,7 @@ const LandCost = () => {
     const allProvinces = useSelector((state) => state.landCost.allProvinces);
     const allDistricts = useSelector((state) => state.landCost.allDistricts);
     const allLocalities = useSelector((state) => state.landCost.allLocalities);
+    const allLandCost = useSelector((state) => state.landCost.allLandCost); 
     const provincesStatus = useSelector((state) => state.landCost.provincesStatus);
     const allDistrictsStatus = useSelector((state) => state.landCost.allDistrictsStatus);
     const allLocalitiesStatus = useSelector((state) => state.landCost.allLocalitiesStatus);
@@ -86,7 +87,6 @@ const LandCost = () => {
         const provinceId = Number(searchParams.get(LAND_COST_KEY.PROVINCE));
         const districtId = Number(searchParams.get(LAND_COST_KEY.DISTRICT));
 
-        // if province id query param exists
         if (provinceId) {
             dispatch(getAllDistrictsInProvinceApi(provinceId));
             if (districtId) {
@@ -103,19 +103,8 @@ const LandCost = () => {
                 }),
             );
         } else {
-            // if is not exists query params
             dispatch(getAllProvincesApi());
             dispatch(getAllLandCostApi({}));
-            // if (filterSelected.locality) {
-            //     dispatch(getAllLandCostApi({ id: filterSelected.locality, type: LAND_COST_KEY.LOCALITY }));
-            // } else if (filterSelected.district) {
-            //     dispatch(getAllLandCostApi({ id: filterSelected.district, type: LAND_COST_KEY.DISTRICT }));
-            // } else if (filterSelected.province) {
-            //     dispatch(getAllLandCostApi({ id: filterSelected.province, type: LAND_COST_KEY.PROVINCE }));
-            // } else {
-            // dispatch(getAllLandCostApi({}));
-
-            // }
         }
         return () => {
             dispatch(setAllLandCost([]));
@@ -185,7 +174,7 @@ const LandCost = () => {
                     Vị trí 4 là hẻm rộng dưới 3m.
                 </p>
                 <p className="land-cost__container--notice">Giữ shift + lăn chuột để xem các cột tiếp theo</p>
-                <LandCostTable tableType={MAP_TABLE_TYPE.ON_ROUTE} />
+                <LandCostTable tableType={MAP_TABLE_TYPE.ON_ROUTE} data={allLandCost} />
             </div>
         </Container>
     );

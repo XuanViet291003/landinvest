@@ -16,7 +16,7 @@ import {
     ZoomControl,
 } from 'react-leaflet';
 import {useDispatch, useSelector} from 'react-redux';
-import {Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
 import {formatToVND} from '../../function/formatToVND';
 import ResetCenterView from '../../function/resetCenterView';
@@ -65,13 +65,22 @@ import ListRegulations from '../ListRegulations/ListRegulations';
 import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
 import CustomTileLayer from '../CustomLayer';
+import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
+    iconSize: [15, 15],
+    iconAnchor: [7.5, 7.5],
+    popupAnchor: [-3, -38],
+});
+
+const iconDuAn = new L.Icon({
+    iconUrl: require('../../assets/du_an.png'),
     iconSize: [38, 38],
     iconAnchor: [22, 38],
     popupAnchor: [-3, -38],
 });
+
 const dotIcon = new L.DivIcon({
     className: 'custom-dot-icon',
     html: `<div></div>`,
@@ -158,8 +167,11 @@ const Map = forwardRef(
         const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false); // Thông tin vị trí có mở không
         const [isLongClick, setIsLongClick] = useState(false); // Kiểm tra click dài
         const [pressTimer, setPressTimer] = useState(null); // Timer cho click dài
+        const [duAn, setDuAn] = useState([]);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
+
+        const [markerLocation, setMarkerLocation] = useState([]);
 
         // const [firstTime, setFirstTime] = useState(true);
 
@@ -467,6 +479,13 @@ const Map = forwardRef(
                     }
                     if (zoom >= 15) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
+                        
+                        const fetchDuan = await fetch(`https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
+                        const resDuan = await fetchDuan.json();
+
+                        // console.log(resDuan?.du_an)
+                        setDuAn(resDuan?.du_an);
+
                         if (!isShowBtnOpen && isShowImagesList) {
                             setIsShowImagesList(true);
                         } else if (!isShowBtnOpen) {
@@ -479,6 +498,8 @@ const Map = forwardRef(
                         if (isShowImagesList) {
                             setIsShowImagesList(false);
                         }
+
+                        setDuAn([]);
                     }
                     if (zoom !== mapZoom) {
                         setMapZoom(zoom);
@@ -585,7 +606,8 @@ const Map = forwardRef(
             return [];
         };
         // click to bounding box for list regulation
-        const handleItemClick = (item) => {
+        const handleItemClick = async (item) => {
+            const vitri = searchParams.get("vitri").split(",");
             const {boundingbox, type, map_type} = item;
             const sharing = searchParams.get('ups');
             const currentBounds = ref?.current?.getBounds();
@@ -627,9 +649,11 @@ const Map = forwardRef(
               const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
               const point = L.latLng(lat, lng);
 
-              if (!currentBounds.contains(point)) {
+              const res = await getLocationInBoudingBox(vitri[0], vitri[1])
+
+              if (!currentBounds.contains(point) && res.provinces != item.idProvince) {
                   if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
-                      ref.current.flyTo([centerLat, centerLon], 16); // Smooth map movement
+                      ref.current.flyTo([centerLat, centerLon], 16); 
                   }
               }
             }
@@ -879,6 +903,12 @@ const Map = forwardRef(
                     clickCountRef.current += 1;
                     const map = e.target;
 
+                    const newParams = new URLSearchParams(searchParams);
+
+                    newParams.set("vitri", `${e.latlng.lat},${e.latlng.lng}`);
+
+                    setSearchParams(newParams);
+
                     if (clickTimeout.current) clearTimeout(clickTimeout.current);
 
                     clickTimeout.current = setTimeout(() => {
@@ -889,6 +919,8 @@ const Map = forwardRef(
 
                     const newLocation = e.latlng;
                     setLocation([newLocation.lat, newLocation.lng]);
+
+                    setMarkerLocation([newLocation.lat, newLocation.lng]);
                 },
 
                 dblclick: async (e) => {
@@ -1084,6 +1116,8 @@ const Map = forwardRef(
                     let center = [];
                     const childrenboundingboxData = [];
                     const firstPlanningIndex = 0;
+
+                    if(sharing) setMarkerLocation([vitri[0], vitri[1]]);
 
                     // dispatch(setInitialBoundingBox())
 
@@ -1387,6 +1421,8 @@ const Map = forwardRef(
 
         const antDrawOpen = document.querySelector(".ant-drawer-open");
 
+        const historyCost = useSelector((state) => state.historyCost.value);
+    
         return (
             <>
                 {contextHolder}
@@ -1451,6 +1487,14 @@ const Map = forwardRef(
                 </ImageList>
                 {/* )} */}
 
+                <div>
+                  {(markerLocation.length > 0 && historyCost && searchParams.get("zoom") == 19) && 
+                    <ChartCostHistory 
+                      lat={markerLocation[0]} 
+                      lon={markerLocation[1]}
+                    />}
+                </div>
+
                 <MapContainer
                     style={{
                         width: '100vw',
@@ -1463,6 +1507,32 @@ const Map = forwardRef(
                     ref={ref}
                     zoomControl={false}
                 >
+                    {duAn.map((duAnItem) => {
+                      const [lat, lng] = duAnItem.toaDo.split(",").map(Number); 
+
+                      return (
+                        <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
+                          <Popup>
+                            <div className="popup-duan">
+                              <img
+                                src={duAnItem.image}
+                                alt={duAnItem.tenDuAn}
+                                className="popup-duan__image"
+                              />
+                              <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                              <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
+                              <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
+                              <p><b>Vị trí:</b> {duAnItem.viTri}</p>
+
+                              <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                Xem chi tiết
+                              </Link>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      );
+                    })}
+
                     {markerPosition && (
                         <Marker position={markerPosition} icon={customIcon}>
                             <Popup>
@@ -1682,6 +1752,7 @@ const Map = forwardRef(
                         handleWikiClick={handleWikiClick}
                     />
                     <DrawerLandUsePlan/>
+
                     {/* {polygonSessionStorage.length > 0 &&
                     isOverview &&
                     polygonSessionStorage.map((polygon, index) => {

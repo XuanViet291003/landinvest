@@ -17,7 +17,6 @@ import plansSelected from './plansSelected/plansSelected';
 import { planTableExtend } from './planTableExtend/planTableExtend';
 import setPolygonsReducer from './polygonSlice/polygonSlice';
 import searchQueryReducer from './search/searchSlice';
-// import baseApi from './apis/baseApi';
 import allPlannings from './AllPlansSlice/AllPlansSlice';
 import landAuctions from './LandAuctions/landAuctions';
 import landBidding from './landBiddingSlice/landBiddingSlice';
@@ -26,6 +25,8 @@ import listRegulationReducer from './ListRegulations/ListRegulationsSlice';
 import mapLayer from './mapLayer/mapLayerSlice';
 import checkSearchReducer from './checkSearch/checkSearchSlice';
 import landUsePlan from './landUsePlanSlice/lanUsePlanSlice';
+import historyCostReducer from './historyCost/historyCostSlice';
+
 const persistConfig = {
     key: 'root',
     version: 1,
@@ -67,6 +68,7 @@ const rootReducer = combineReducers({
     landUsePlan,
     landAuctions,
     checkSearch: checkSearchReducer,
+    historyCost: historyCostReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

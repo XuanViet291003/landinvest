@@ -153,42 +153,47 @@ const MarkerItem = ({ item, handleShareMarkerLocation }) => {
                     closeOnEscapeKey
                     autoClose
                     eventHandlers={{
-                        click: (e) => e.target.open(),
+                      click: (e) => e.target.open(),
                     }}
                 >
-                    {(viewType === DATA_TYPE.FLYCAM || viewType === DATA_TYPE.GROUND_IMAGES) && (
-                        <Image
-                            src={item?.imageHttp}
-                            alt={item?.id_quyhoach}
-                            className="popup-thumnail"
-                            preview={{
+                  <div className="popup-quyhoach">
+                      {(viewType === DATA_TYPE.FLYCAM || viewType === DATA_TYPE.GROUND_IMAGES) && (
+                          <Image
+                              src={item?.imageHttp}
+                              alt={item?.id_quyhoach}
+                              className="popup-quyhoach__thumbnail"
+                              preview={{
                                 visible: isPreviewVisible,
                                 onVisibleChange: handleChangePreview,
-                            }}
-                        />
-                    )}
-                    {(viewType === DATA_TYPE.FLYCAM_VIDEO || viewType === DATA_TYPE.VIDEO) && (
-                        <div onClick={handleOpenVideo}>
-                            <YoutubeThumbnail youtubeId={videoId} />
-                        </div>
-                    )}
-                    {viewType === DATA_TYPE.IMAGE_360 && (
-                        <div onClick={handleOpenImage360}>
-                            <img
-                                src={url}
-                                alt={`Ảnh quy hoạch ${item?.id_quyhoach}`}
-                                className="image-360-thumbnail"
-                                style={{ width: '100%', height: '100%', cursor: 'pointer' }}
-                            />
-                        </div>
-                    )}
-                    <span className="popup-description">
-                        Quy hoạch: {item?.description || 'Chưa có thông tin mô tả'}
-                    </span>
-                    <button className="button--share" onClick={() => handleShareMarkerLocation(location, shareData)}>
-                        <FaShareAlt />
-                        Chia sẻ vị trí
-                    </button>
+                              }}
+                          />
+                      )}
+
+                      {(viewType === DATA_TYPE.FLYCAM_VIDEO || viewType === DATA_TYPE.VIDEO) && (
+                          <div className="popup-quyhoach__video" onClick={handleOpenVideo}>
+                              <YoutubeThumbnail youtubeId={videoId} />
+                          </div>
+                      )}
+
+                      {viewType === DATA_TYPE.IMAGE_360 && (
+                          <div className="popup-quyhoach__image360" onClick={handleOpenImage360}>
+                              <img
+                                  src={url}
+                                  alt={`Ảnh quy hoạch ${item?.id_quyhoach}`}
+                                  className="popup-quyhoach__image360-thumbnail"
+                              />
+                          </div>
+                      )}
+
+                      <span className="popup-quyhoach__description">
+                          Quy hoạch: {item?.description || 'Chưa có thông tin mô tả'}
+                      </span>
+
+                      <button className="popup-quyhoach__button--share" onClick={() => handleShareMarkerLocation(location, shareData)}>
+                          <FaShareAlt />
+                          Chia sẻ vị trí
+                      </button>
+                    </div>
                 </Popup>
             </Marker>
             <Image360Modal

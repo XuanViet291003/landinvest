@@ -27,16 +27,20 @@ const ListGetDistrictProvinces = ({ location, handleItemClick, address }) => {
                 try {
                     const res = await getLocationInBoudingBox(location[0], location[1]);
                     if (res?.quyhoach?.length > 0) {
-                        setDiaChi(res.diachi || 'Không xác định');
-                        setDistrict(res.district || 'Không có dữ liệu district');
-                        setProvinces(res.provinces || 'Không có dữ liệu province');
-                        setMessageText(res.message || 'Không có dữ liệu message');
                         setQuyHoachData(res.quyhoach);
                     } else {
                         setDiaChi('Không có dữ liệu quy hoạch.');
                         setQuyHoachData([]);
                         messageApi.warning('Không tìm thấy dữ liệu quy hoạch.');
                     }
+
+                    if (res?.diachi) {
+                        setDiaChi(res.diachi);
+                        setDistrict(res.district || 'Không có dữ liệu district');
+                        setProvinces(res.provinces || 'Không có dữ liệu province');
+                        setMessageText(res.message || 'Không có dữ liệu message');
+                        setQuyHoachData(res.quyhoach);
+                    } 
                 } catch (error) {
                     setDiaChi('Lỗi khi lấy dữ liệu.');
                     setQuyHoachData([]);

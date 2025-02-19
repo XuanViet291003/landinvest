@@ -10,6 +10,7 @@ import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistric
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
 import { FaWikipediaW } from "react-icons/fa";
+import { toggleHistoryCost } from '../../redux/historyCost/historyCostSlice.js';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -42,6 +43,9 @@ const LocationInfoSidebar = ({
     const districtId = useSelector((state) => state.landCost.districtId);
     const [isLandAuction, setIsLandAuction] = useState(true);
     const [isShowMore, setIsShowMore] = useState(false);
+
+    const historyCost = useSelector((state) => state.historyCost.value);
+    const dispatch = useDispatch();
 
     const tileLayer = `https://api.quyhoach.xyz/get_quyhoach_theo_tinh/${provincePlansId}/${mapZoom}/${coordinates.x}/${coordinates.y}`;
 
@@ -89,6 +93,10 @@ const LocationInfoSidebar = ({
         }
     }, [location]);
 
+  const handleHistoryCostClick = () => {
+    dispatch(toggleHistoryCost());
+  };
+
 
     // useEffect(() => {
     //     const formData = new FormData();
@@ -120,6 +128,11 @@ const LocationInfoSidebar = ({
             >
                 {' '}
                 <div className="ant-drawer-body-wrapper">
+                    {searchParams.get('zoom') == 19 && (
+                      <button style={{margin:"20px", marginTop: 0}} onClick={() => handleHistoryCostClick()}>
+                        {historyCost ? "Tắt xem lịch sử giá đất" : "Mở xem lịch sử giá đất"}
+                      </button>
+                    )}
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>

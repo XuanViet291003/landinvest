@@ -71,8 +71,8 @@ function GroupNews() {
             <div className="list-articles">
                 {articles.map((item, index) => (
                     <div
-                        style={{ cursor: 'pointer' }}
-                        className="d-flex flex-column justify-content-center align-items-center "
+                        style={{ cursor: 'pointer', width: '100%' }}
+                        className="d-flex flex-column justify-content-center align-items-center"
                         onClick={() => handleNavigate(item.PostID)}
                     >
                         <div key={index} className="list-articles__item">
