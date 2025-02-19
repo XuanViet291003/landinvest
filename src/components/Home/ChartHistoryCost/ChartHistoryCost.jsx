@@ -14,7 +14,6 @@ import { useSearchParams } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import { getLocationInBoudingBox } from "../../../services/api";
 import './ChartHistoryCost.scss';
-import { useDispatch, useSelector } from "react-redux";
 
 const ChartCostHistory = (props) => {
   const [data, setData] = useState(null);
@@ -24,13 +23,10 @@ const ChartCostHistory = (props) => {
   const [diaChi, setDiaChi] = useState("");
   const [hoveredTab, setHoveredTab] = useState(null);
 
-  const [isClose, setIsClose] = useState(false);
-
   const { lat, lon } = props;
 
   // Lấy dữ liệu từ API
   useEffect(() => {
-    setIsClose(false);
     if (searchParams.get("type") && processedData) {
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("type");
@@ -49,7 +45,7 @@ const ChartCostHistory = (props) => {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        
+
         // Lọc các type trùng nhau (không phân biệt chữ hoa chữ thường)
         const uniqueData = result.lich_su_gia.filter(
           (item, index, self) =>
@@ -123,101 +119,104 @@ const ChartCostHistory = (props) => {
   };
 
   const handleClose = () => {
-    setIsClose(true);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("ups");
+    setSearchParams(newParams);
   };
 
   return (
     <>
-      {!isClose && (
-        <Container>
-          <div className="history-cost-container">
-            <div className="close-btn" onClick={handleClose} title="Đóng">
-              X
-            </div>
-
-            <div className="address-box">
-              <div className="address-text">
-                <strong>Địa chỉ:</strong> {diaChi}
-              </div>
-            </div>
-
-            {data && processedData ? (
-              <>
-                <div className="tabs-container">
-                  {data.map((item, index) => (
-                    <div key={index} className="tab-item">
-                      <button
-                        className={`tab-btn ${index === selectedTab ? "active" : ""
-                          }`}
-                        onClick={() => handleTabChange(index)}
-                        onMouseEnter={() => setHoveredTab(index)}
-                        onMouseLeave={() => setHoveredTab(null)}
-                      >
-                        {item.type.trim()}
-                      </button>
-                      {hoveredTab === index && (
-                        <div className="tab-popup">
-                          {item.image_links && (
-                            <img
-                              src={item.image_links.split(",")[0]}
-                              alt="Preview"
-                            />
-                          )}
-                          <p>{item.description}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <ResponsiveContainer width="100%" height={320}>
-                  <LineChart data={processedData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="monthYear" />
-                    <YAxis domain={([min, max]) => [min - 5, max + 10]} />
-                    <Tooltip
-                      formatter={(value, name, props) => [
-                        value > 1000 ? `${(value / 1000).toFixed(2)} tỷ/m²` : `${value} triệu/m²`,
-                        name,
-                      ]}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="max"
-                      stroke="#FF0000"
-                      name="Giá cao nhất"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="avg"
-                      stroke="#00BFFF"
-                      name="Giá phổ biến"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="min"
-                      stroke="#008000"
-                      name="Giá thấp nhất"
-                      strokeWidth={2}
-                    />
-                    <Brush
-                      dataKey="monthYear"
-                      height={30}
-                      stroke="#8884d8"
-                      travellerWidth={10}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </>
-            ) : (
-              <h2 className="loading">Loading...</h2>
-            )}
+      <Container>
+        <div className="history-cost-container">
+          <div className="close-btn"
+            onClick={handleClose}
+            title="Đóng"
+          >
+            X
           </div>
-        </Container>
-      )}
+
+          <div className="address-box">
+            <div className="address-text">
+              <strong>Địa chỉ:</strong> {diaChi}
+            </div>
+          </div>
+
+          {data && processedData ? (
+            <>
+              <div className="tabs-container">
+                {data.map((item, index) => (
+                  <div key={index} className="tab-item">
+                    <button
+                      className={`tab-btn ${index === selectedTab ? "active" : ""
+                        }`}
+                      onClick={() => handleTabChange(index)}
+                      onMouseEnter={() => setHoveredTab(index)}
+                      onMouseLeave={() => setHoveredTab(null)}
+                    >
+                      {item.type.trim()}
+                    </button>
+                    {hoveredTab === index && (
+                      <div className="tab-popup">
+                        {item.image_links && (
+                          <img
+                            src={item.image_links.split(",")[0]}
+                            alt="Preview"
+                          />
+                        )}
+                        <p>{item.description}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <ResponsiveContainer width="100%" height={320}>
+                <LineChart data={processedData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="monthYear" />
+                  <YAxis domain={([min, max]) => [min - 5, max + 10]} />
+                  <Tooltip
+                    formatter={(value, name, props) => [
+                      value > 1000 ? `${(value / 1000).toFixed(2)} tỷ/m²` : `${value} triệu/m²`,
+                      name,
+                    ]}
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="max"
+                    stroke="#FF0000"
+                    name="Giá cao nhất"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="avg"
+                    stroke="#00BFFF"
+                    name="Giá phổ biến"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="min"
+                    stroke="#008000"
+                    name="Giá thấp nhất"
+                    strokeWidth={2}
+                  />
+                  <Brush
+                    dataKey="monthYear"
+                    height={30}
+                    stroke="#8884d8"
+                    travellerWidth={10}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </>
+          ) : (
+            <h2 className="loading">Loading...</h2>
+          )}
+        </div>
+      </Container>
     </>
   );
 };

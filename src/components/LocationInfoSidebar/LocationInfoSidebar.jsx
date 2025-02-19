@@ -10,7 +10,7 @@ import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistric
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
 import { FaWikipediaW } from "react-icons/fa";
-import { toggleHistoryCost } from '../../redux/historyCost/historyCostSlice.js';
+import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost.jsx';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -94,7 +94,13 @@ const LocationInfoSidebar = ({
     }, [location]);
 
   const handleHistoryCostClick = () => {
-    dispatch(toggleHistoryCost());
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (newSearchParams.get("ups") === "history-cost") {
+      newSearchParams.delete("ups");
+    } else {
+      newSearchParams.set("ups", "history-cost");
+    }
+    setSearchParams(newSearchParams);
   };
 
 
@@ -128,11 +134,9 @@ const LocationInfoSidebar = ({
             >
                 {' '}
                 <div className="ant-drawer-body-wrapper">
-                    {searchParams.get('zoom') == 19 && (
-                      <button style={{margin:"20px", marginTop: 0}} onClick={() => handleHistoryCostClick()}>
-                        {historyCost ? "Tắt xem lịch sử giá đất" : "Mở xem lịch sử giá đất"}
-                      </button>
-                    )}
+                    <button style={{margin:"20px", marginTop: 0}} onClick={() => handleHistoryCostClick()}>
+                      {searchParams.get("ups") === "history-cost" ? "Đóng lịch sử giá đất" : "Mở lịch sử giá đất"}
+                    </button>
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>
