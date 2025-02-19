@@ -49,6 +49,7 @@ const ChartCostHistory = (props) => {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
+        console.log(result)
         // Lọc các type trùng nhau (không phân biệt chữ hoa chữ thường)
         const uniqueData = result.lich_su_gia.filter(
           (item, index, self) =>
@@ -62,7 +63,7 @@ const ChartCostHistory = (props) => {
 
         // Lấy thông tin địa chỉ
         const res = await getLocationInBoudingBox(lat, lon);
-        if (res?.quyhoach?.length > 0) {
+        if (res?.diachi) {
           setDiaChi(res.diachi || "Không xác định");
         } else {
           setDiaChi("Không có dữ liệu quy hoạch.");
