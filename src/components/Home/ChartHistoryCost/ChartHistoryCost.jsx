@@ -49,7 +49,7 @@ const ChartCostHistory = (props) => {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        console.log(result)
+        
         // Lọc các type trùng nhau (không phân biệt chữ hoa chữ thường)
         const uniqueData = result.lich_su_gia.filter(
           (item, index, self) =>

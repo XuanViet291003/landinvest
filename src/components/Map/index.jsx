@@ -930,11 +930,19 @@ const Map = forwardRef(
                     setIsLandAdministationLoading(true);
                     setIsShowLandAdministration(true);
 
+                    const startTime = Date.now();
                     const res = await getAreaLocation(newLocation.lat, newLocation.lng);
+                    const endTime = Date.now();
+
+                    console.log("Data địa chính: " + res.dulieu)
+
+                    console.log(`Thời gian lấy data địa chính: ${endTime - startTime} ms`);
+
                     setIsLandAdministationLoading(false);
                     setLandAdministrationData(res.dulieu);
 
                     if (res) {
+                        const startTimeAfter = Date.now();
                         const getAddress = await getLocationInBoudingBox(newLocation.lat, newLocation.lng);
                         if (getAddress.diachi) {
                             setAddress(getAddress.diachi);
@@ -988,7 +996,11 @@ const Map = forwardRef(
                                 </Marker>
                             ),
                         };
+                        console.log("Data Polygon: " + newPolygonArea)
                         setPolygonArea(newPolygonArea);
+                        const endTimeAfter = Date.now();
+
+                        console.log(`Thời gian vẽ Polygon(sau khi có thông tin địa chính): ${endTimeAfter - startTimeAfter} ms`);
                     } else {
                         setPolygonArea({...polygonArea, address: 'Không có dữ liệu ...'});
                     }
