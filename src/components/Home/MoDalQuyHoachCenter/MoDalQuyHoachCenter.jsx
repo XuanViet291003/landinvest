@@ -2,7 +2,7 @@ import { Input, Modal, Radio, List } from 'antd';
 import { memo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './MoDalQuyHoachCenter.scss';
-import { doGetQuyHoach } from '../../../redux/getQuyHoach/getQuyHoachSlice';
+import { doClearQuyHoach, doGetQuyHoach } from '../../../redux/getQuyHoach/getQuyHoachSlice';
 import ModalLogin from '../../Auth/ModalNotification';
 
 function ModalQuyHoachCenter({ isShowModalQuyHoachCenter, setIsShowModalQuyHoachCenter, quyHoachList }) {
