@@ -1,24 +1,29 @@
-import {Modal, Select} from 'antd';
-import React, {forwardRef, memo, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {LOCATION_KEYS} from '../../constants/commonKey';
-import {calculateLocation} from '../../function/calculateLocation';
+import { Modal, Select, Spin } from 'antd';
+import React, { forwardRef, memo, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { LOCATION_KEYS } from '../../constants/commonKey';
+import { calculateLocation } from '../../function/calculateLocation';
 import fetchProvinceName from '../../function/findProvince';
-import {getPolygonsQuanHuyen, getPolygonsTinh} from '../../function/getPolygonByName';
-import {doSearch} from '../../redux/search/searchSlice';
+import { getPolygonsQuanHuyen, getPolygonsTinh } from '../../function/getPolygonByName';
+import { doSearch } from '../../redux/search/searchSlice';
 import {
     getAllDistrictInProvince,
     getAllProvinces,
     getAllWandInDistrict,
-    getWardPolygon
+    getLocationInBoudingBox,
+    getWardPolygon,
 } from '../../services/api';
 import '../../styles/selectLocationModal.scss';
+import { setDistrictId } from '../../redux/landCostSlice/landCostSlice';
+import { useSearchParams } from 'react-router-dom';
 
-const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef) => {
+const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose, lat, lon }, mapRef) => {
     const [allProvinces, setAllProvinces] = useState([]);
     const [allDistricts, setAllDistricts] = useState([]);
     const [allWards, setAllWards] = useState([]);
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
     const zoom = 15;
     const options = {
         animate: true,
@@ -36,15 +41,16 @@ const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef)
     });
 
     const onChangeProvince = async (id) => {
+        setLoading(true);
+        console.log('change province');
         try {
-            const boundingBox = JSON.parse(
-                allProvinces.filter((item) => item.ProvinceID === id)?.[0]?.bounding_box || [],
-            );
+            const province = allProvinces?.find((item) => item.ProvinceID === id);
+            const boundingBox = province?.bounding_box ? JSON.parse(province.bounding_box) : [];
             const [lng, lat] = calculateLocation([
                 [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
             ]);
             const res = await getAllDistrictInProvince(id);
-
+            setAllDistricts(res);
             setCurrentLocation({
                 locationId: id,
                 locationType: LOCATION_KEYS.PROVINCE,
@@ -56,22 +62,19 @@ const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef)
             setDefaultProvince(id);
             setDefaultSelectDistrict(null);
             setDefaultSelectWard(null);
-            setAllDistricts(res);
         } catch (error) {
             console.log(error);
         }
+        setLoading(false);
     };
-
     const onChangeDistrict = async (id) => {
         try {
-            const boundingBox = JSON.parse(
-                allDistricts.filter((item) => item.DistrictID === id)?.[0]?.bounding_box || [],
-            );
+            const district = allDistricts.find((item) => item.DistrictID === id);
+            const boundingBox = district?.bounding_box ? JSON.parse(district.bounding_box) : [];
             const [lng, lat] = calculateLocation([
                 [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
             ]);
             const res = await getAllWandInDistrict(id);
-
             setCurrentLocation({
                 locationId: id,
                 locationType: LOCATION_KEYS.DISTRICT,
@@ -80,19 +83,18 @@ const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef)
                     lng,
                 },
             });
-            console.log(id);
+            setAllWards(res.all_xa);
             setDefaultSelectDistrict(id);
             setDefaultSelectWard(null);
-            setAllWards(res.all_xa);
         } catch (error) {
             console.log(error);
         }
     };
 
     const onChangeWard = async (id) => {
-        const boundingBox = JSON.parse(allWards.filter((item) => item.WandID === id)?.[0]?.bbox || []);
+        const ward = allWards.find((item) => item.WandID === id);
+        const boundingBox = ward?.bbox ? JSON.parse(ward.bbox) : [];
         const [lng, lat] = calculateLocation([boundingBox]);
-
         setDefaultSelectWard(id);
         setCurrentLocation({
             locationId: id,
@@ -103,7 +105,6 @@ const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef)
             },
         });
     };
-
     const handleSearchLocation = async () => {
         let polygons = [];
         if (!currentLocation.locationId) return;
@@ -156,39 +157,68 @@ const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef)
         (async () => {
             try {
                 const res = await getAllProvinces();
-                const boundingBox = JSON.parse(res.dulieu?.[0]?.bounding_box || []);
-                const [lng, lat] = calculateLocation([
-                    [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
-                ]);
+                // const boundingBox = JSON.parse(res.dulieu?.[0]?.bounding_box || []);
+                // const [lng, lat] = calculateLocation([
+                //     [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
+                // ]);
                 setAllProvinces(res.dulieu);
-                setCurrentLocation({
-                    locationId: defaultSelectProvince,
-                    locationType: LOCATION_KEYS.PROVINCE,
-                    location: {
-                        lat,
-                        lng,
-                    },
-                });
+                // setCurrentLocation({
+                //     locationId: defaultSelectProvince,
+                //     locationType: LOCATION_KEYS.PROVINCE,
+                //     location: {
+                //         lat,
+                //         lng,
+                //     },
+                // });
             } catch (error) {
                 console.log(error);
             }
         })();
-
-        (async () => {
-            try {
-                const districts = await getAllDistrictInProvince(defaultSelectProvince);
-                setAllDistricts(districts);
-            } catch (error) {
-                console.log(error);
-            }
-        })();
+        // (async () => {
+        //     setLoading(true);
+        //     try {
+        //         const districts = await getAllDistrictInProvince(defaultSelectProvince);
+        //         setAllDistricts(districts);
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        //     setLoading(false);
+        // })();
     }, []);
+    useEffect(() => {
+        (async () => {
+            setLoading(true);
+            try {
+                const vitri = searchParams.get('vitri');
+                if (!vitri) {
+                    console.warn('Không tìm thấy "vitri" trong URL');
+                    return;
+                }
+
+                const point = vitri.split(',');
+                if (point.length < 2) {
+                    console.warn('Dữ liệu vị trí không hợp lệ:', point);
+                    return;
+                }
+
+                const location = await getLocationInBoudingBox(point[0], point[1]);
+                console.log('Location found:', location);
+
+                if (location?.provinces) await onChangeProvince(location.provinces);
+                if (location?.district) await onChangeDistrict(location.district);
+            } catch (e) {
+                console.log(e);
+            }
+            setLoading(false);
+        })();
+    }, [isOpen]);
 
     const removeVietnameseTones = (str) => {
         return str
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d").replace(/Đ/g, "D");
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D');
     };
 
     const isVietnamese = (str) => {
@@ -206,74 +236,82 @@ const SelectLocationModal = forwardRef(({isOpen, handleOk, handleClose}, mapRef)
 
     return (
         <Modal width={600} footer={null} open={isOpen} onOk={handleOk} onCancel={handleClose}>
-            <div className="select-location__modal">
-                {/* Chọn tỉnh / thành phố */}
-                <div className="select-location__modal--wrapper">
-                    <div className="select-location__modal__label">
-                        <span className="select-location__modal__label--location">Tỉnh</span>{' '}
-                        <span className="select-location__modal__label--split">/</span>{' '}
-                        <span className="select-location__modal__label--location">Thành phố</span>
+            <Spin spinning={loading}>
+                <div className="select-location__modal">
+                    {/* Chọn tỉnh / thành phố */}
+                    <div className="select-location__modal--wrapper">
+                        <div className="select-location__modal__label">
+                            <span className="select-location__modal__label--location">Tỉnh</span>{' '}
+                            <span className="select-location__modal__label--split">/</span>{' '}
+                            <span className="select-location__modal__label--location">Thành phố</span>
+                        </div>
+                        <Select
+                            showSearch
+                            placeholder="Chọn tỉnh thành phố"
+                            optionFilterProp="label"
+                            onChange={onChangeProvince}
+                            value={defaultSelectProvince}
+                            className="select-location__modal--select"
+                            filterOption={filterLocation}
+                            options={allProvinces?.map((item) => ({
+                                label: item.ProvinceName,
+                                value: item.ProvinceID,
+                            }))}
+                        />
                     </div>
-                    <Select
-                        showSearch
-                        placeholder="Chọn tỉnh thành phố"
-                        optionFilterProp="label"
-                        onChange={onChangeProvince}
-                        defaultValue={defaultSelectProvince}
-                        className="select-location__modal--select"
-                        filterOption={filterLocation}
-                        options={allProvinces?.map((item) => ({label: item.ProvinceName, value: item.ProvinceID}))}
-                    />
-                </div>
 
-                {/* Chọn quận / huyện */}
-                <div className="select-location__modal--wrapper">
-                    <div className="select-location__modal__label">
-                        <span className="select-location__modal__label--location">Quận</span>{' '}
-                        <span className="select-location__modal__label--split">/</span>{' '}
-                        <span className="select-location__modal__label--location">Huyện</span>
+                    {/* Chọn quận / huyện */}
+                    <div className="select-location__modal--wrapper">
+                        <div className="select-location__modal__label">
+                            <span className="select-location__modal__label--location">Quận</span>{' '}
+                            <span className="select-location__modal__label--split">/</span>{' '}
+                            <span className="select-location__modal__label--location">Huyện</span>
+                        </div>
+                        <Select
+                            showSearch
+                            placeholder="Chọn quận huyện"
+                            optionFilterProp="label"
+                            onChange={onChangeDistrict}
+                            value={defaultSelectDistrict}
+                            className="select-location__modal--select"
+                            filterOption={filterLocation}
+                            options={allDistricts?.map((item) => ({
+                                label: item.DistrictName,
+                                value: item.DistrictID,
+                            }))}
+                        />
                     </div>
-                    <Select
-                        showSearch
-                        placeholder="Chọn quận huyện"
-                        optionFilterProp="label"
-                        onChange={onChangeDistrict}
-                        value={defaultSelectDistrict}
-                        className="select-location__modal--select"
-                        filterOption={filterLocation}
-                        options={allDistricts?.map((item) => ({label: item.DistrictName, value: item.DistrictID}))}
-                    />
-                </div>
 
-                {/* Chọn xã / phường */}
-                <div className="select-location__modal--wrapper">
-                    <div className="select-location__modal__label">
-                        <span className="select-location__modal__label--location">Xã</span>{' '}
-                        <span className="select-location__modal__label--split">/</span>{' '}
-                        <span className="select-location__modal__label--location">Phường</span>
+                    {/* Chọn xã / phường */}
+                    <div className="select-location__modal--wrapper">
+                        <div className="select-location__modal__label">
+                            <span className="select-location__modal__label--location">Xã</span>{' '}
+                            <span className="select-location__modal__label--split">/</span>{' '}
+                            <span className="select-location__modal__label--location">Phường</span>
+                        </div>
+                        <Select
+                            showSearch
+                            placeholder="Chọn phường xã"
+                            optionFilterProp="label"
+                            onChange={onChangeWard}
+                            value={defaultSelectWard}
+                            className="select-location__modal--select"
+                            filterOption={filterLocation}
+                            options={allWards?.map((item) => ({ label: item.WandName, value: item.WandID }))}
+                        />
                     </div>
-                    <Select
-                        showSearch
-                        placeholder="Chọn phường xã"
-                        optionFilterProp="label"
-                        onChange={onChangeWard}
-                        value={defaultSelectWard}
-                        className="select-location__modal--select"
-                        filterOption={filterLocation}
-                        options={allWards?.map((item) => ({label: item.WandName, value: item.WandID}))}
-                    />
-                </div>
 
-                {/* Nút hành động */}
-                <div className="select-location__modal--wrapper-btn">
-                    <div className="select-location__modal--btn-warning" onClick={handleReset}>
-                        Đặt lại
-                    </div>
-                    <div className="select-location__modal--btn" onClick={handleSearchLocation}>
-                        Tìm khu vực
+                    {/* Nút hành động */}
+                    <div className="select-location__modal--wrapper-btn">
+                        <div className="select-location__modal--btn-warning" onClick={handleReset}>
+                            Đặt lại
+                        </div>
+                        <div className="select-location__modal--btn" onClick={handleSearchLocation}>
+                            Tìm khu vực
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Spin>
         </Modal>
     );
 });

@@ -1,125 +1,173 @@
-import { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
-import { useSearchParams } from "react-router-dom";
-
-import "./Investor.scss";
-import InvestorCard from "./components/InvestorCard";
-
+import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
+import './Investor.scss';
+import InvestorCard from './components/InvestorCard';
+import { Input, Spin } from 'antd';
+import { getListSearchInvestor } from '../../services/api';
+const { Search } = Input;
 const Investor = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [data, setData] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
-
-  // Lấy trang hiện tại từ URL query (nếu không có thì mặc định là 1)
-  const currentPage = parseInt(searchParams.get("page")) || 1;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`https://api.quyhoach.xyz/list_nhadautu?page=${currentPage}`);
-        const result = await response.json();
-        setData(result.data);
-        if (result.page_numer) {
-          setTotalPages(Math.ceil(result.page_numer));
+    const [data, setData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [isSearch, setIsSearch] = useState(false);
+    const [keySearch, setKeySearch] = useState('');
+    const onSearch = async (e) => {
+        setIsSearch(true);
+        if (currentPage !== 1) {
+            setCurrentPage(1);
+            return;
         }
-      } catch (err) {
-        console.log(err.message);
-      }
+        setCurrentPage(1);
+        setLoading(true);
+        try {
+            if (e.trim() == '') {
+                const response = await fetch(`https://api.quyhoach.xyz/list_nhadautu?page=${1}`);
+                const result = await response.json();
+                setData(result.data);
+                setTotalPages(Math.ceil(result.page_numer));
+                setLoading(false);
+                return;
+            }
+            const res = await getListSearchInvestor(e);
+            setData(res.data);
+            if (res) {
+                setTotalPages(Math.ceil(res.page_numer));
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        setLoading(false);
+    };
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                let result;
+                if (!isSearch) {
+                    const response = await fetch(`https://api.quyhoach.xyz/list_nhadautu?page=${currentPage}`);
+                    result = await response.json();
+                    setData(result.data);
+                } else {
+                    console.log(1);
+                    const res = await getListSearchInvestor(keySearch, currentPage);
+                    console.log(res);
+                    result = res.data;
+                    setData(result);
+                }
+                if (result.page_numer) {
+                    setTotalPages(Math.ceil(result.page_numer));
+                }
+            } catch (err) {
+                console.log(err.message);
+            }
+            setLoading(false);
+        };
+        fetchData();
+    }, [currentPage]);
+
+    // Hàm bắt sự kiện click vào trang
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
     };
 
-    fetchData();
-  }, [currentPage]);
+    // Hàm tạo danh sách số trang
+    const renderPagination = () => {
+        let pages = [];
+        let startPage = Math.max(2, currentPage - 1);
+        let endPage = Math.min(totalPages - 1, currentPage + 1);
 
-  // Hàm bắt sự kiện click vào trang
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setData([]);
-      setSearchParams({ page: page.toString() });
-    }
-  };
+        if (currentPage > 3) {
+            pages.push('...');
+        }
 
-  // Hàm tạo danh sách số trang 
-  const renderPagination = () => {
-    let pages = [];
-    let startPage = Math.max(2, currentPage - 1);
-    let endPage = Math.min(totalPages - 1, currentPage + 1);
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
 
-    if (currentPage > 3) {
-      pages.push("...");
-    }
+        if (currentPage < totalPages - 2) {
+            pages.push('...');
+        }
 
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
+        return pages;
+    };
 
-    if (currentPage < totalPages - 2) {
-      pages.push("...");
-    }
+    return (
+        <Container>
+            <Spin size="large" spinning={loading}>
+                <div className="investor-container">
+                    <h3 className="head-title">Danh sách nhà đầu tư được phê duyệt</h3>
+                    <Search
+                        loading={loading}
+                        placeholder="Tìm kiếm"
+                        size="large"
+                        onSearch={onSearch}
+                        onChange={(e) => {
+                            setKeySearch(e.target.value);
+                        }}
+                        enterButton
+                        style={{ width: '300px' }}
+                    />
 
-    return pages;
-  };
+                    {data.map((item, index) => (
+                        <InvestorCard key={index} data={item} />
+                    ))}
+                    <ul className="pagination">
+                        <li>
+                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                «
+                            </button>
+                        </li>
 
-  return (
-    <Container>
-      <div className="investor-container">
-        {data.length > 0 && <h3 className="head-title">Danh sách nhà đầu tư được phê duyệt</h3>}
+                        <li>
+                            <button className={currentPage === 1 ? 'active' : ''} onClick={() => handlePageChange(1)}>
+                                1
+                            </button>
+                        </li>
 
-        {data.length > 0 ? (
-          data.map((item, index) => <InvestorCard key={index} data={item} />)
-        ) : (
-          <p>Không có dữ liệu</p>
-        )}
+                        {renderPagination().map((page, index) =>
+                            page === '...' ? (
+                                <li key={index} className="dots">
+                                    ...
+                                </li>
+                            ) : (
+                                <li key={index}>
+                                    <button
+                                        className={currentPage === page ? 'active' : ''}
+                                        onClick={() => handlePageChange(page)}
+                                    >
+                                        {page}
+                                    </button>
+                                </li>
+                            ),
+                        )}
 
-        {data.length > 0 && (
-          <ul className="pagination">
-            <li>
-              <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                «
-              </button>
-            </li>
+                        {totalPages > 1 && (
+                            <li>
+                                <button
+                                    className={currentPage === totalPages ? 'active' : ''}
+                                    onClick={() => handlePageChange(totalPages)}
+                                >
+                                    {totalPages}
+                                </button>
+                            </li>
+                        )}
 
-            <li>
-              <button className={currentPage === 1 ? "active" : ""} onClick={() => handlePageChange(1)}>
-                1
-              </button>
-            </li>
-
-            {renderPagination().map((page, index) =>
-              page === "..." ? (
-                <li key={index} className="dots">...</li>
-              ) : (
-                <li key={index}>
-                  <button
-                    className={currentPage === page ? "active" : ""}
-                    onClick={() => handlePageChange(page)}
-                  >
-                    {page}
-                  </button>
-                </li>
-              )
-            )}
-
-            {totalPages > 1 && (
-              <li>
-                <button
-                  className={currentPage === totalPages ? "active" : ""}
-                  onClick={() => handlePageChange(totalPages)}
-                >
-                  {totalPages}
-                </button>
-              </li>
-            )}
-
-            <li>
-              <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                »
-              </button>
-            </li>
-          </ul>
-        )}
-      </div>
-    </Container>
-  );
+                        <li>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                            >
+                                »
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </Spin>
+        </Container>
+    );
 };
 
 export default Investor;
