@@ -349,6 +349,7 @@ const Map = forwardRef(
         const [RegulationImages, setRegulationImages] = useState(null);
         const [selectedBounds, setSelectedBounds] = useState(null);
         const [imageOverlay, setImageOverlay] = useState(null);
+        const [showPopup, setShowPopup] = useState(false);
 
         // const mapRef = useRef();
         // const sharing = searchParams.get('ups');
@@ -593,6 +594,9 @@ const Map = forwardRef(
                         clearTimeout(pressTimer);
                     }
                 },
+                dragend: () => {
+                  setShowPopup(false);
+                }
             });
             return null;
         };
@@ -1557,24 +1561,35 @@ const Map = forwardRef(
                       const [lat, lng] = duAnItem.toaDo.split(",").map(Number); 
 
                       return (
-                        <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
-                          <Popup>
-                            <div className="popup-duan">
-                              <img
-                                src={duAnItem.image}
-                                alt={duAnItem.tenDuAn}
-                                className="popup-duan__image"
-                              />
-                              <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
-                              <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
-                              <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
-                              <p><b>Vị trí:</b> {duAnItem.viTri}</p>
+                        <Marker 
+                          key={duAnItem.id} 
+                          position={[lat, lng]} 
+                          icon={iconDuAn}
+                          eventHandlers={{
+                            click: () => {
+                              setShowPopup(true);
+                            },
+                          }}
+                        >
+                          {showPopup && (
+                            <Popup onClose={() => setShowPopup(false)}>
+                              <div className="popup-duan">
+                                <img
+                                  src={duAnItem.image}
+                                  alt={duAnItem.tenDuAn}
+                                  className="popup-duan__image"
+                                />
+                                <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                                <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
+                                <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
+                                <p><b>Vị trí:</b> {duAnItem.viTri}</p>
 
-                              <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
-                                Xem chi tiết
-                              </Link>
-                            </div>
-                          </Popup>
+                                <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                  Xem chi tiết
+                                </Link>
+                              </div>
+                            </Popup>
+                          )}
                         </Marker>
                       );
                     })}
