@@ -91,6 +91,7 @@ function PostNews() {
                 date.getMonth() + 1
             }/${date.getFullYear()}`;
             const newData = [
+                ...(listComments.length >= 10 ? listComments.slice(0, -1) : listComments),
                 {
                     avatar: dataUser.avatarLink,
                     username: dataUser.Username,
@@ -103,7 +104,6 @@ function PostNews() {
                     })),
                     actionAt: dateString,
                 },
-                ...(listComments.length >= 10 ? listComments.slice(0, -1) : listComments),
             ].map((item) => {
                 const content = item.content.split('[/QUOTE]');
                 let reply = '',
