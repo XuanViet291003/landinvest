@@ -38,9 +38,14 @@ const LandAuctionModal = ({ isLandAuctionModalOpen, handleOk, handleCancel }) =>
 
     return (
         <>
-            {isLandAuctionModalOpen && (
-                isMobile ? (
-                    <Modal title="Danh sách đấu giá" open={isLandAuctionModalOpen} onCancel={handleCancel} footer={null}>
+            {isLandAuctionModalOpen &&
+                (isMobile ? (
+                    <Modal
+                        title="Danh sách đấu giá"
+                        open={isLandAuctionModalOpen}
+                        onCancel={handleCancel}
+                        footer={null}
+                    >
                         {contextHolder}
                         <div>
                             <p>
@@ -66,22 +71,31 @@ const LandAuctionModal = ({ isLandAuctionModalOpen, handleOk, handleCancel }) =>
                                         <span className="land-cost-area__wrapper__header--bold">
                                             {currentLocation.districtName} - {currentLocation.provinceName}.
                                         </span>
-                                        <span className="land-cost-area__wrapper__header--share" onClick={handleShareLocation}>
+                                        <span
+                                            className="land-cost-area__wrapper__header--share"
+                                            onClick={handleShareLocation}
+                                        >
                                             <CiShare2 size={16} /> Chia sẻ
                                         </span>
                                     </span>
-                                    <FaCircleMinus color="#fff" fontSize={26} className="land-cost-area__wrapper__header--icon" onClick={handleCancel} />
+                                    <FaCircleMinus
+                                        color="#fff"
+                                        fontSize={26}
+                                        className="land-cost-area__wrapper__header--icon"
+                                        onClick={handleCancel}
+                                    />
                                 </div>
                                 <p className="land-cost__container--notice" style={{ marginTop: '13px' }}>
                                     Modal này có thể chỉnh kích thước được.
                                 </p>
-                                <p className="land-cost__container--notice">Giữ shift + lăn chuột để xem các cột tiếp theo</p>
+                                <p className="land-cost__container--notice">
+                                    Giữ shift + lăn chuột để xem các cột tiếp theo
+                                </p>
                                 <LandAuctionTable tableType={MAP_TABLE_TYPE.ON_MAP} handleClose={handleCancel} />
                             </div>
                         </div>
                     </ReactWindow>
-                )
-            )}
+                ))}
         </>
     );
 };

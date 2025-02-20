@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getGroupByPage } from '../../../services/api';
 import ReactPaginate from 'react-paginate';
 import { FaEye } from 'react-icons/fa';
@@ -21,16 +21,16 @@ function GroupNews() {
     const [isShowModalCreate, setIsShowModalCreate] = useState(false);
     const [isShowModalEdit, setIsShowModalEdit] = useState(false);
     const [news, setNews] = useState({});
+    const [searchParam, setSearchParam] = useSearchParams();
     const handlePageClick = async (e) => {
-        const fetchApi = async () => {
-            try {
-                const res = await getGroupByPage(id, e.selected + 1);
-                setArticles(res.data);
-            } catch {
-                message.error('Đã có lỗi xảy ra !');
-            }
-        };
-        fetchApi();
+        try {
+            searchParam.set('page', e.selected + 1);
+            setSearchParam(searchParam);
+            const res = await getGroupByPage(id, e.selected + 1);
+            setArticles(res.data);
+        } catch {
+            message.error('Đã có lỗi xảy ra !');
+        }
     };
     const handleCreate = () => {
         if (!isAuthenticated) {
@@ -43,8 +43,9 @@ function GroupNews() {
         navigate(`/news/group/post/${id}`);
     };
     useLayoutEffect(() => {
+        const page = searchParam.get('page');
         const fetchApi = async () => {
-            const res = await getGroupByPage(id, 1);
+            const res = await getGroupByPage(id, page || 1);
             setArticles(res.data);
             setTotalPage(parseInt(Math.ceil(res.total_page)));
         };
@@ -63,6 +64,7 @@ function GroupNews() {
                 pageRangeDisplayed={3}
                 onPageChange={handlePageClick}
                 activeClassName="pagination--active"
+                initialPage={parseInt(searchParam.get('page') || 1) - 1}
             />
             <button className=" button-create" onClick={handleCreate}>
                 Tạo bài viết

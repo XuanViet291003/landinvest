@@ -5,24 +5,24 @@ import { MdIntegrationInstructions } from 'react-icons/md';
 import { RiSubtractLine } from 'react-icons/ri';
 import './Home.scss';
 
-import ios1 from "../../assets/shareLocationPopup/ios-1.png"
-import ios2 from "../../assets/shareLocationPopup/ios-2.png"
-import ios3 from "../../assets/shareLocationPopup/ios-3.png"
-import ios4 from "../../assets/shareLocationPopup/ios-4.png"
-import ios5 from "../../assets/shareLocationPopup/ios-5.png"
-import ios6 from "../../assets/shareLocationPopup/ios-6.png"
-import ios7 from "../../assets/shareLocationPopup/ios-7.png"
-import ios8 from "../../assets/shareLocationPopup/ios-8.png"
-import ios9 from "../../assets/shareLocationPopup/ios-9.png"
+import ios1 from '../../assets/shareLocationPopup/ios-1.png';
+import ios2 from '../../assets/shareLocationPopup/ios-2.png';
+import ios3 from '../../assets/shareLocationPopup/ios-3.png';
+import ios4 from '../../assets/shareLocationPopup/ios-4.png';
+import ios5 from '../../assets/shareLocationPopup/ios-5.png';
+import ios6 from '../../assets/shareLocationPopup/ios-6.png';
+import ios7 from '../../assets/shareLocationPopup/ios-7.png';
+import ios8 from '../../assets/shareLocationPopup/ios-8.png';
+import ios9 from '../../assets/shareLocationPopup/ios-9.png';
 
-import android1 from "../../assets/shareLocationPopup/android-1.png"
-import android2 from "../../assets/shareLocationPopup/android-2.png"
-import android3 from "../../assets/shareLocationPopup/android-3.png"
-import android4 from "../../assets/shareLocationPopup/android-4.png"
-import android5 from "../../assets/shareLocationPopup/android-5.png"
-import android6 from "../../assets/shareLocationPopup/android-6.png"
-import android7 from "../../assets/shareLocationPopup/android-7.png"
-import android8 from "../../assets/shareLocationPopup/android-8.png"
+import android1 from '../../assets/shareLocationPopup/android-1.png';
+import android2 from '../../assets/shareLocationPopup/android-2.png';
+import android3 from '../../assets/shareLocationPopup/android-3.png';
+import android4 from '../../assets/shareLocationPopup/android-4.png';
+import android5 from '../../assets/shareLocationPopup/android-5.png';
+import android6 from '../../assets/shareLocationPopup/android-6.png';
+import android7 from '../../assets/shareLocationPopup/android-7.png';
+import android8 from '../../assets/shareLocationPopup/android-8.png';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GrLocation } from 'react-icons/gr';
@@ -131,7 +131,7 @@ function Home() {
     const [openShareLoCationPopup, setOpenShareLoCationPopup] = useState(false);
 
     // Device = 1: IOS, Device = 2: Android
-    const [device, setDevice] = useState(1)
+    const [device, setDevice] = useState(1);
 
     const showLandCostModal = () => {
         setIsLandCostModalOpen(true);
@@ -358,7 +358,7 @@ function Home() {
 
         if (
             searchParams.get('ups') === ACTIONS.SHARING &&
-            searchParams.get('share-typ') === LAND_COST_KEY.SHARING &&
+            searchParams.get('share-type') === LAND_COST_KEY.SHARING &&
             (searchParams.get(LAND_COST_KEY.PROVINCE) ||
                 (searchParams.get(LAND_COST_KEY.PROVINCE) && searchParams.get(LAND_COST_KEY.DISTRICT)))
         ) {
@@ -498,117 +498,154 @@ function Home() {
 
     return (
         <>
-          {openShareLoCationPopup && (
-            <>
-              <div className="overlay" onClick={() => setOpenShareLoCationPopup(false)}></div>
-              <div className="popup">
-                <button className="close-btn" onClick={() => setOpenShareLoCationPopup(false)}>
-                  ×
-                </button>
-                <h4>Bạn chưa cấp quyền cung cấp vị trí!</h4>
-                <p>
-                  Vui lòng làm theo hướng dẫn sau để cấp quyền truy cập vị trí cho website, 
-                  giúp gia tăng độ chính xác và trải nghiệm của bạn.
-                </p>
-                <hr />
-                {device === 1 && (
-                  <>
-                    <div className="popup-buttons">
-                      <button className="popup-btn ios" onClick={() => setDevice(1)} style={{backgroundColor: "#007bff"}}>IOS</button>
-                      <button className="popup-btn android" onClick={() => setDevice(2)}>Android</button>
-                    </div>
-                    <ol>
-                      <li>
-                        <p>Vào <b>Cài đặt.</b></p>
-                        <img src={ios1} alt="Popup Image" style={{"width": "50%"}}/>
-                      </li>
-                      <li>
-                        <p>Chọn <b>Quyền riêng tư.</b></p>
-                        <img src={ios2} alt="Popup Image" />
-                      </li>
-                      <li>
-                        <p>Chọn <b>Dịch vụ định vị</b></p>
-                        <img src={ios3} alt="Popup Image" />
-                      </li>
-                      <li>
-                        <p>Chọn <b>Chrome</b> hoặc <b>Safari</b> và
-                        Cấp quyền truy cập vị trí: <b>Khi dùng Ứng dụng</b></p>
-                      </li>
-                      <img src={ios4} alt="Popup Image" />
-                      <img src={ios5} alt="Popup Image" />
-                      <li>
+            {openShareLoCationPopup && (
+                <>
+                    <div className="overlay" onClick={() => setOpenShareLoCationPopup(false)}></div>
+                    <div className="popup">
+                        <button className="close-btn" onClick={() => setOpenShareLoCationPopup(false)}>
+                            ×
+                        </button>
+                        <h4>Bạn chưa cấp quyền cung cấp vị trí!</h4>
                         <p>
-                          <b>Đối với Safari</b>, bạn cần làm thêm một bước. 
-                          Trở lại <b>Cài đặt</b>, Chọn hoặc tìm kiếm <b>Safari</b>
-                          <img src={ios6} alt="Popup Image" />
-                          <img src={ios7} alt="Popup Image" />
+                            Vui lòng làm theo hướng dẫn sau để cấp quyền truy cập vị trí cho website, giúp gia tăng độ
+                            chính xác và trải nghiệm của bạn.
                         </p>
-                      </li>
-                      <li>
-                        <p>
-                          Chọn <b>Vị trí</b> (ở gần cuối) và <b>Cho phép</b>.
-                          <img src={ios8} alt="Popup Image" />
-                          <img src={ios9} alt="Popup Image" />
-                        </p>
-                      </li>
-                      <li>
-                        <p>
-                          <b>Tải lại trang</b> hoặc <b>Khởi động lại app</b>.
-                        </p>
-                      </li>
-                    </ol>
-                  </>
-                )}
+                        <hr />
+                        {device === 1 && (
+                            <>
+                                <div className="popup-buttons">
+                                    <button
+                                        className="popup-btn ios"
+                                        onClick={() => setDevice(1)}
+                                        style={{ backgroundColor: '#007bff' }}
+                                    >
+                                        IOS
+                                    </button>
+                                    <button className="popup-btn android" onClick={() => setDevice(2)}>
+                                        Android
+                                    </button>
+                                </div>
+                                <ol>
+                                    <li>
+                                        <p>
+                                            Vào <b>Cài đặt.</b>
+                                        </p>
+                                        <img src={ios1} alt="Popup Image" style={{ width: '50%' }} />
+                                    </li>
+                                    <li>
+                                        <p>
+                                            Chọn <b>Quyền riêng tư.</b>
+                                        </p>
+                                        <img src={ios2} alt="Popup Image" />
+                                    </li>
+                                    <li>
+                                        <p>
+                                            Chọn <b>Dịch vụ định vị</b>
+                                        </p>
+                                        <img src={ios3} alt="Popup Image" />
+                                    </li>
+                                    <li>
+                                        <p>
+                                            Chọn <b>Chrome</b> hoặc <b>Safari</b> và Cấp quyền truy cập vị trí:{' '}
+                                            <b>Khi dùng Ứng dụng</b>
+                                        </p>
+                                    </li>
+                                    <img src={ios4} alt="Popup Image" />
+                                    <img src={ios5} alt="Popup Image" />
+                                    <li>
+                                        <p>
+                                            <b>Đối với Safari</b>, bạn cần làm thêm một bước. Trở lại <b>Cài đặt</b>,
+                                            Chọn hoặc tìm kiếm <b>Safari</b>
+                                            <img src={ios6} alt="Popup Image" />
+                                            <img src={ios7} alt="Popup Image" />
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            Chọn <b>Vị trí</b> (ở gần cuối) và <b>Cho phép</b>.
+                                            <img src={ios8} alt="Popup Image" />
+                                            <img src={ios9} alt="Popup Image" />
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            <b>Tải lại trang</b> hoặc <b>Khởi động lại app</b>.
+                                        </p>
+                                    </li>
+                                </ol>
+                            </>
+                        )}
 
-                {device === 2 && (
-                  <>
-                    <div className="popup-buttons">
-                        <button className="popup-btn ios" onClick={() => setDevice(1)}>IOS</button>
-                        <button className="popup-btn android" onClick={() => setDevice(2)} style={{backgroundColor: "#007bff"}}>Android</button>
+                        {device === 2 && (
+                            <>
+                                <div className="popup-buttons">
+                                    <button className="popup-btn ios" onClick={() => setDevice(1)}>
+                                        IOS
+                                    </button>
+                                    <button
+                                        className="popup-btn android"
+                                        onClick={() => setDevice(2)}
+                                        style={{ backgroundColor: '#007bff' }}
+                                    >
+                                        Android
+                                    </button>
+                                </div>
+                                <ol>
+                                    <li>
+                                        <p>
+                                            Vào <b>Cài đặt</b>, sau đó vào <b>Vị trí</b>
+                                        </p>
+                                        <img src={android1} alt="Popup Image" style={{ width: '50%' }} />
+                                        <img src={android2} alt="Popup Image" />
+                                    </li>
+                                    <li>
+                                        <p>
+                                            Bật <b>Truy cập vị trí</b> (nếu chưa). Sau đó, vào{' '}
+                                            <b>Quyền truy cập ứng dụng</b>
+                                        </p>
+                                        <img src={android3} alt="Popup Image" />
+                                    </li>
+                                    <li>
+                                        <p>
+                                            Chọn <b>Chrome</b>, sau đó, <b>Cho phép</b> ứng dụng sử dụng vị trí.
+                                        </p>
+                                        <img src={android4} alt="Popup Image" />
+                                        <img src={android5} alt="Popup Image" />
+                                    </li>
+                                    <li>
+                                        <p>
+                                            <b>Tải lại trang</b> hoặc <b>Khởi động lại app</b>.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <ul className="android-ul">
+                                            <li>
+                                                <p>
+                                                    <b>Đối với Chrome</b> trên một số dòng máy Samsung/LG, trên thanh
+                                                    đường dẫn, chọn icon <b>Ổ Khóa</b>
+                                                </p>
+                                                <img src={android6} alt="Popup Image" />
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    Chọn <b>Quyền</b>.
+                                                </p>
+                                                <img src={android7} alt="Popup Image" />
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    Cho phép <b>Vị trí</b>.
+                                                </p>
+                                                <img src={android8} alt="Popup Image" />
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </>
+                        )}
                     </div>
-                    <ol>
-                      <li>
-                        <p>Vào <b>Cài đặt</b>, sau đó vào <b>Vị trí</b></p>
-                        <img src={android1} alt="Popup Image" style={{"width": "50%"}}/>
-                        <img src={android2} alt="Popup Image" />
-                      </li>
-                      <li>
-                        <p>Bật <b>Truy cập vị trí</b> (nếu chưa). Sau đó, vào <b>Quyền truy cập ứng dụng</b></p>
-                        <img src={android3} alt="Popup Image" />
-                      </li>
-                      <li>
-                        <p>Chọn <b>Chrome</b>, sau đó, <b>Cho phép</b> ứng dụng sử dụng vị trí.</p>
-                        <img src={android4} alt="Popup Image" />
-                        <img src={android5} alt="Popup Image" />
-                      </li>
-                      <li>
-                        <p><b>Tải lại trang</b> hoặc <b>Khởi động lại app</b>.</p>
-                      </li>
-                      <li>
-                        <ul className='android-ul'>
-                          <li>
-                            <p><b>Đối với Chrome</b> trên một số dòng máy Samsung/LG, 
-                              trên thanh đường dẫn, chọn icon <b>Ổ Khóa</b>
-                            </p>
-                            <img src={android6} alt="Popup Image" />
-                          </li>
-                          <li>
-                            <p>Chọn <b>Quyền</b>.</p>
-                            <img src={android7} alt="Popup Image" />
-                          </li>
-                          <li>
-                            <p>Cho phép <b>Vị trí</b>.</p>
-                            <img src={android8} alt="Popup Image" />
-                          </li>
-                        </ul>
-                      </li>
-                    </ol>
-                  </>
-                )}
-                
-              </div>
-            </>
-          )}
+                </>
+            )}
 
             {contextHolder}
             <div

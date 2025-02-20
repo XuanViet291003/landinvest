@@ -20,6 +20,7 @@ const options = [
     },
 ];
 const convertTime = (string) => {
+    if (!string) return '1/1/2025';
     const date = new Date(string);
     const PostTime = `${date.getHours()}:${date.getMinutes()}  ${date.getDate()}/${
         date.getMonth() + 1
@@ -90,7 +91,7 @@ function Follow() {
                             <thead>
                                 <tr>
                                     <th scope="col">STT</th>
-                                    <th scope="col">Họ tên</th>
+                                    <th scope="col">Username</th>
                                     <th scope="col">Ngày hoạt động</th>
                                 </tr>
                             </thead>
@@ -99,7 +100,7 @@ function Follow() {
                                     ListNewUser.map((item, index) => (
                                         <tr span={6} key={'user-new' + item.userid}>
                                             <th scope="row">{index + 1}</th>
-                                            <td>{item.FullName}</td>
+                                            <td>{item.UserName}</td>
                                             <td>{convertTime(item.LastActivityTime)}</td>
                                         </tr>
                                     ))}

@@ -61,11 +61,26 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
         <div style={{ backgroundColor: '#0b0a0a', color: '#eae5e5', padding: '20px', borderRadius: '8px' }}>
             {contextHolder}
             <div className="land-cost-area__wrapper">
-                <div className="land-cost-area__wrapper__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div
+                    className="land-cost-area__wrapper__header"
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                     <span className="land-cost-area__wrapper__header--title">
                         Bảng giá tại vị trí bạn đang xem ở
-                        <strong> {currentLocation.districtName} - {currentLocation.provinceName}.</strong>
-                        <span className="land-cost-area__wrapper__header--share" onClick={handleShareLocation} style={{ marginLeft: '10px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                        <strong>
+                            {' '}
+                            {currentLocation.districtName} - {currentLocation.provinceName}.
+                        </strong>
+                        <span
+                            className="land-cost-area__wrapper__header--share"
+                            onClick={handleShareLocation}
+                            style={{
+                                marginLeft: '10px',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                            }}
+                        >
                             <CiShare2 size={16} /> Chia sẻ
                         </span>
                     </span>
@@ -88,7 +103,10 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                     style={{ margin: '10px 0', width: '100%' }}
                 />
                 <p>*Bảng giá đất 2024 do chính phủ ban hành.</p>
-                <p>Chú thích: Vị trí 1 là mặt tiền đường; Vị trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m - 5m; Vị trí 4 là hẻm rộng dưới 3m.</p>
+                <p>
+                    Chú thích: Vị trí 1 là mặt tiền đường; Vị trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m - 5m;
+                    Vị trí 4 là hẻm rộng dưới 3m.
+                </p>
                 <LandCostTable searchValue={debouncedInputSearch} tableType={MAP_TABLE_TYPE.ON_MAP} type="popup" />
             </div>
         </div>
