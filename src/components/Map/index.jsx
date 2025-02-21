@@ -171,6 +171,8 @@ const Map = forwardRef(
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
+        const [showHistoryChart, setShowHistoryChart] = useState(false);
+
         // const [firstTime, setFirstTime] = useState(true);
 
         // const [id, setId] = useState(searchParams.get('id'));
@@ -516,7 +518,7 @@ const Map = forwardRef(
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
                     }
-                    if (zoom >= 15) {
+                    if (zoom >= 16) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
                         
                         const fetchDuan = await fetch(`https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
@@ -1471,7 +1473,20 @@ const Map = forwardRef(
 
         const antDrawOpen = document.querySelector(".ant-drawer-open");
 
-        const historyCost = useSelector((state) => state.historyCost.value);
+        const [latHistoryCost, setLatHistoryCost] = useState("");
+        const [lonHistoryCost, setLonHistoryCost] = useState("");
+
+        const handleShowHistoryChart = () => {
+          const vitri = searchParams.get("vitri");
+          if (vitri) {
+            const [newLat, newLon] = vitri.split(",");
+            setLatHistoryCost(newLat);
+            setLonHistoryCost(newLon);
+            const newSearchParams = new URLSearchParams(searchParams);
+            newSearchParams.set("ups", "history-cost");
+            setSearchParams(newSearchParams);
+          }
+        };
     
         return (
             <>
@@ -1538,11 +1553,12 @@ const Map = forwardRef(
                 {/* )} */}
 
                 <div>
-                  {(searchParams.get("ups") === "history-cost") && 
-                    <ChartCostHistory 
-                      lat={searchParams.get("vitri").split(",")[0]} 
-                      lon={searchParams.get("vitri").split(",")[1]} 
-                    />}
+                {searchParams.get("ups") === "history-cost" && (
+                  <ChartCostHistory 
+                    lat={latHistoryCost} 
+                    lon={lonHistoryCost} 
+                  />
+                )}
                 </div>
 
                 <MapContainer
@@ -1743,7 +1759,7 @@ const Map = forwardRef(
                 )} */}
 
                     {/* Marker in location now */}
-                    {mapZoom >= 15 && boundingboxDataLocation?.list_image?.length > 0 && (
+                    {mapZoom >= 16 && boundingboxDataLocation?.list_image?.length > 0 && (
                         <>
                             {boundingboxDataLocation?.list_image?.map((item) => {
                                 return (
@@ -1811,6 +1827,7 @@ const Map = forwardRef(
                         handleItemClick={handleItemClick}
                         RegulationsImagesList={RegulationsImagesList}
                         handleWikiClick={handleWikiClick}
+                        onShowHistoryChart={handleShowHistoryChart} 
                     />
                     <DrawerLandUsePlan/>
 

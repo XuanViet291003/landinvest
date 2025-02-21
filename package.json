@@ -56,6 +56,7 @@
         "react-rnd": "^10.4.14",
         "react-router-dom": "6.9.0",
         "react-scripts": "5.0.1",
+        "react-select": "^5.10.0",
         "react-slick": "^0.30.2",
         "reactjs-popup": "^2.0.6",
         "reactjs-windows": "^1.0.2",

@@ -10,7 +10,6 @@ import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistric
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
 import { FaWikipediaW } from "react-icons/fa";
-import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost.jsx';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -23,7 +22,8 @@ const LocationInfoSidebar = ({
     setIsShowModalUpload,
     RegulationsImagesList,
     handleItemClick,
-    handleWikiClick
+    handleWikiClick,
+    onShowHistoryChart
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -93,17 +93,6 @@ const LocationInfoSidebar = ({
         }
     }, [location]);
 
-  const handleHistoryCostClick = () => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (newSearchParams.get("ups") === "history-cost") {
-      newSearchParams.delete("ups");
-    } else {
-      newSearchParams.set("ups", "history-cost");
-    }
-    setSearchParams(newSearchParams);
-  };
-
-
     // useEffect(() => {
     //     const formData = new FormData();
 
@@ -134,8 +123,8 @@ const LocationInfoSidebar = ({
             >
                 {' '}
                 <div className="ant-drawer-body-wrapper">
-                    <button style={{margin:"20px", marginTop: 0}} onClick={() => handleHistoryCostClick()}>
-                      {searchParams.get("ups") === "history-cost" ? "Đóng lịch sử giá đất" : "Mở lịch sử giá đất"}
+                    <button style={{margin:"20px", marginTop: 0}} onClick={onShowHistoryChart}>
+                      Xem lịch sử giá đất
                     </button>
                     {isShowMore && (
                         <>
