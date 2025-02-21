@@ -156,6 +156,7 @@ const Map = forwardRef(
         const [redoStack, setRedoStack] = useState([]);
         const [trigger, setTrigger] = useState(false);
         const [polygonArea, setPolygonArea] = useState({distances: [], polygon: []});
+        const [polygonDuAnArea, setPolygonDuAnArea] = useState({polygon: []})
         const [isShowModalArea, setIsShowModalArea] = useState(false);
         const [address, setAddress] = useState('');
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
@@ -1489,7 +1490,6 @@ const Map = forwardRef(
         };
 
         const handleClickDuAnIcon = async (id) => {
-          setShowPopup(true);
           const response = await fetch(`https://api.quyhoach.xyz/detail_du_an/${id}`);
 
           if (!response.ok) {
@@ -1499,47 +1499,20 @@ const Map = forwardRef(
           const res = await response.json();
 
           if (res.data?.polygon) {
-              // Chuyển đổi chuỗi JSON thành mảng tọa độ
               const dataPolygon = JSON.parse(res.data?.polygon);
 
-              // Chuyển đổi thành mảng { lat, lng }
               const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
-              console.log(polygon)
-
-              // Tính khoảng cách giữa các điểm trong Polygon
-              const newDistances = polygon.map((point, i) => {
-                  const nextPoint = polygon[(i + 1) % polygon.length]; // Nối điểm cuối với điểm đầu
-                  return {
-                      start: point,
-                      end: nextPoint,
-                      distance: L.latLng(point).distanceTo(nextPoint),
-                  };
-              });
-
-              // Chuyển đổi sang GeoJSON để tìm tâm
-              const geoJsonPolygon = turf.polygon([polygon.map(({ lng, lat }) => [lng, lat])]);
-              const [centerLng, centerLat] = turf.center(geoJsonPolygon).geometry.coordinates;
-
-              // Tạo icon cho marker trung tâm
-              const icon = L.divIcon({
-                  className: 'custom-icon-distance',
-                  html: `<div style="color: black;"></div>`,
-                  iconSize: [100, 30],
-                  iconAnchor: [50, 15],
-              });
-
-              const middleLatLng = L.latLng(centerLat, centerLng);
 
               // Lưu dữ liệu vào state
-              setPolygonArea({
+              setPolygonDuAnArea({
                   polygon,
                   address: res.data.diachi || "Không có địa chỉ",
-                  distances: newDistances,
-                  area: <Marker position={middleLatLng} icon={icon}>{` m`}</Marker>,
               });
           } else {
-              setPolygonArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
+              setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
           }
+
+          setShowPopup(true);
         }
     
         return (
@@ -2004,6 +1977,7 @@ const Map = forwardRef(
                     {!isSelectedMeasure && <MapEventArea/>}
                     {polygonArea?.area}
                     <Polygon positions={polygonArea?.polygon} color="rgb(23,119,255)"/>
+                    <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)"/>
                 </MapContainer>
                 {/* loading */}
                 {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen/>}
