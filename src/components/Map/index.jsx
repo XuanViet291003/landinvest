@@ -162,17 +162,20 @@ const Map = forwardRef(
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
 
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
-        const polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
+
+        let polygonOnSearch = [];
+        if(searchParams.get("heat-map") !== "on")
+          polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
+
         // console.log(itemSearch)
         const [location, setLocation] = useState([0, 0]); // Vị trí hiện tại
         const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false); // Thông tin vị trí có mở không
         const [isLongClick, setIsLongClick] = useState(false); // Kiểm tra click dài
         const [pressTimer, setPressTimer] = useState(null); // Timer cho click dài
         const [duAn, setDuAn] = useState([]);
+        const [polygonHeatMap, setPolygonHeatMap] = useState(null);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
-
-        const [showHistoryChart, setShowHistoryChart] = useState(false);
 
         // const [firstTime, setFirstTime] = useState(true);
 
@@ -1486,12 +1489,22 @@ const Map = forwardRef(
         };
 
         const handleClickDuAnIcon = (id) => {
-          console.log(showPopup === true)
-
           searchParams.set("id-duan", id);
           setSearchParams(searchParams);
         }
 
+        const handleHeatMapClick = async () => {
+          if(searchParams.get("heat-map") === "on"){
+            searchParams.delete("heat-map");
+            setPolygonHeatMap(null);
+          }
+          else{
+            searchParams.set("heat-map", "on");
+          } 
+          setSearchParams(searchParams);
+        };
+        
+        
         useEffect(() => {
           const fetchData = async () => {
             const id = searchParams.get("id-duan");
@@ -1522,6 +1535,60 @@ const Map = forwardRef(
           }
           fetchData();
           setShowPopup(true);
+        }, [searchParams])
+
+        useEffect(() => {
+          const isHeatMap = searchParams.get("heat-map");
+
+          const fetchData = async() => {
+            try {
+              const vitri = searchParams.get("vitri")?.split(",");
+              if (!vitri || vitri.length < 2) {
+                throw new Error("Vị trí không hợp lệ!");
+              }
+          
+              const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
+              if (!resLocation) {
+                throw new Error("Không lấy được vị trí từ bounding box!");
+              }
+          
+              const now = new Date();
+              const month = now.getMonth() + 1;
+              const year = now.getFullYear();
+          
+              const responseHeat = await fetch(
+                `https://api.quyhoach.xyz/get_lich_su_gia_dat_district/${resLocation.district}/${month}/${year}`
+              );
+          
+              if (!responseHeat.ok) {
+                throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
+              }
+          
+              const data = await responseHeat.json();
+          
+              // Kiểm tra dữ liệu hợp lệ
+              if (!data?.lichsu || !Array.isArray(data.lichsu)) {
+                throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
+              }
+          
+              const polygonsByColor = {};
+          
+              data.lichsu.forEach(({ polygon, color }) => {
+                const rgbColor = `rgb(${color.red}, ${color.green}, ${color.blue})`;
+          
+                polygonsByColor[rgbColor] = polygon[0]; 
+              });
+          
+              
+              setPolygonHeatMap(polygonsByColor);
+            } catch (error) {
+              console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
+            }
+          }
+
+          if(isHeatMap === "on"){
+            fetchData();
+          }
         }, [searchParams])
     
         return (
@@ -1667,6 +1734,12 @@ const Map = forwardRef(
                             }}
                         />
                     )}
+
+                  {polygonHeatMap && Object.entries(polygonHeatMap).map(([color, polygons], index) => (
+                    polygons.map((polygon, i) => (
+                      <Polygon key={`${index}-${i}`} positions={polygon} color={color} />
+                    ))
+                  ))}
 
                     {/* {polygonPoint?.points?.length > 0 && (
                         <Polygon
@@ -1862,6 +1935,7 @@ const Map = forwardRef(
                         RegulationsImagesList={RegulationsImagesList}
                         handleWikiClick={handleWikiClick}
                         onShowHistoryChart={handleShowHistoryChart} 
+                        handleHeatMapClick={handleHeatMapClick}
                     />
                     <DrawerLandUsePlan/>
 

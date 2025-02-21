@@ -23,7 +23,8 @@ const LocationInfoSidebar = ({
     RegulationsImagesList,
     handleItemClick,
     handleWikiClick,
-    onShowHistoryChart
+    onShowHistoryChart,
+    handleHeatMapClick
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -123,9 +124,14 @@ const LocationInfoSidebar = ({
             >
                 {' '}
                 <div className="ant-drawer-body-wrapper">
-                    <button style={{margin:"20px", marginTop: 0}} onClick={onShowHistoryChart}>
-                      Xem lịch sử giá đất
-                    </button>
+                <div style={{margin: "20px", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
+                  <button style={{width: "calc(50%-5px)"}} onClick={onShowHistoryChart}>
+                    Xem lịch sử giá đất
+                  </button>
+                  <button style={{width: "calc(50%-5px)"}} onClick={handleHeatMapClick}>
+                   {searchParams.get("heat-map") !== "on" ? "Xem bản đồ nhiệt" : "Ẩn bản đồ nhiệt"} 
+                  </button>
+                </div>
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>
