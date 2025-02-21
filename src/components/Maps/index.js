@@ -845,6 +845,7 @@ const Map = forwardRef(
             });
             return null;
         };
+
         const GetMarkerInboundingBox = () => {
             const map = useMap();
             const zoom = map.getZoom();

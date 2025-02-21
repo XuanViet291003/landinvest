@@ -481,8 +481,6 @@ const Map = forwardRef(
                     // Gọi API lấy thông tin tỉnh/thành phố
                     const dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
 
-                    const newParams = new URLSearchParams(searchParams);
-
                     if (zoom >= 19 && 
                         (!RegulationImages ||
                           (RegulationImages[0].idProvince != dataProvinceCurrent.provinces &&
@@ -503,17 +501,17 @@ const Map = forwardRef(
                       // Tìm tỉnh phù hợp với vị trí hiện tại
                       const tinh = dataDiaChinh.find((item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17);
 
-                      newParams.set("type", "QUYHOACH_DIACHINH");
-                      newParams.set("id", tinh.id);
-                      newParams.set("draw", "auto");
-                      setSearchParams(newParams)
+                      searchParams.set("type", "QUYHOACH_DIACHINH");
+                      searchParams.set("id", tinh.id);
+                      searchParams.set("draw", "auto");
+                      setSearchParams(searchParams)
                     } 
 
-                    if((zoom < 18 || zoom > 22) && newParams.get("draw") === "auto"){
+                    if((zoom < 18 || zoom > 22) && searchParams.get("draw") === "auto"){
                       setRegulationImages(null);
-                      newParams.delete("type");
-                      newParams.delete("id");
-                      setSearchParams(newParams)
+                      searchParams.delete("type");
+                      searchParams.delete("id");
+                      // setSearchParams(searchParams)
                     }
 
                     if (zoom >= 13) {
@@ -597,7 +595,7 @@ const Map = forwardRef(
                         clearTimeout(pressTimer);
                     }
                 },
-                dragend: () => {
+                dragstart: () => {
                   setShowPopup(false);
                 }
             });
@@ -948,11 +946,9 @@ const Map = forwardRef(
                     clickCountRef.current += 1;
                     const map = e.target;
 
-                    const newParams = new URLSearchParams(searchParams);
+                    searchParams.set("vitri", `${e.latlng.lat},${e.latlng.lng}`);
 
-                    newParams.set("vitri", `${e.latlng.lat},${e.latlng.lng}`);
-
-                    setSearchParams(newParams);
+                    setSearchParams(searchParams);
 
                     if (clickTimeout.current) clearTimeout(clickTimeout.current);
 
@@ -1489,31 +1485,44 @@ const Map = forwardRef(
           }
         };
 
-        const handleClickDuAnIcon = async (id) => {
-          const response = await fetch(`https://api.quyhoach.xyz/detail_du_an/${id}`);
+        const handleClickDuAnIcon = (id) => {
+          console.log(showPopup === true)
 
-          if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const res = await response.json();
-
-          if (res.data?.polygon) {
-              const dataPolygon = JSON.parse(res.data?.polygon);
-
-              const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
-
-              // Lưu dữ liệu vào state
-              setPolygonDuAnArea({
-                  polygon,
-                  address: res.data.diachi || "Không có địa chỉ",
-              });
-          } else {
-              setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
-          }
-
-          setShowPopup(true);
+          searchParams.set("id-duan", id);
+          setSearchParams(searchParams);
         }
+
+        useEffect(() => {
+          const fetchData = async () => {
+            const id = searchParams.get("id-duan");
+
+            if(id){
+              const response = await fetch(`https://api.quyhoach.xyz/detail_du_an/${id}`);
+
+              if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+    
+              const res = await response.json();
+    
+              if (res.data?.polygon) {
+                  const dataPolygon = JSON.parse(res.data?.polygon);
+    
+                  const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
+    
+                  // Lưu dữ liệu vào state
+                  setPolygonDuAnArea({
+                      polygon,
+                      address: res.data.diachi || "Không có địa chỉ",
+                  });
+              } else {
+                  setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
+              }
+            }
+          }
+          fetchData();
+          setShowPopup(true);
+        }, [searchParams])
     
         return (
             <>
