@@ -514,7 +514,7 @@ const Map = forwardRef(
                       setRegulationImages(null);
                       searchParams.delete("type");
                       searchParams.delete("id");
-                      // setSearchParams(searchParams)
+                      setSearchParams(searchParams)
                     }
 
                     if (zoom >= 13) {
