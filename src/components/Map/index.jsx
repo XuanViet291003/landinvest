@@ -1735,11 +1735,21 @@ const Map = forwardRef(
                         />
                     )}
 
-                  {polygonHeatMap && Object.entries(polygonHeatMap).map(([color, polygons], index) => (
-                    polygons.map((polygon, i) => (
-                      <Polygon key={`${index}-${i}`} positions={polygon} color={color} />
-                    ))
-                  ))}
+                    {polygonHeatMap &&
+                      Object.entries(polygonHeatMap).map(([color, polygons], index) =>
+                        polygons.map((polygon, i) => (
+                          polygon && polygon.length > 2 ? (  
+                            <Polygon
+                              key={`${index}-${i}-${opacity}`}
+                              positions={polygon}
+                              color={color}
+                              fillColor={color}
+                              opacity={opacity}
+                              fillOpacity={opacity}
+                            />
+                          ) : null
+                        ))
+                      )}
 
                     {/* {polygonPoint?.points?.length > 0 && (
                         <Polygon
