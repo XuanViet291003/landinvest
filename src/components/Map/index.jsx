@@ -174,6 +174,7 @@ const Map = forwardRef(
         const [pressTimer, setPressTimer] = useState(null); // Timer cho click dài
         const [duAn, setDuAn] = useState([]);
         const [polygonHeatMap, setPolygonHeatMap] = useState(null);
+        const [heatMapLoading, setHeatMapLoading] = useState(false);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
@@ -1493,17 +1494,96 @@ const Map = forwardRef(
           setSearchParams(searchParams);
         }
 
-        const handleHeatMapClick = async () => {
-          if(searchParams.get("heat-map") === "on"){
+        const handleHeatMapSwitch = () => {
+          if(searchParams.get("heat-map") === "off"){
             searchParams.delete("heat-map");
-            setPolygonHeatMap(null);
+            setSearchParams(searchParams);
           }
           else{
-            searchParams.set("heat-map", "on");
-          } 
-          setSearchParams(searchParams);
+            searchParams.set("heat-map", "off");
+            setSearchParams(searchParams);
+          }
+        }
+
+        const fetchHeatMapData = async (id) => {
+          try {      
+            setHeatMapLoading(true);
+    
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+    
+            const responseHeat = await fetch(
+                `https://api.quyhoach.xyz/get_lich_su_gia_dat_district/${id}/${month}/${year}`
+            );
+    
+            if (!responseHeat.ok) {
+                throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
+            }
+    
+            const data = await responseHeat.json();
+    
+            if (!data?.lichsu || !Array.isArray(data.lichsu)) {
+                throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
+            }
+    
+            const getPolygonCenter = (polygon) => {
+                if (!polygon || polygon.length < 3) return null;
+    
+                const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
+                const geoJsonPolygon = turf.polygon([convertedCoords]);
+                const center = turf.center(geoJsonPolygon).geometry.coordinates;
+                return L.latLng(center[1], center[0]);
+            };
+    
+            const polygonsByColor = data.lichsu.map(({ polygon, color, max, avg, min, name_xaphuong }) => ({
+                color: `rgb(${color.red}, ${color.green}, ${color.blue})`,
+                polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
+                center: getPolygonCenter(polygon.flat(2)),
+                max,
+                avg,
+                min,
+                name_xaphuong
+            }));
+    
+            setPolygonHeatMap(polygonsByColor);
+    
+            searchParams.set("id-district", id);
+            setSearchParams(searchParams);
+    
+          } catch (error) {
+              console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
+          } finally {
+              setHeatMapLoading(false);
+          }
+        }
+
+        const handleHeatMapClick = async () => {
+          const vitri = searchParams.get("vitri")?.split(",");
+            if (!vitri || vitri.length < 2) {
+                throw new Error("Vị trí không hợp lệ!");
+            }
+    
+            const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
+            if (!resLocation) {
+                throw new Error("Không lấy được vị trí từ bounding box!");
+            }
+    
+            const currentDistrict = searchParams.get("id-district");
+    
+            if (resLocation.district == currentDistrict) {
+                return;
+            }
+          await fetchHeatMapData(resLocation.district);
         };
-        
+
+        useEffect(() => {
+          const id = searchParams.get("id-district");
+          if(searchParams.get("id-district")){
+            fetchHeatMapData(id);
+          }
+        }, [])
+      
         
         useEffect(() => {
           const fetchData = async () => {
@@ -1537,59 +1617,13 @@ const Map = forwardRef(
           setShowPopup(true);
         }, [searchParams])
 
-        useEffect(() => {
-          const isHeatMap = searchParams.get("heat-map");
-
-          const fetchData = async() => {
-            try {
-              const vitri = searchParams.get("vitri")?.split(",");
-              if (!vitri || vitri.length < 2) {
-                throw new Error("Vị trí không hợp lệ!");
-              }
-          
-              const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
-              if (!resLocation) {
-                throw new Error("Không lấy được vị trí từ bounding box!");
-              }
-          
-              const now = new Date();
-              const month = now.getMonth() + 1;
-              const year = now.getFullYear();
-          
-              const responseHeat = await fetch(
-                `https://api.quyhoach.xyz/get_lich_su_gia_dat_district/${resLocation.district}/${month}/${year}`
-              );
-          
-              if (!responseHeat.ok) {
-                throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
-              }
-          
-              const data = await responseHeat.json();
-          
-              // Kiểm tra dữ liệu hợp lệ
-              if (!data?.lichsu || !Array.isArray(data.lichsu)) {
-                throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
-              }
-          
-              const polygonsByColor = {};
-          
-              data.lichsu.forEach(({ polygon, color }) => {
-                const rgbColor = `rgb(${color.red}, ${color.green}, ${color.blue})`;
-          
-                polygonsByColor[rgbColor] = polygon[0]; 
-              });
-          
-              
-              setPolygonHeatMap(polygonsByColor);
-            } catch (error) {
-              console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
-            }
-          }
-
-          if(isHeatMap === "on"){
-            fetchData();
-          }
-        }, [searchParams])
+        const textIcon = (text) =>
+          L.divIcon({
+            className: "polygon-label",
+            html: `<div style="text-align: center; font-weight: bold; font-size: 8.5px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
+            iconSize: [100, 30],
+            iconAnchor: [50, 15],
+          });
     
         return (
             <>
@@ -1671,7 +1705,6 @@ const Map = forwardRef(
                     }}
                     center={initialCenter}
                     zoom={initialZoom}
-                    s
                     maxZoom={30}
                     ref={ref}
                     zoomControl={false}
@@ -1735,21 +1768,25 @@ const Map = forwardRef(
                         />
                     )}
 
-                    {polygonHeatMap &&
-                      Object.entries(polygonHeatMap).map(([color, polygons], index) =>
-                        polygons.map((polygon, i) => (
-                          polygon && polygon.length > 2 ? (  
-                            <Polygon
-                              key={`${index}-${i}-${opacity}`}
-                              positions={polygon}
-                              color={color}
-                              fillColor={color}
-                              opacity={opacity}
-                              fillOpacity={opacity}
-                            />
-                          ) : null
-                        ))
-                      )}
+                    {searchParams.get("heat-map") !== "off" && polygonHeatMap?.map((item, index) =>
+                      <>
+                        <Polygon
+                          key={`${index} - ${opacity}`}
+                          positions={item.polygons}
+                          color={item.color}
+                          fillColor={item.color}
+                          opacity={opacity}
+                          fillOpacity={opacity}
+                        />
+
+                        {item.center && (
+                          <Marker 
+                            position={[item.center.lat, item.center.lng]} 
+                            icon={textIcon(`${item.name_xaphuong} <br> Max: ${item.max} Min: ${item.min} <br> Avg: ${item.avg}`)} 
+                          />
+                        )}
+                      </>
+                    )}
 
                     {/* {polygonPoint?.points?.length > 0 && (
                         <Polygon
@@ -1946,6 +1983,8 @@ const Map = forwardRef(
                         handleWikiClick={handleWikiClick}
                         onShowHistoryChart={handleShowHistoryChart} 
                         handleHeatMapClick={handleHeatMapClick}
+                        handleHeatMapSwitch={handleHeatMapSwitch}
+                        heatMapLoading={heatMapLoading}
                     />
                     <DrawerLandUsePlan/>
 

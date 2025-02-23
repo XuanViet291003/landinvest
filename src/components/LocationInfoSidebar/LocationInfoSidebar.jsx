@@ -1,5 +1,5 @@
 import { CloseOutlined, EnvironmentOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { Drawer, Image, Spin, message } from 'antd';
+import { Drawer, Image, Spin, Switch, message } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { MdArrowDropDown, MdArrowDropUp, MdFileUpload } from 'react-icons/md';
 import { useMap } from 'react-leaflet';
@@ -24,7 +24,9 @@ const LocationInfoSidebar = ({
     handleItemClick,
     handleWikiClick,
     onShowHistoryChart,
-    handleHeatMapClick
+    handleHeatMapClick,
+    handleHeatMapSwitch,
+    heatMapLoading
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -123,13 +125,21 @@ const LocationInfoSidebar = ({
                 className={`overflow-y-hidden ${window.innerWidth > 768 && 'desktop'}`}
             >
                 {' '}
+                <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "16px", fontWeight: "500" }}>Bật/tắt bản đồ nhiệt</span>
+                  <Switch 
+                      checked={searchParams.get("heat-map") !== "off"} 
+                      onChange={handleHeatMapSwitch} 
+                  />
+              </div>
+
                 <div className="ant-drawer-body-wrapper">
                 <div style={{margin: "20px", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
                   <button style={{width: "calc(50%-5px)"}} onClick={onShowHistoryChart}>
                     Xem lịch sử giá đất
                   </button>
-                  <button style={{width: "calc(50%-5px)"}} onClick={handleHeatMapClick}>
-                   {searchParams.get("heat-map") !== "on" ? "Xem bản đồ nhiệt" : "Ẩn bản đồ nhiệt"} 
+                  <button style={{width: "calc(50%-5px)"}} onClick={handleHeatMapClick}  disabled={heatMapLoading}>
+                    {heatMapLoading ? "Đang tải bản đồ nhiệt..." : "Xem bản đồ nhiệt tại đây"}
                   </button>
                 </div>
                     {isShowMore && (
