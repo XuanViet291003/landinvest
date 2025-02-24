@@ -1,0 +1,26 @@
+.compact-price-chart {
+  position: fixed;
+  top: 65px;
+  right: 100px;
+  width: 35%;
+  background-color: #1f252a;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  border-radius: 8px;
+  z-index: 1000;
+  text-align: center;
+  color: #fff;
+  transition: all 0.3s ease-in-out;
+
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: white;
+    cursor: pointer;
+
+    &:hover {
+      background: darkred;
+    }
+  }
+}

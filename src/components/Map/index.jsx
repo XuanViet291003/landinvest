@@ -66,6 +66,7 @@ import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
 import CustomTileLayer from '../CustomLayer';
 import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
+import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -175,6 +176,7 @@ const Map = forwardRef(
         const [duAn, setDuAn] = useState([]);
         const [polygonHeatMap, setPolygonHeatMap] = useState(null);
         const [heatMapLoading, setHeatMapLoading] = useState(false);
+        const [regionalPrice, setRegionalPrice] = useState(null);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
@@ -1597,6 +1599,8 @@ const Map = forwardRef(
               }
     
               const res = await response.json();
+
+              setRegionalPrice(res?.data?.gia_cung_khu_vuc);
     
               if (res.data?.polygon) {
                   const dataPolygon = JSON.parse(res.data?.polygon);
@@ -1695,6 +1699,10 @@ const Map = forwardRef(
                     lat={latHistoryCost} 
                     lon={lonHistoryCost} 
                   />
+                )}
+
+                {regionalPrice && (
+                  <RegionalPriceChart regionalPrice={regionalPrice} />
                 )}
                 </div>
 
@@ -2108,8 +2116,8 @@ const Map = forwardRef(
                     {location.length > 0 && <Marker position={location} icon={iconLocation}/>}
                     {!isSelectedMeasure && <MapEventArea/>}
                     {polygonArea?.area}
-                    <Polygon positions={polygonArea?.polygon} color="rgb(23,119,255)"/>
                     <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)"/>
+                    <Polygon positions={polygonArea?.polygon} color="darkred"/>
                 </MapContainer>
                 {/* loading */}
                 {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen/>}
