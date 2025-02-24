@@ -513,13 +513,6 @@ const Map = forwardRef(
                       setSearchParams(searchParams)
                     } 
 
-                    if((zoom < 18 || zoom > 22) && searchParams.get("draw") === "auto"){
-                      setRegulationImages(null);
-                      searchParams.delete("type");
-                      searchParams.delete("id");
-                      setSearchParams(searchParams)
-                    }
-
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
                     }
@@ -1445,7 +1438,8 @@ const Map = forwardRef(
 
         // // Hàm render các TileLayer
         const renderTileLayers = () => {
-            if (!RegulationImages || RegulationImages.length === 0) {
+            if (!RegulationImages || RegulationImages.length === 0 ||
+              ((searchParams.get("zoom") < 18 || searchParams.get("zoom") > 22) && searchParams.get("draw") === "auto" && RegulationImages)){
                 return <div></div>;
             }
 
@@ -1885,7 +1879,7 @@ const Map = forwardRef(
                             })}
 
                         {renderTileLayers()}
-                        {RegulationImages &&
+                        {(RegulationImages && !((searchParams.get("zoom") < 18 || searchParams.get("zoom") > 22) && searchParams.get("draw") === "auto" && RegulationImages)) &&
                           RegulationImages.length > 0 &&
                           RegulationImages.map((item, index) => (
                               <CustomTileLayer key={index} item={item} opacity={opacity}/>
