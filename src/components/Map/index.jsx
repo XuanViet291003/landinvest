@@ -1784,7 +1784,7 @@ const Map = forwardRef(
                         {item.center && (
                           <Marker 
                             position={[item.center.lat, item.center.lng]} 
-                            icon={textIcon(`${item.name_xaphuong} <br> Max: ${item.max} Min: ${item.min} <br> Avg: ${item.avg}`)} 
+                            icon={textIcon(`${item.name_xaphuong} <br> Max: ${item.max} Min: ${item.min} <br> Trung Bình: ${item.avg}`)} 
                           />
                         )}
                       </>
