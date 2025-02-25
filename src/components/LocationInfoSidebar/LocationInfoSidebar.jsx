@@ -1,5 +1,5 @@
 import { CloseOutlined, EnvironmentOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { Drawer, Image, Spin, message } from 'antd';
+import { Drawer, Image, Spin, Switch, message } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { MdArrowDropDown, MdArrowDropUp, MdFileUpload } from 'react-icons/md';
 import { useMap } from 'react-leaflet';
@@ -10,7 +10,6 @@ import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistric
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
 import { FaWikipediaW } from "react-icons/fa";
-import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost.jsx';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -23,7 +22,11 @@ const LocationInfoSidebar = ({
     setIsShowModalUpload,
     RegulationsImagesList,
     handleItemClick,
-    handleWikiClick
+    handleWikiClick,
+    onShowHistoryChart,
+    handleHeatMapClick,
+    handleHeatMapSwitch,
+    heatMapLoading
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -93,17 +96,6 @@ const LocationInfoSidebar = ({
         }
     }, [location]);
 
-  const handleHistoryCostClick = () => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (newSearchParams.get("ups") === "history-cost") {
-      newSearchParams.delete("ups");
-    } else {
-      newSearchParams.set("ups", "history-cost");
-    }
-    setSearchParams(newSearchParams);
-  };
-
-
     // useEffect(() => {
     //     const formData = new FormData();
 
@@ -133,10 +125,23 @@ const LocationInfoSidebar = ({
                 className={`overflow-y-hidden ${window.innerWidth > 768 && 'desktop'}`}
             >
                 {' '}
+                <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "16px", fontWeight: "500" }}>Bật/tắt bản đồ nhiệt</span>
+                  <Switch 
+                      checked={searchParams.get("heat-map") !== "off"} 
+                      onChange={handleHeatMapSwitch} 
+                  />
+              </div>
+
                 <div className="ant-drawer-body-wrapper">
-                    <button style={{margin:"20px", marginTop: 0}} onClick={() => handleHistoryCostClick()}>
-                      {searchParams.get("ups") === "history-cost" ? "Đóng lịch sử giá đất" : "Mở lịch sử giá đất"}
-                    </button>
+                <div style={{margin: "20px", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
+                  <button style={{width: "calc(50%-5px)"}} onClick={onShowHistoryChart}>
+                    Xem lịch sử giá đất
+                  </button>
+                  <button style={{width: "calc(50%-5px)"}} onClick={handleHeatMapClick}  disabled={heatMapLoading}>
+                    {heatMapLoading ? "Đang tải bản đồ nhiệt..." : "Xem bản đồ nhiệt tại đây"}
+                  </button>
+                </div>
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>

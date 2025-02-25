@@ -644,3 +644,7 @@ export const getListSearchInvestor = async (key, page = 1) => {
     const res = await instance.get(`list_nhadautu_search/${key}?page=${page}`);
     return res.data;
 };
+export const postPolyGonForDuAn = async (id, value) => {
+    const res = await instance.post(`edit_polygon_du_an_bds/${id}`, value);
+    return res.data;
+};

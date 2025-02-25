@@ -1,11 +1,28 @@
 import parse from 'html-react-parser';
+import L from 'leaflet';
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import React, { useEffect, useState } from 'react';
 import { CiLocationOn } from 'react-icons/ci';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getAllDetail } from '../../../services/api';
 import './Detail.scss';
+import { FaLocationDot } from 'react-icons/fa6';
+import ReactDOMServer from 'react-dom/server';
+
+const iconHtml = ReactDOMServer.renderToStaticMarkup(
+    <div style={{color: 'red', fontSize: '30px'}}>
+        <FaLocationDot/>
+    </div>,
+);
+
+const icon = L.divIcon({
+    html: iconHtml,
+    className: '', 
+    iconSize: [30, 30],
+    iconAnchor: [15, 30], 
+  
+});
 
 const Detail = () => {
     const [detailData, setDetailData] = useState({});
@@ -16,6 +33,13 @@ const Detail = () => {
     const [imageHeader, setImageHeader] = useState('');
     const [results, setResults] = useState([]);
     const [location, setLocation] = useState({});
+    const navigate = useNavigate();
+
+    const handleNavigate = () => {
+      if (location.lat && location.lon) {
+        navigate(`/?vitri=${location.lat},${location.lon}&ups=sharing`);
+      }
+    };
     
     const handleConvert = (string) => {
         if (!string) return '';
@@ -209,16 +233,33 @@ const Detail = () => {
                                     {(location.lat && location.lon) && (
                                       <MapContainer 
                                           center={[location.lat, location.lon]} 
-                                          zoom={15} 
-                                          style={{ margin: "10px auto", height: "50vh", width: "70%" }} 
+                                          zoom={17} 
+                                          style={{ margin: "10px auto", height: "50vh", width: "70%" }}
                                       >
                                         <TileLayer
-                                            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                            subdomains='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
+                                            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                                            maxZoom={30}
+                                            attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
                                         />
-                                          <Marker position={[location.lat, location.lon]} />
+                                          <Marker position={[location.lat, location.lon]} icon={icon}/>
                                       </MapContainer>
                                     )}
+                                     <button 
+                                        onClick={handleNavigate} 
+                                        style={{
+                                            display: "block", 
+                                            margin: "10px 0 0auto", 
+                                            padding: "10px 20px", 
+                                            background: "#007bff", 
+                                            color: "#fff", 
+                                            border: "none", 
+                                            borderRadius: "5px", 
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        Điều hướng tới vị trí này
+                                    </button>
                                 </div>
 
                                 <div className="extension-container">

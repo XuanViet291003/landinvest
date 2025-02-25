@@ -22,10 +22,10 @@ const ChartCostHistory = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [diaChi, setDiaChi] = useState("");
   const [hoveredTab, setHoveredTab] = useState(null);
+  const [timeFilter, setTimeFilter] = useState("month");
 
   const { lat, lon } = props;
 
-  // Lấy dữ liệu từ API
   useEffect(() => {
     if (searchParams.get("type") && processedData) {
       const newParams = new URLSearchParams(searchParams);
@@ -46,7 +46,6 @@ const ChartCostHistory = (props) => {
         }
         const result = await response.json();
 
-        // Lọc các type trùng nhau (không phân biệt chữ hoa chữ thường)
         const uniqueData = result.lich_su_gia.filter(
           (item, index, self) =>
             index === self.findIndex(
@@ -57,7 +56,6 @@ const ChartCostHistory = (props) => {
         );
         setData(uniqueData);
 
-        // Lấy thông tin địa chỉ
         const res = await getLocationInBoudingBox(lat, lon);
         if (res?.diachi) {
           setDiaChi(res.diachi || "Không xác định");
@@ -72,7 +70,6 @@ const ChartCostHistory = (props) => {
     fetchData();
   }, [lat, lon]);
 
-  // Đồng bộ selectedTab với query param khi có data
   useEffect(() => {
     if (data) {
       const typeFromUrl = searchParams.get("type");
@@ -89,26 +86,44 @@ const ChartCostHistory = (props) => {
     }
   }, [data, searchParams]);
 
-  // Xử lý dữ liệu của tab được chọn
   useEffect(() => {
     if (data) {
+      console.log(data)
       const selectedLocation = data[selectedTab];
       if (selectedLocation && selectedLocation.list_gia) {
-        const proData = selectedLocation.list_gia
-          .map((item) => ({
-            ...item,
-            month: item.month ?? new Date(item.endDate).getMonth() + 1,
-            year: item.year ?? new Date(item.endDate).getFullYear(),
-            monthYear: `${item.month ?? new Date(item.endDate).getMonth() + 1}/${item.year ?? new Date(item.endDate).getFullYear()
-              }`,
-          }))
-          .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
-        setProcessedData(proData);
+        let proData = selectedLocation.list_gia.map((item) => ({
+          ...item,
+          month: item.month ?? new Date(item.endDate).getMonth() + 1,
+          year: item.year ?? new Date(item.endDate).getFullYear(),
+          monthYear: `${item.month ?? new Date(item.endDate).getMonth() + 1}/${item.year ?? new Date(item.endDate).getFullYear()}`,
+        }));
+
+        if (timeFilter === "quarter") {
+          proData = proData.reduce((acc, curr) => {
+            const quarter = Math.ceil(curr.month / 3);
+            const key = `${quarter}/${curr.year}`;
+            if (!acc[key] || curr.max > acc[key].max) {
+              acc[key] = { ...curr, monthYear: key };
+            }
+            return acc;
+          }, {});
+          proData = Object.values(proData);
+        } else if (timeFilter === "year") {
+          proData = proData.reduce((acc, curr) => {
+            const key = `${curr.year}`;
+            if (!acc[key] || curr.max > acc[key].max) {
+              acc[key] = { ...curr, monthYear: key };
+            }
+            return acc;
+          }, {});
+          proData = Object.values(proData);
+        }
+
+        setProcessedData(proData.sort((a, b) => new Date(a.endDate) - new Date(b.endDate)));
       }
     }
-  }, [data, selectedTab]);
+  }, [data, selectedTab, timeFilter]);
 
-  // Hàm xử lý khi chuyển tab, đồng thời cập nhật query param
   const handleTabChange = (index) => {
     setSelectedTab(index);
     if (data && data[index]) {
@@ -125,30 +140,29 @@ const ChartCostHistory = (props) => {
   };
 
   return (
-    <>
-      <Container>
-        <div className="history-cost-container">
-          <div className="close-btn"
-            onClick={handleClose}
-            title="Đóng"
-          >
-            X
+    <Container>
+      <div className="history-cost-container">
+        <div className="close-btn" onClick={handleClose} title="Đóng">X</div>
+        <div className="address-box">
+          <div className="address-text">
+            <strong>Địa chỉ:</strong> {diaChi}
           </div>
+        </div>
 
-          <div className="address-box">
-            <div className="address-text">
-              <strong>Địa chỉ:</strong> {diaChi}
-            </div>
-          </div>
-
-          {data && processedData ? (
+        {data ? (
+          data.length > 0 ? (
             <>
+              <select onChange={(e) => setTimeFilter(e.target.value)}>
+                <option value="month">Tháng/Năm</option>
+                <option value="quarter">Quý/Năm</option>
+                <option value="year">Năm</option>
+              </select>
+
               <div className="tabs-container">
-                {data.map((item, index) => (
+                {data?.map((item, index) => (
                   <div key={index} className="tab-item">
                     <button
-                      className={`tab-btn ${index === selectedTab ? "active" : ""
-                        }`}
+                      className={`tab-btn ${index === selectedTab ? "active" : ""}`}
                       onClick={() => handleTabChange(index)}
                       onMouseEnter={() => setHoveredTab(index)}
                       onMouseLeave={() => setHoveredTab(null)}
@@ -158,10 +172,7 @@ const ChartCostHistory = (props) => {
                     {hoveredTab === index && (
                       <div className="tab-popup">
                         {item.image_links && (
-                          <img
-                            src={item.image_links.split(",")[0]}
-                            alt="Preview"
-                          />
+                          <img src={item.image_links.split(",")[0]} alt="Preview" />
                         )}
                         <p>{item.description}</p>
                       </div>
@@ -174,50 +185,21 @@ const ChartCostHistory = (props) => {
                 <LineChart data={processedData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="monthYear" />
-                  <YAxis domain={([min, max]) => [min - 5, max + 10]} />
-                  <Tooltip
-                    formatter={(value, name, props) => [
-                      value > 1000 ? `${(value / 1000).toFixed(2)} tỷ/m²` : `${value} triệu/m²`,
-                      name,
-                    ]}
-                  />
+                  <YAxis />
+                  <Tooltip />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="max"
-                    stroke="#FF0000"
-                    name="Giá cao nhất"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avg"
-                    stroke="#00BFFF"
-                    name="Giá phổ biến"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="min"
-                    stroke="#008000"
-                    name="Giá thấp nhất"
-                    strokeWidth={2}
-                  />
-                  <Brush
-                    dataKey="monthYear"
-                    height={30}
-                    stroke="#8884d8"
-                    travellerWidth={10}
-                  />
+                  <Line type="monotone" dataKey="max" stroke="#FF0000" name="Giá cao nhất" />
+                  <Line type="monotone" dataKey="avg" stroke="#00BFFF" name="Giá phổ biến" />
+                  <Line type="monotone" dataKey="min" stroke="#008000" name="Giá thấp nhất" />
                 </LineChart>
               </ResponsiveContainer>
             </>
           ) : (
-            <h2 className="loading">Loading...</h2>
-          )}
-        </div>
-      </Container>
-    </>
+            <h1 className="loading">Không có dữ liệu</h1>
+          )
+        ) : <h1 className="loading">Loading...</h1>}
+      </div>
+    </Container>
   );
 };
 
