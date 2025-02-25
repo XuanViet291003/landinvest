@@ -1,5 +1,5 @@
 import { CloseOutlined, EnvironmentOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { Drawer, Image, Spin, Switch, message } from 'antd';
+import { Drawer, Image, Select, Spin, Switch, message } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { MdArrowDropDown, MdArrowDropUp, MdFileUpload } from 'react-icons/md';
 import { useMap } from 'react-leaflet';
@@ -110,6 +110,13 @@ const LocationInfoSidebar = ({
     //     };
     // }, [landAuctionListCurrentPage, landCostprovinceId, districtId, location]);
 
+    const { Option } = Select;
+
+  const handleHeatTypeChange = (value) => {
+    searchParams.set("heat-type", value); 
+    setSearchParams(searchParams);
+  };
+
     return (
         <>
             {contextHolder}
@@ -125,16 +132,29 @@ const LocationInfoSidebar = ({
                 className={`overflow-y-hidden ${window.innerWidth > 768 && 'desktop'}`}
             >
                 {' '}
-                <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "16px", fontWeight: "500" }}>Bật/tắt bản đồ nhiệt</span>
-                  <Switch 
-                      checked={searchParams.get("heat-map") !== "off"} 
-                      onChange={handleHeatMapSwitch} 
-                  />
+                <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                  <div>
+                    <span style={{ fontSize: "16px", fontWeight: "500", marginRight: "10px" }}>Bật/tắt bản đồ nhiệt</span>
+                    <Switch 
+                        checked={searchParams.get("heat-map") !== "off"} 
+                        onChange={handleHeatMapSwitch} 
+                    />
+                  </div>
+
+                  <Select 
+                     defaultValue={searchParams.get("heat-type") || "biet_thu"} 
+                     style={{ width: 170 }}
+                     onChange={handleHeatTypeChange} 
+                  >
+                    <Option value="biet_thu">Biệt Thự</Option>
+                    <Option value="chungcu">Chung Cư</Option>
+                    <Option value="shophouse">ShopHouse</Option>
+                    <Option value="tho_cu">Thổ Cư</Option>
+                  </Select>
               </div>
 
                 <div className="ant-drawer-body-wrapper">
-                <div style={{margin: "20px", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
+                <div style={{margin: "20px auto", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
                   <button style={{width: "calc(50%-5px)"}} onClick={onShowHistoryChart}>
                     Xem lịch sử giá đất
                   </button>
