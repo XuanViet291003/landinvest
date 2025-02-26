@@ -3,39 +3,72 @@ import { TileLayer } from "react-leaflet";
 
 const CustomTileLayer = ({ item, opacity }) => {
     const tileLayerRef = useRef(null);
+    const tileLayerRefs = useRef([]); 
+
+    const updateTileLayer = (tileLayer, link) => {
+      if (!tileLayer) return;
+      if (item.type_load_anh === "NGHICH") {
+          tileLayer.getTileUrl = ({ x, y, z }) => {
+              const newY = Math.pow(2, z) - 1 - y;
+              return `${link}/${z}/${x}/${newY}.png`;
+          };
+      } else {
+          tileLayer.getTileUrl = ({ x, y, z }) => {
+              return `${link}/${z}/${x}/${y}.png`;
+          };
+      }
+      tileLayer.redraw();
+  };
 
     useEffect(() => {
-        if (tileLayerRef.current) {
-            if (item.type_load_anh === "NGHICH") {
-                tileLayerRef.current.getTileUrl = function ({ x, y, z }) {
-                    const newY = Math.pow(2, z) - 1 - y;
-                    return `${item.link_quyhoach}/${z}/${x}/${newY}.png`;
-                };
-            } else if(item.type_load_anh === "THUAN") {
-                // Khi trở về THUẬN, đặt lại URL mặc định bằng setUrl()
-                tileLayerRef.current.getTileUrl = function ({ x, y, z }) {
-                return `${item.link_quyhoach}/${z}/${x}/${y}.png`;
-              };
-            } else {
-              tileLayerRef.current.getTileUrl = function ({ x, y, z }) {
-                return `${item.link_quyhoach}/${z}/${x}/${y}`;
-              };
+        if (item.type_link === "1_link") {
+            if (tileLayerRef.current) {
+                updateTileLayer(tileLayerRef.current, item.link_quyhoach);
             }
-            tileLayerRef.current.redraw(); // Vẽ lại các tile
+        } else {
+            const links = item.link_quyhoach
+                .split(",")
+                .map((link) => link.trim().replace(/[^a-zA-Z0-9:/._-]/g, ""));
+            
+            links.forEach((link, index) => {
+                if (tileLayerRefs.current[index]) {
+                    updateTileLayer(tileLayerRefs.current[index], link);
+                }
+            });
         }
     }, [item.type_load_anh, item.link_quyhoach]);
 
     return (
-        <TileLayer
-            ref={tileLayerRef}
-            url={`${item.link_quyhoach}/{z}/{x}/{y}.png`} // URL mặc định
-            pane="overlayPane"
-            minNativeZoom={item.min_zoom ? item.min_zoom : 12}
-            maxNativeZoom={item.zoom ? item.zoom : 18}
-            minZoom={item.min_zoom ? item.min_zoom - 3 : 9}
-            maxZoom={25}
-            opacity={opacity}
-        />
+        <>
+            {item.type_link === "1_link" ? (
+                <TileLayer
+                    ref={tileLayerRef}
+                    url={`${item.link_quyhoach}/{z}/{x}/{y}.png`} 
+                    pane="overlayPane"
+                    minNativeZoom={item.min_zoom || 12}
+                    maxNativeZoom={item.zoom || 18}
+                    minZoom={(item.min_zoom || 12) - 3}
+                    maxZoom={25}
+                    opacity={opacity}
+                />
+            ) : (
+                item.link_quyhoach
+                    .split(",")
+                    .map((link, index) => (
+                        <TileLayer
+                            key={index}
+                            ref={(el) => (tileLayerRefs.current[index] = el)}
+                            url={`${link}/{z}/{x}/{y}.png`}
+                            pane="overlayPane"
+                            minNativeZoom={item.min_zoom || 12}
+                            maxNativeZoom={item.zoom || 18}
+                            minZoom={(item.min_zoom || 12) - 3}
+                            maxZoom={25}
+                            opacity={opacity}
+                        />
+                    ))
+            )}
+        </>
     );
 };
 
