@@ -1768,7 +1768,14 @@ const Map = forwardRef(
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
 
                         return (
-                            <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
+                            <Marker
+                                key={duAnItem.id}
+                                position={[lat, lng]}
+                                icon={iconDuAn}
+                                eventHandlers={{
+                                    click: () => handleClickDuAnIcon(duAnItem.id),
+                                }}
+                            >
                                 <Popup>
                                     <div className="popup-duan">
                                         <img
