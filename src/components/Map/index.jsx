@@ -1531,76 +1531,106 @@ const Map = forwardRef(
             }
         };
 
-        const fetchHeatMapData = async (id) => {
-            try {
-                setHeatMapLoading(true);
-
-                const now = new Date();
-                const month = now.getMonth() + 1;
-                const year = now.getFullYear();
-
-                const responseHeat = await fetch(
-                    `https://api.quyhoach.xyz/get_lich_su_gia_dat_district/${id}/${month}/${year}`,
-                );
-
-                if (!responseHeat.ok) {
-                    throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
-                }
-
-                const data = await responseHeat.json();
-
-                if (!data?.lichsu || !Array.isArray(data.lichsu)) {
-                    throw new Error('Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!');
-                }
-
-                const getPolygonCenter = (polygon) => {
-                    if (!polygon || polygon.length < 3) return null;
-
-                    const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
-                    const geoJsonPolygon = turf.polygon([convertedCoords]);
-                    const center = turf.center(geoJsonPolygon).geometry.coordinates;
-                    return L.latLng(center[1], center[0]);
-                };
-
-                const polygonsByColor = data.lichsu.map(({ polygon, color, max, avg, min, name_xaphuong }) => ({
-                    color: `rgb(${color.red}, ${color.green}, ${color.blue})`,
-                    polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
-                    center: getPolygonCenter(polygon.flat(2)),
-                    max,
-                    avg,
-                    min,
-                    name_xaphuong,
-                }));
-
-                setPolygonHeatMap(polygonsByColor);
-
-                searchParams.set('id-district', id);
-                setSearchParams(searchParams);
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu bản đồ nhiệt:', error.message);
-            } finally {
-                setHeatMapLoading(false);
+        const fetchHeatMapData = async (id, heatType) => {
+          try {
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+    
+            const responseHeat = await fetch(
+              `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
+            );
+    
+            if (!responseHeat.ok) {
+              throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
             }
+    
+            const data = await responseHeat.json();
+    
+            if (!data?.[heatType] || !Array.isArray(data[heatType])) {
+              messageApi.open({
+                type: 'error',
+                content: 'Chưa có dữ liệu lịch sử giá đất!',
+              });
+              throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
+            }
+    
+            const getPolygonCenter = (polygon) => {
+              if (!polygon || polygon.length < 3) return null; 
+              
+              try {
+                  const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
+                  
+                  // Kiểm tra nếu điểm đầu có khớp với điểm cuối không (để tạo đa giác hợp lệ)
+                  if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
+                      convertedCoords.push(convertedCoords[0]);
+                  }
+                  
+                  const geoJsonPolygon = turf.polygon([convertedCoords]);
+                  const center = turf.center(geoJsonPolygon).geometry.coordinates;
+                  
+                  return L.latLng(center[1], center[0]); 
+              } catch (error) {
+                  console.error("Lỗi khi tính toán tâm đa giác:", error);
+                  return null;
+              }
+          };          
+    
+            const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
+            
+            const polygonsByColor = data.list_polygon
+            .filter(({ WandID }) => validWandIDs.has(WandID)) 
+            .map(({ polygon, WandID }) => {
+              const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
+
+              console.log(relatedData)
+
+              return {
+                color: relatedData.color ? 
+                    `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})` : "#ccc",
+                polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
+                center: getPolygonCenter(polygon.flat(2)),
+                max: relatedData.max,
+                avg: relatedData.avg,
+                min: relatedData.min, 
+                name_xaphuong: relatedData.name_xaphuong,
+              };
+            })
+
+    
+            setPolygonHeatMap(polygonsByColor);
+    
+            searchParams.set("id-district", id);
+            searchParams.set("heat-type", heatType);
+            setSearchParams(searchParams);
+          } catch (error) {
+              console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
+          } finally {
+              setHeatMapLoading(false);
+          }
         };
-
+      
         const handleHeatMapClick = async () => {
-            const vitri = searchParams.get('vitri')?.split(',');
+            setHeatMapLoading(true);
+            const vitri = searchParams.get("vitri")?.split(",");
             if (!vitri || vitri.length < 2) {
-                throw new Error('Vị trí không hợp lệ!');
+                throw new Error("Vị trí không hợp lệ!");
             }
-
+        
             const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
             if (!resLocation) {
-                throw new Error('Không lấy được vị trí từ bounding box!');
+                throw new Error("Không lấy được vị trí từ bounding box!");
             }
-
-            const currentDistrict = searchParams.get('id-district');
-
-            if (resLocation.district == currentDistrict) {
+        
+            const currentDistrict = searchParams.get("id-district");
+            const heatType = searchParams.get("heat-type") || "biet_thu";
+        
+            if (resLocation.district === currentDistrict) {
                 return;
             }
-            await fetchHeatMapData(resLocation.district);
-        };
+        
+            await fetchHeatMapData(resLocation.district, heatType);
+        };      
 
         useEffect(() => {
             const id = searchParams.get('id-district');
