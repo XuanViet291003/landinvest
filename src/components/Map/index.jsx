@@ -1,5 +1,5 @@
 import { message, notification, Radio } from 'antd';
-import L from 'leaflet';
+import L, { icon } from 'leaflet';
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaMapMarkedAlt } from 'react-icons/fa';
 import {
@@ -32,6 +32,7 @@ import {
     getAllPlansDetails,
     getAreaLocation,
     getLocationInBoudingBox,
+    postPolyGonForDuAn,
 } from '../../services/api';
 import DrawerView from '../Home/DrawerView';
 // import useGetParams from '../Hooks/useGetParams';
@@ -66,6 +67,7 @@ import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
 import CustomTileLayer from '../CustomLayer';
 import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
+import { Button } from 'react-bootstrap';
 import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
 
 const customIcon = new L.Icon({
@@ -93,7 +95,11 @@ const iconHtml = ReactDOMServer.renderToStaticMarkup(
         <FaLocationDot />
     </div>,
 );
-
+const iconSavePolygon = L.divIcon({
+    className: 'custom-icon',
+    html: `<button style="background: #007bff; color: white;z-index : 1000; border: none; padding: 5px 10px; border-radius: 5px;">Lưu</button>`,
+    iconSize: [50, 30],
+});
 // Tạo DivIcon với HTML
 const iconLocation = L.divIcon({
     html: iconHtml,
@@ -161,7 +167,6 @@ const Map = forwardRef(
         const [isShowModalArea, setIsShowModalArea] = useState(false);
         const [address, setAddress] = useState('');
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
-
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
 
         let polygonOnSearch = [];
@@ -183,10 +188,35 @@ const Map = forwardRef(
         // const [firstTime, setFirstTime] = useState(true);
 
         // const [id, setId] = useState(searchParams.get('id'));
-
+        const [isDrawPolygon, setIsDrawPolygon] = useState(false);
         const id = searchParams.get('id');
         const type = searchParams.get('type');
-
+        const [idDuAn, setIdDuAn] = useState(null);
+        const handleDrawPolygon = (id) => {
+            setMarkers([]);
+            setDistances([]);
+            message.info('Bạn đã bắt đàu vẽ !');
+            setIsSelectedMeasure(true);
+            setIsDrawPolygon(true);
+            setIdDuAn(id);
+        };
+        const handleSavePolygon = async () => {
+            try {
+                const newMarkers = [...markers, markers[0]].map((item) => [item.lat, item.lng]);
+                const formData = new FormData();
+                console.log(typeof JSON.stringify(newMarkers));
+                formData.append('polygon', JSON.stringify(newMarkers));
+                await postPolyGonForDuAn(idDuAn, formData);
+                message.success('Bạn đã lưu thành công !');
+                setIsSelectedMeasure(false);
+                setIsDrawPolygon(false);
+                setMarkers([]);
+                setDistances([]);
+            } catch (e) {
+                message.error('Đã có lỗi xảy ra !');
+                console.log(e);
+            }
+        };
         useEffect(() => {
             // Hàm lấy thông tin hệ điều hành
             const detectOs = (userAgent) => {
@@ -499,16 +529,8 @@ const Map = forwardRef(
 
                         const dataQuyHoach = await resQuyHoach.json();
 
-                        // Lọc danh sách quy hoạch địa chính
-                        const dataDiaChinh = dataQuyHoach.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH');
-
-                        // Tìm tỉnh phù hợp với vị trí hiện tại
-                        const tinh = dataDiaChinh.find(
-                            (item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17,
-                        );
-
                         searchParams.set('type', 'QUYHOACH_DIACHINH');
-                        searchParams.set('id', tinh.id);
+                        //searchParams.set('id', tinh.id);
                         searchParams.set('draw', 'auto');
                         setSearchParams(searchParams);
                     }
@@ -1509,14 +1531,16 @@ const Map = forwardRef(
             }
         };
 
-        const fetchHeatMapData = async (id, heatType) => {
+        const fetchHeatMapData = async (id) => {
             try {
+                setHeatMapLoading(true);
+
                 const now = new Date();
                 const month = now.getMonth() + 1;
                 const year = now.getFullYear();
 
                 const responseHeat = await fetch(
-                    `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`,
+                    `https://api.quyhoach.xyz/get_lich_su_gia_dat_district/${id}/${month}/${year}`,
                 );
 
                 if (!responseHeat.ok) {
@@ -1525,48 +1549,32 @@ const Map = forwardRef(
 
                 const data = await responseHeat.json();
 
-                if (!data?.[heatType] || !Array.isArray(data[heatType])) {
-                    messageApi.open({
-                        type: 'error',
-                        content: 'Chưa có dữ liệu lịch sử giá đất!',
-                    });
+                if (!data?.lichsu || !Array.isArray(data.lichsu)) {
                     throw new Error('Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!');
                 }
 
                 const getPolygonCenter = (polygon) => {
                     if (!polygon || polygon.length < 3) return null;
+
                     const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
                     const geoJsonPolygon = turf.polygon([convertedCoords]);
                     const center = turf.center(geoJsonPolygon).geometry.coordinates;
                     return L.latLng(center[1], center[0]);
                 };
 
-                const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
-
-                const polygonsByColor = data.list_polygon
-                    .filter(({ WandID }) => validWandIDs.has(WandID))
-                    .map(({ polygon, WandID }) => {
-                        const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
-
-                        console.log(relatedData);
-
-                        return {
-                            color: relatedData.color
-                                ? `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})`
-                                : '#ccc',
-                            polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
-                            center: getPolygonCenter(polygon.flat(2)),
-                            max: relatedData.max,
-                            avg: relatedData.avg,
-                            min: relatedData.min,
-                            name_xaphuong: relatedData.name_xaphuong,
-                        };
-                    });
+                const polygonsByColor = data.lichsu.map(({ polygon, color, max, avg, min, name_xaphuong }) => ({
+                    color: `rgb(${color.red}, ${color.green}, ${color.blue})`,
+                    polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
+                    center: getPolygonCenter(polygon.flat(2)),
+                    max,
+                    avg,
+                    min,
+                    name_xaphuong,
+                }));
 
                 setPolygonHeatMap(polygonsByColor);
 
                 searchParams.set('id-district', id);
-                searchParams.set('heat-type', heatType);
                 setSearchParams(searchParams);
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu bản đồ nhiệt:', error.message);
@@ -1576,7 +1584,6 @@ const Map = forwardRef(
         };
 
         const handleHeatMapClick = async () => {
-            setHeatMapLoading(true);
             const vitri = searchParams.get('vitri')?.split(',');
             if (!vitri || vitri.length < 2) {
                 throw new Error('Vị trí không hợp lệ!');
@@ -1588,13 +1595,11 @@ const Map = forwardRef(
             }
 
             const currentDistrict = searchParams.get('id-district');
-            const heatType = searchParams.get('heat-type') || 'biet_thu';
 
-            if (resLocation.district === currentDistrict) {
+            if (resLocation.district == currentDistrict) {
                 return;
             }
-
-            await fetchHeatMapData(resLocation.district, heatType);
+            await fetchHeatMapData(resLocation.district);
         };
 
         useEffect(() => {
@@ -1641,8 +1646,8 @@ const Map = forwardRef(
         const textIcon = (text) =>
             L.divIcon({
                 className: 'polygon-label',
-                html: `<div style="text-align: center; font-weight: bold; font-size: 9px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
-                iconSize: [120, 30],
+                html: `<div style="text-align: center; font-weight: bold; font-size: 8.5px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
+                iconSize: [100, 30],
                 iconAnchor: [50, 15],
             });
 
@@ -1733,39 +1738,37 @@ const Map = forwardRef(
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
 
                         return (
-                            <Marker
-                                key={duAnItem.id}
-                                position={[lat, lng]}
-                                icon={iconDuAn}
-                                eventHandlers={{
-                                    click: () => handleClickDuAnIcon(duAnItem.id),
-                                }}
-                            >
-                                {showPopup && (
-                                    <Popup onClose={() => setShowPopup(false)}>
-                                        <div className="popup-duan">
-                                            <img
-                                                src={duAnItem.image}
-                                                alt={duAnItem.tenDuAn}
-                                                className="popup-duan__image"
-                                            />
-                                            <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
-                                            <p>
-                                                <b>Loại hình:</b> {duAnItem.loaiHinh}
-                                            </p>
-                                            <p>
-                                                <b>Trạng thái:</b> {duAnItem.trangThai}
-                                            </p>
-                                            <p>
-                                                <b>Vị trí:</b> {duAnItem.viTri}
-                                            </p>
-
-                                            <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
-                                                Xem chi tiết
-                                            </Link>
-                                        </div>
-                                    </Popup>
-                                )}
+                            <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
+                                <Popup>
+                                    <div className="popup-duan">
+                                        <img
+                                            src={duAnItem.image}
+                                            alt={duAnItem.tenDuAn}
+                                            className="popup-duan__image"
+                                        />
+                                        <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                                        <p>
+                                            <b>Loại hình:</b> {duAnItem.loaiHinh}
+                                        </p>
+                                        <p>
+                                            <b>Trạng thái:</b> {duAnItem.trangThai}
+                                        </p>
+                                        <p>
+                                            <b>Vị trí:</b> {duAnItem.viTri}
+                                        </p>
+                                        <Button
+                                            className="popup-duan__button"
+                                            onClick={() => {
+                                                handleDrawPolygon(duAnItem.id);
+                                            }}
+                                        >
+                                            Update polygon
+                                        </Button>
+                                        <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                            Xem chi tiết
+                                        </Link>
+                                    </div>
+                                </Popup>
                             </Marker>
                         );
                     })}
@@ -1810,7 +1813,7 @@ const Map = forwardRef(
                                     <Marker
                                         position={[item.center.lat, item.center.lng]}
                                         icon={textIcon(
-                                            `${item.name_xaphuong} <br> Max: ${item.max} triệu/m² <br> Min: ${item.min} triệu/m² <br> Trung Bình: ${item.avg} triệu/m²`,
+                                            `${item.name_xaphuong} <br> Max: ${item.max} Min: ${item.min} <br> Trung Bình: ${item.avg}`,
                                         )}
                                     />
                                 )}
@@ -1909,7 +1912,8 @@ const Map = forwardRef(
                         {RegulationImages &&
                             !(
                                 (searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&
-                                searchParams.get('draw') === 'auto'
+                                searchParams.get('draw') === 'auto' &&
+                                RegulationImages
                             ) &&
                             RegulationImages.length > 0 &&
                             RegulationImages.map((item, index) => (
@@ -2072,7 +2076,30 @@ const Map = forwardRef(
                             </TooltipLeaflet>
                         </Polygon>
                     )}
+                    {/* {console.log(
+                        turf.centroid(turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]))
+                            .geometry.coordinates,
+                    )} */}
                     {isSelectedMeasure && <MapClickHandler />}
+                    {isSelectedMeasure && isDrawPolygon && markers.length >= 3 && (
+                        <Marker
+                            eventHandlers={{
+                                click: (e) => {
+                                    e.originalEvent.stopPropagation();
+                                    handleSavePolygon();
+                                },
+                            }}
+                            icon={iconSavePolygon}
+                            position={[
+                                turf.centroid(
+                                    turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]),
+                                ).geometry.coordinates[1],
+                                turf.centroid(
+                                    turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]),
+                                ).geometry.coordinates[0],
+                            ]}
+                        ></Marker>
+                    )}
                     {markers.map((position, index) => (
                         <Marker
                             draggable
