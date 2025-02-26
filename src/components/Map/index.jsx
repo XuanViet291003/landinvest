@@ -1634,8 +1634,8 @@ const Map = forwardRef(
         const textIcon = (text) =>
           L.divIcon({
             className: "polygon-label",
-            html: `<div style="text-align: center; font-weight: bold; font-size: 8.5px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
-            iconSize: [100, 30],
+            html: `<div style="text-align: center; font-weight: bold; font-size: 9px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
+            iconSize: [120, 30],
             iconAnchor: [50, 15],
           });
     
@@ -1800,7 +1800,7 @@ const Map = forwardRef(
                         {item.center && (
                           <Marker 
                             position={[item.center.lat, item.center.lng]} 
-                            icon={textIcon(`${item.name_xaphuong} <br> Max: ${item.max} Min: ${item.min} <br> Trung Bình: ${item.avg}`)} 
+                            icon={textIcon(`${item.name_xaphuong} <br> Max: ${item.max} triệu/m² <br> Min: ${item.min} triệu/m² <br> Trung Bình: ${item.avg} triệu/m²`)} 
                           />
                         )}
                       </>
