@@ -1,5 +1,5 @@
 import { message, notification, Radio } from 'antd';
-import L, { icon } from 'leaflet';
+import L from 'leaflet';
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaMapMarkedAlt } from 'react-icons/fa';
 import {
@@ -32,7 +32,6 @@ import {
     getAllPlansDetails,
     getAreaLocation,
     getLocationInBoudingBox,
-    postPolyGonForDuAn,
 } from '../../services/api';
 import DrawerView from '../Home/DrawerView';
 // import useGetParams from '../Hooks/useGetParams';
@@ -67,7 +66,7 @@ import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
 import CustomTileLayer from '../CustomLayer';
 import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
-import { Button } from 'react-bootstrap';
+import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -94,11 +93,7 @@ const iconHtml = ReactDOMServer.renderToStaticMarkup(
         <FaLocationDot />
     </div>,
 );
-const iconSavePolygon = L.divIcon({
-    className: 'custom-icon',
-    html: `<button style="background: #007bff; color: white;z-index : 1000; border: none; padding: 5px 10px; border-radius: 5px;">Lưu</button>`,
-    iconSize: [50, 30],
-});
+
 // Tạo DivIcon với HTML
 const iconLocation = L.divIcon({
     html: iconHtml,
@@ -162,52 +157,36 @@ const Map = forwardRef(
         const [redoStack, setRedoStack] = useState([]);
         const [trigger, setTrigger] = useState(false);
         const [polygonArea, setPolygonArea] = useState({ distances: [], polygon: [] });
+        const [polygonDuAnArea, setPolygonDuAnArea] = useState({ polygon: [] });
         const [isShowModalArea, setIsShowModalArea] = useState(false);
         const [address, setAddress] = useState('');
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
+
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
-        const polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
+
+        let polygonOnSearch = [];
+        if (searchParams.get('heat-map') !== 'on')
+            polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
+
         // console.log(itemSearch)
         const [location, setLocation] = useState([0, 0]); // Vị trí hiện tại
         const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false); // Thông tin vị trí có mở không
         const [isLongClick, setIsLongClick] = useState(false); // Kiểm tra click dài
         const [pressTimer, setPressTimer] = useState(null); // Timer cho click dài
         const [duAn, setDuAn] = useState([]);
+        const [polygonHeatMap, setPolygonHeatMap] = useState(null);
+        const [heatMapLoading, setHeatMapLoading] = useState(false);
+        const [regionalPrice, setRegionalPrice] = useState(null);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
         // const [firstTime, setFirstTime] = useState(true);
 
         // const [id, setId] = useState(searchParams.get('id'));
-        const [isDrawPolygon, setIsDrawPolygon] = useState(false);
+
         const id = searchParams.get('id');
         const type = searchParams.get('type');
-        const [idDuAn, setIdDuAn] = useState(null);
-        const handleDrawPolygon = (id) => {
-            setMarkers([]);
-            setDistances([]);
-            message.success('Bạn đã bắt đàu vẽ !');
-            setIsSelectedMeasure(true);
-            setIsDrawPolygon(true);
-            setIdDuAn(id);
-        };
-        const handleSavePolygon = async () => {
-            try {
-                const newMarkers = [...markers, markers[0]].map((item) => [item.lat, item.lng]);
-                const formData = new FormData();
-                console.log(typeof JSON.stringify(newMarkers));
-                formData.append('polygon', JSON.stringify(newMarkers));
-                await postPolyGonForDuAn(idDuAn, formData);
-                message.success('Bạn đã lưu thành công !');
-                setIsSelectedMeasure(false);
-                setIsDrawPolygon(false);
-                setMarkers([]);
-                setDistances([]);
-            } catch (e) {
-                message.error('Đã có lỗi xảy ra !');
-                console.log(e);
-            }
-        };
+
         useEffect(() => {
             // Hàm lấy thông tin hệ điều hành
             const detectOs = (userAgent) => {
@@ -378,6 +357,7 @@ const Map = forwardRef(
         const [RegulationImages, setRegulationImages] = useState(null);
         const [selectedBounds, setSelectedBounds] = useState(null);
         const [imageOverlay, setImageOverlay] = useState(null);
+        const [showPopup, setShowPopup] = useState(false);
 
         // const mapRef = useRef();
         // const sharing = searchParams.get('ups');
@@ -506,8 +486,6 @@ const Map = forwardRef(
                     // Gọi API lấy thông tin tỉnh/thành phố
                     const dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
 
-                    const newParams = new URLSearchParams(searchParams);
-
                     if (
                         zoom >= 19 &&
                         (!RegulationImages ||
@@ -529,23 +507,16 @@ const Map = forwardRef(
                             (item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17,
                         );
 
-                        newParams.set('type', 'QUYHOACH_DIACHINH');
-                        newParams.set('id', tinh.id);
-                        newParams.set('draw', 'auto');
-                        setSearchParams(newParams);
-                    }
-
-                    if ((zoom < 18 || zoom > 22) && newParams.get('draw') === 'auto') {
-                        setRegulationImages(null);
-                        newParams.delete('type');
-                        newParams.delete('id');
-                        setSearchParams(newParams);
+                        searchParams.set('type', 'QUYHOACH_DIACHINH');
+                        searchParams.set('id', tinh.id);
+                        searchParams.set('draw', 'auto');
+                        setSearchParams(searchParams);
                     }
 
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
                     }
-                    if (zoom >= 15) {
+                    if (zoom >= 16) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
 
                         const fetchDuan = await fetch(
@@ -625,6 +596,9 @@ const Map = forwardRef(
                         setIsLongClick(false);
                         clearTimeout(pressTimer);
                     }
+                },
+                dragstart: () => {
+                    setShowPopup(false);
                 },
             });
             return null;
@@ -973,11 +947,9 @@ const Map = forwardRef(
                     clickCountRef.current += 1;
                     const map = e.target;
 
-                    const newParams = new URLSearchParams(searchParams);
+                    searchParams.set('vitri', `${e.latlng.lat},${e.latlng.lng}`);
 
-                    newParams.set('vitri', `${e.latlng.lat},${e.latlng.lng}`);
-
-                    setSearchParams(newParams);
+                    setSearchParams(searchParams);
 
                     if (clickTimeout.current) clearTimeout(clickTimeout.current);
 
@@ -1470,7 +1442,13 @@ const Map = forwardRef(
 
         // // Hàm render các TileLayer
         const renderTileLayers = () => {
-            if (!RegulationImages || RegulationImages.length === 0) {
+            if (
+                !RegulationImages ||
+                RegulationImages.length === 0 ||
+                ((searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&
+                    searchParams.get('draw') === 'auto' &&
+                    RegulationImages)
+            ) {
                 return <div></div>;
             }
 
@@ -1501,7 +1479,172 @@ const Map = forwardRef(
 
         const antDrawOpen = document.querySelector('.ant-drawer-open');
 
-        const historyCost = useSelector((state) => state.historyCost.value);
+        const [latHistoryCost, setLatHistoryCost] = useState('');
+        const [lonHistoryCost, setLonHistoryCost] = useState('');
+
+        const handleShowHistoryChart = () => {
+            const vitri = searchParams.get('vitri');
+            if (vitri) {
+                const [newLat, newLon] = vitri.split(',');
+                setLatHistoryCost(newLat);
+                setLonHistoryCost(newLon);
+                const newSearchParams = new URLSearchParams(searchParams);
+                newSearchParams.set('ups', 'history-cost');
+                setSearchParams(newSearchParams);
+            }
+        };
+
+        const handleClickDuAnIcon = (id) => {
+            searchParams.set('id-duan', id);
+            setSearchParams(searchParams);
+        };
+
+        const handleHeatMapSwitch = () => {
+            if (searchParams.get('heat-map') === 'off') {
+                searchParams.delete('heat-map');
+                setSearchParams(searchParams);
+            } else {
+                searchParams.set('heat-map', 'off');
+                setSearchParams(searchParams);
+            }
+        };
+
+        const fetchHeatMapData = async (id, heatType) => {
+            try {
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                const year = now.getFullYear();
+
+                const responseHeat = await fetch(
+                    `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`,
+                );
+
+                if (!responseHeat.ok) {
+                    throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
+                }
+
+                const data = await responseHeat.json();
+
+                if (!data?.[heatType] || !Array.isArray(data[heatType])) {
+                    messageApi.open({
+                        type: 'error',
+                        content: 'Chưa có dữ liệu lịch sử giá đất!',
+                    });
+                    throw new Error('Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!');
+                }
+
+                const getPolygonCenter = (polygon) => {
+                    if (!polygon || polygon.length < 3) return null;
+                    const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
+                    const geoJsonPolygon = turf.polygon([convertedCoords]);
+                    const center = turf.center(geoJsonPolygon).geometry.coordinates;
+                    return L.latLng(center[1], center[0]);
+                };
+
+                const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
+
+                const polygonsByColor = data.list_polygon
+                    .filter(({ WandID }) => validWandIDs.has(WandID))
+                    .map(({ polygon, WandID }) => {
+                        const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
+
+                        console.log(relatedData);
+
+                        return {
+                            color: relatedData.color
+                                ? `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})`
+                                : '#ccc',
+                            polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
+                            center: getPolygonCenter(polygon.flat(2)),
+                            max: relatedData.max,
+                            avg: relatedData.avg,
+                            min: relatedData.min,
+                            name_xaphuong: relatedData.name_xaphuong,
+                        };
+                    });
+
+                setPolygonHeatMap(polygonsByColor);
+
+                searchParams.set('id-district', id);
+                searchParams.set('heat-type', heatType);
+                setSearchParams(searchParams);
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu bản đồ nhiệt:', error.message);
+            } finally {
+                setHeatMapLoading(false);
+            }
+        };
+
+        const handleHeatMapClick = async () => {
+            setHeatMapLoading(true);
+            const vitri = searchParams.get('vitri')?.split(',');
+            if (!vitri || vitri.length < 2) {
+                throw new Error('Vị trí không hợp lệ!');
+            }
+
+            const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
+            if (!resLocation) {
+                throw new Error('Không lấy được vị trí từ bounding box!');
+            }
+
+            const currentDistrict = searchParams.get('id-district');
+            const heatType = searchParams.get('heat-type') || 'biet_thu';
+
+            if (resLocation.district === currentDistrict) {
+                return;
+            }
+
+            await fetchHeatMapData(resLocation.district, heatType);
+        };
+
+        useEffect(() => {
+            const id = searchParams.get('id-district');
+            if (searchParams.get('id-district')) {
+                fetchHeatMapData(id);
+            }
+        }, []);
+
+        useEffect(() => {
+            const fetchData = async () => {
+                const id = searchParams.get('id-duan');
+
+                if (id) {
+                    const response = await fetch(`https://api.quyhoach.xyz/detail_du_an/${id}`);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const res = await response.json();
+
+                    setRegionalPrice(res?.data?.gia_cung_khu_vuc);
+
+                    if (res.data?.polygon) {
+                        const dataPolygon = JSON.parse(res.data?.polygon);
+
+                        const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
+
+                        // Lưu dữ liệu vào state
+                        setPolygonDuAnArea({
+                            polygon,
+                            address: res.data.diachi || 'Không có địa chỉ',
+                        });
+                    } else {
+                        setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
+                    }
+                }
+            };
+            fetchData();
+            setShowPopup(true);
+        }, [searchParams]);
+
+        const textIcon = (text) =>
+            L.divIcon({
+                className: 'polygon-label',
+                html: `<div style="text-align: center; font-weight: bold; font-size: 9px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
+                iconSize: [120, 30],
+                iconAnchor: [50, 15],
+            });
 
         return (
             <>
@@ -1569,11 +1712,10 @@ const Map = forwardRef(
 
                 <div>
                     {searchParams.get('ups') === 'history-cost' && (
-                        <ChartCostHistory
-                            lat={searchParams.get('vitri').split(',')[0]}
-                            lon={searchParams.get('vitri').split(',')[1]}
-                        />
+                        <ChartCostHistory lat={latHistoryCost} lon={lonHistoryCost} />
                     )}
+
+                    {regionalPrice && <RegionalPriceChart regionalPrice={regionalPrice} />}
                 </div>
 
                 <MapContainer
@@ -1583,7 +1725,6 @@ const Map = forwardRef(
                     }}
                     center={initialCenter}
                     zoom={initialZoom}
-                    s
                     maxZoom={30}
                     ref={ref}
                     zoomControl={false}
@@ -1592,37 +1733,39 @@ const Map = forwardRef(
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
 
                         return (
-                            <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
-                                <Popup>
-                                    <div className="popup-duan">
-                                        <img
-                                            src={duAnItem.image}
-                                            alt={duAnItem.tenDuAn}
-                                            className="popup-duan__image"
-                                        />
-                                        <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
-                                        <p>
-                                            <b>Loại hình:</b> {duAnItem.loaiHinh}
-                                        </p>
-                                        <p>
-                                            <b>Trạng thái:</b> {duAnItem.trangThai}
-                                        </p>
-                                        <p>
-                                            <b>Vị trí:</b> {duAnItem.viTri}
-                                        </p>
-                                        <Button
-                                            className="popup-duan__button"
-                                            onClick={() => {
-                                                handleDrawPolygon(duAnItem.id);
-                                            }}
-                                        >
-                                            Update polygon
-                                        </Button>
-                                        <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
-                                            Xem chi tiết
-                                        </Link>
-                                    </div>
-                                </Popup>
+                            <Marker
+                                key={duAnItem.id}
+                                position={[lat, lng]}
+                                icon={iconDuAn}
+                                eventHandlers={{
+                                    click: () => handleClickDuAnIcon(duAnItem.id),
+                                }}
+                            >
+                                {showPopup && (
+                                    <Popup onClose={() => setShowPopup(false)}>
+                                        <div className="popup-duan">
+                                            <img
+                                                src={duAnItem.image}
+                                                alt={duAnItem.tenDuAn}
+                                                className="popup-duan__image"
+                                            />
+                                            <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                                            <p>
+                                                <b>Loại hình:</b> {duAnItem.loaiHinh}
+                                            </p>
+                                            <p>
+                                                <b>Trạng thái:</b> {duAnItem.trangThai}
+                                            </p>
+                                            <p>
+                                                <b>Vị trí:</b> {duAnItem.viTri}
+                                            </p>
+
+                                            <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                                Xem chi tiết
+                                            </Link>
+                                        </div>
+                                    </Popup>
+                                )}
                             </Marker>
                         );
                     })}
@@ -1650,6 +1793,29 @@ const Map = forwardRef(
                             }}
                         />
                     )}
+
+                    {searchParams.get('heat-map') !== 'off' &&
+                        polygonHeatMap?.map((item, index) => (
+                            <>
+                                <Polygon
+                                    key={`${index} - ${opacity}`}
+                                    positions={item.polygons}
+                                    color={item.color}
+                                    fillColor={item.color}
+                                    opacity={opacity}
+                                    fillOpacity={opacity}
+                                />
+
+                                {item.center && (
+                                    <Marker
+                                        position={[item.center.lat, item.center.lng]}
+                                        icon={textIcon(
+                                            `${item.name_xaphuong} <br> Max: ${item.max} triệu/m² <br> Min: ${item.min} triệu/m² <br> Trung Bình: ${item.avg} triệu/m²`,
+                                        )}
+                                    />
+                                )}
+                            </>
+                        ))}
 
                     {/* {polygonPoint?.points?.length > 0 && (
                         <Polygon
@@ -1741,6 +1907,10 @@ const Map = forwardRef(
 
                         {renderTileLayers()}
                         {RegulationImages &&
+                            !(
+                                (searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&
+                                searchParams.get('draw') === 'auto'
+                            ) &&
                             RegulationImages.length > 0 &&
                             RegulationImages.map((item, index) => (
                                 <CustomTileLayer key={index} item={item} opacity={opacity} />
@@ -1776,7 +1946,7 @@ const Map = forwardRef(
                 )} */}
 
                     {/* Marker in location now */}
-                    {mapZoom >= 15 && boundingboxDataLocation?.list_image?.length > 0 && (
+                    {mapZoom >= 16 && boundingboxDataLocation?.list_image?.length > 0 && (
                         <>
                             {boundingboxDataLocation?.list_image?.map((item) => {
                                 return (
@@ -1844,6 +2014,10 @@ const Map = forwardRef(
                         handleItemClick={handleItemClick}
                         RegulationsImagesList={RegulationsImagesList}
                         handleWikiClick={handleWikiClick}
+                        onShowHistoryChart={handleShowHistoryChart}
+                        handleHeatMapClick={handleHeatMapClick}
+                        handleHeatMapSwitch={handleHeatMapSwitch}
+                        heatMapLoading={heatMapLoading}
                     />
                     <DrawerLandUsePlan />
 
@@ -1898,30 +2072,7 @@ const Map = forwardRef(
                             </TooltipLeaflet>
                         </Polygon>
                     )}
-                    {/* {console.log(
-                        turf.centroid(turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]))
-                            .geometry.coordinates,
-                    )} */}
                     {isSelectedMeasure && <MapClickHandler />}
-                    {isSelectedMeasure && isDrawPolygon && markers.length >= 3 && (
-                        <Marker
-                            eventHandlers={{
-                                click: (e) => {
-                                    e.originalEvent.stopPropagation();
-                                    handleSavePolygon();
-                                },
-                            }}
-                            icon={iconSavePolygon}
-                            position={[
-                                turf.centroid(
-                                    turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]),
-                                ).geometry.coordinates[1],
-                                turf.centroid(
-                                    turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]),
-                                ).geometry.coordinates[0],
-                            ]}
-                        ></Marker>
-                    )}
                     {markers.map((position, index) => (
                         <Marker
                             draggable
@@ -1990,7 +2141,8 @@ const Map = forwardRef(
                     {location.length > 0 && <Marker position={location} icon={iconLocation} />}
                     {!isSelectedMeasure && <MapEventArea />}
                     {polygonArea?.area}
-                    <Polygon positions={polygonArea?.polygon} color="rgb(23,119,255)" />
+                    <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)" />
+                    <Polygon positions={polygonArea?.polygon} color="darkred" />
                 </MapContainer>
                 {/* loading */}
                 {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen />}
