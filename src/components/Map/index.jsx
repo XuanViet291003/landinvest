@@ -1,7 +1,7 @@
-import {message, notification, Radio} from 'antd';
-import L from 'leaflet';
-import React, {forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {FaMapMarkedAlt} from 'react-icons/fa';
+import { message, notification, Radio } from 'antd';
+import L, { icon } from 'leaflet';
+import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FaMapMarkedAlt } from 'react-icons/fa';
 import {
     LayersControl,
     MapContainer,
@@ -15,44 +15,45 @@ import {
     useMapEvents,
     ZoomControl,
 } from 'react-leaflet';
-import {useDispatch, useSelector} from 'react-redux';
-import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
-import {formatToVND} from '../../function/formatToVND';
+import { formatToVND } from '../../function/formatToVND';
 import ResetCenterView from '../../function/resetCenterView';
 import useMapParams from '../../hooks/useMapParams';
 import useWindowSize from '../../hooks/useWindowSise';
-import {selectFilteredMarkers} from '../../redux/filter/filterSelector';
-import {setListMarker} from '../../redux/listMarker/listMarkerSllice';
-import {setPlanByProvince, setPlansInfo} from '../../redux/plansSelected/plansSelected';
-import {setCurrentLocation} from '../../redux/search/searchSlice';
+import { selectFilteredMarkers } from '../../redux/filter/filterSelector';
+import { setListMarker } from '../../redux/listMarker/listMarkerSllice';
+import { setPlanByProvince, setPlansInfo } from '../../redux/plansSelected/plansSelected';
+import { setCurrentLocation } from '../../redux/search/searchSlice';
 import {
     fetchListInfo,
     fetQuyHoachByIdDistrict,
     getAllPlansDetails,
     getAreaLocation,
     getLocationInBoudingBox,
+    postPolyGonForDuAn,
 } from '../../services/api';
 import DrawerView from '../Home/DrawerView';
 // import useGetParams from '../Hooks/useGetParams';
-import {CloseOutlined} from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import * as turf from '@turf/turf';
-import {Tooltip} from 'antd';
+import { Tooltip } from 'antd';
 import axios from 'axios';
 import _ from 'lodash';
 import ReactDOMServer from 'react-dom/server';
-import {FaList, FaLocationDot} from 'react-icons/fa6';
-import {THUNK_API_STATUS} from '../../constants/thunkApiStatus';
-import {areBoundingBoxesDifferent} from '../../function/areBoundingBoxesDifferent';
-import {calculateLocation} from '../../function/calculateLocation';
+import { FaList, FaLocationDot } from 'react-icons/fa6';
+import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
+import { areBoundingBoxesDifferent } from '../../function/areBoundingBoxesDifferent';
+import { calculateLocation } from '../../function/calculateLocation';
 import handleGetLocation from '../../function/handleGetLocation';
 import handleShareLocation from '../../function/handleShareLocation';
-import {setTreeCheckedKey} from '../../redux/apiCache/treePlans';
-import {getBoundingboxData, setCurrentBoundingBox} from '../../redux/boundingMarkerBoxSlice/boundingMarkerBoxSlice';
-import {doGetQuyHoach} from '../../redux/getQuyHoach/getQuyHoachSlice';
-import {getDistrictIdApi} from '../../redux/landCostSlice/landCostSlice';
-import {fetchListRegulations} from '../../redux/ListRegulations/ListRegulationsSlice';
-import {setActiveLayer} from '../../redux/mapLayer/mapLayerSlice';
+import { setTreeCheckedKey } from '../../redux/apiCache/treePlans';
+import { getBoundingboxData, setCurrentBoundingBox } from '../../redux/boundingMarkerBoxSlice/boundingMarkerBoxSlice';
+import { doGetQuyHoach } from '../../redux/getQuyHoach/getQuyHoachSlice';
+import { getDistrictIdApi } from '../../redux/landCostSlice/landCostSlice';
+import { fetchListRegulations } from '../../redux/ListRegulations/ListRegulationsSlice';
+import { setActiveLayer } from '../../redux/mapLayer/mapLayerSlice';
 import GoToLocation from '../_common/GoToLocation';
 import LoadingScreen from '../_common/LoadingScreen';
 import GetBoundingBoxOnFirstRender from '../GetBoundingBoxOnFirstRender/GetBoundingBoxOnFirstRender';
@@ -66,7 +67,7 @@ import LocationInfoSidebar from '../LocationInfoSidebar/LocationInfoSidebar';
 import UserLocationMarker from '../UserLocationMarker';
 import CustomTileLayer from '../CustomLayer';
 import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
-import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
+import { Button } from 'react-bootstrap';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -89,11 +90,15 @@ const dotIcon = new L.DivIcon({
     iconAnchor: [7.5, 7.5],
 });
 const iconHtml = ReactDOMServer.renderToStaticMarkup(
-    <div style={{color: 'red', fontSize: '30px'}}>
-        <FaLocationDot/>
+    <div style={{ color: 'red', fontSize: '30px' }}>
+        <FaLocationDot />
     </div>,
 );
-
+const iconSavePolygon = L.divIcon({
+    className: 'custom-icon',
+    html: `<button style="background: #007bff; color: white;z-index : 1000; border: none; padding: 5px 10px; border-radius: 5px;">Lưu</button>`,
+    iconSize: [50, 30],
+});
 // Tạo DivIcon với HTML
 const iconLocation = L.divIcon({
     html: iconHtml,
@@ -139,7 +144,7 @@ const Map = forwardRef(
         const listRegulations = useSelector((state) => state.listRegulationsSlice.listRegulations);
         const RegulationsImagesList = listRegulations?.list_image;
         const treeCheckedKeys = useSelector((state) => state.treePlans.treeCheckedKeys);
-        const {initialCenter, initialZoom} = useMapParams();
+        const { initialCenter, initialZoom } = useMapParams();
         const windowSize = useWindowSize();
         const [searchPara, setSearchPara] = useSearchParams();
         const closeDrawer = () => setIsDrawerVisible(false);
@@ -156,128 +161,143 @@ const Map = forwardRef(
         const [undoStack, setUndoStack] = useState([]);
         const [redoStack, setRedoStack] = useState([]);
         const [trigger, setTrigger] = useState(false);
-        const [polygonArea, setPolygonArea] = useState({distances: [], polygon: []});
-        const [polygonDuAnArea, setPolygonDuAnArea] = useState({polygon: []})
+        const [polygonArea, setPolygonArea] = useState({ distances: [], polygon: [] });
         const [isShowModalArea, setIsShowModalArea] = useState(false);
         const [address, setAddress] = useState('');
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
-
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
-
-        let polygonOnSearch = [];
-        if(searchParams.get("heat-map") !== "on")
-          polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
-
+        const polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
         // console.log(itemSearch)
         const [location, setLocation] = useState([0, 0]); // Vị trí hiện tại
         const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false); // Thông tin vị trí có mở không
         const [isLongClick, setIsLongClick] = useState(false); // Kiểm tra click dài
         const [pressTimer, setPressTimer] = useState(null); // Timer cho click dài
         const [duAn, setDuAn] = useState([]);
-        const [polygonHeatMap, setPolygonHeatMap] = useState(null);
-        const [heatMapLoading, setHeatMapLoading] = useState(false);
-        const [regionalPrice, setRegionalPrice] = useState(null);
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
         // const [firstTime, setFirstTime] = useState(true);
 
         // const [id, setId] = useState(searchParams.get('id'));
-
+        const [isDrawPolygon, setIsDrawPolygon] = useState(false);
         const id = searchParams.get('id');
         const type = searchParams.get('type');
-
-        useEffect(() => {
-          // Hàm lấy thông tin hệ điều hành
-          const detectOs = (userAgent) => {
-            if (/Windows NT/i.test(userAgent)) {
-              return "Windows";
-            } else if (/Mac OS X/i.test(userAgent)) {
-                return "macOS";
-            } else if (/iPhone|iPad/i.test(userAgent)) {
-                return "iOS";
-            } else if (/Android/i.test(userAgent)) {
-                return "Android";
-            } else if (/Linux/i.test(userAgent)) {
-                return "Linux";
-            }
-            return "Unknown OS";
-          }
-
-          // Hàm lấy thông tin thiết bị
-          const detectDevice = (userAgent) => {
-            let device = "Unknown";
-            if (/Mobi|Android/i.test(userAgent)) {
-                return "Mobile";
-            } else if (/Tablet|iPad/i.test(userAgent)) {
-                device = "Tablet";
-            } else {
-                device = "Laptop";
-            }
-
-            return device;
-          }
-
-          const fetchLocation = async () => {
+        const [idDuAn, setIdDuAn] = useState(null);
+        const handleDrawPolygon = (id) => {
+            setMarkers([]);
+            setDistances([]);
+            message.success('Bạn đã bắt đàu vẽ !');
+            setIsSelectedMeasure(true);
+            setIsDrawPolygon(true);
+            setIdDuAn(id);
+        };
+        const handleSavePolygon = async () => {
             try {
-              // Lấy vị trí từ Cloudflare API
-              const responseVitri = await fetch("https://ipv4-check-perf.radar.cloudflare.com/api/info");
-              if (!responseVitri.ok) throw new Error("Không thể lấy dữ liệu vị trí");
-      
-              const vitriData = await responseVitri.json();
-              const { longitude, latitude, ip_address, city } = vitriData;
-
-              if (!longitude || !latitude) throw new Error("Dữ liệu vị trí không hợp lệ");
-      
-              // Gọi API lấy thông tin tỉnh/thành phố
-              // const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
-
-              const userAgent = navigator.userAgent;
-
-              // Tạo đối tượng FormData
-              const formData = new FormData();
-              formData.append("iplocation", ip_address); 
-              formData.append("city", city);
-              formData.append("lat", latitude);
-              formData.append("lon", longitude);
-              formData.append("device_active", detectDevice(userAgent));
-              formData.append("he_dieu_hanh", detectOs(userAgent)); 
-
-              // Gửi dữ liệu data User bằng fetch API
-              const responseUser = await fetch("https://api.quyhoach.xyz/add_active_user_activity", {
-                  method: "POST",
-                  body: formData
-              })
-              const dataUser = await responseUser.json();
-              console.log("Response:", dataUser); 
-      
-              // Gọi API lấy thông tin quy hoạch
-              // const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
-              // const resQuyHoach = await fetch(apiUrl);
-              // if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
-      
-              // const dataQuyHoach = await resQuyHoach.json();
-      
-              // Lọc danh sách quy hoạch tỉnh
-              // const dataTinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_TINH");
-      
-              // Tìm tỉnh phù hợp với vị trí hiện tại
-              // const tinh = dataTinh.find((item) => item.idProvince === dataProvinceCurrent.provinces);
-      
-              // Set ID nếu tìm thấy tỉnh
-              // if (tinh?.id) setId(tinh.id);
-      
-              // Kích hoạt button Quy Hoạch Tỉnh
-              // document.querySelectorAll(".button-item[button-type]").forEach(btn => btn.classList.remove("active"));
-              // document.querySelector('[button-type="3"]')?.classList.add("active");
-      
-            } catch (error) {
-              console.error("Lỗi khi lấy vị trí:", error);
+                const newMarkers = [...markers, markers[0]].map((item) => [item.lat, item.lng]);
+                const formData = new FormData();
+                console.log(typeof JSON.stringify(newMarkers));
+                formData.append('polygon', JSON.stringify(newMarkers));
+                await postPolyGonForDuAn(idDuAn, formData);
+                message.success('Bạn đã lưu thành công !');
+                setIsSelectedMeasure(false);
+                setIsDrawPolygon(false);
+                setMarkers([]);
+                setDistances([]);
+            } catch (e) {
+                message.error('Đã có lỗi xảy ra !');
+                console.log(e);
             }
-          };
-      
-          fetchLocation();
-        }, []); 
+        };
+        useEffect(() => {
+            // Hàm lấy thông tin hệ điều hành
+            const detectOs = (userAgent) => {
+                if (/Windows NT/i.test(userAgent)) {
+                    return 'Windows';
+                } else if (/Mac OS X/i.test(userAgent)) {
+                    return 'macOS';
+                } else if (/iPhone|iPad/i.test(userAgent)) {
+                    return 'iOS';
+                } else if (/Android/i.test(userAgent)) {
+                    return 'Android';
+                } else if (/Linux/i.test(userAgent)) {
+                    return 'Linux';
+                }
+                return 'Unknown OS';
+            };
+
+            // Hàm lấy thông tin thiết bị
+            const detectDevice = (userAgent) => {
+                let device = 'Unknown';
+                if (/Mobi|Android/i.test(userAgent)) {
+                    return 'Mobile';
+                } else if (/Tablet|iPad/i.test(userAgent)) {
+                    device = 'Tablet';
+                } else {
+                    device = 'Laptop';
+                }
+
+                return device;
+            };
+
+            const fetchLocation = async () => {
+                try {
+                    // Lấy vị trí từ Cloudflare API
+                    const responseVitri = await fetch('https://ipv4-check-perf.radar.cloudflare.com/api/info');
+                    if (!responseVitri.ok) throw new Error('Không thể lấy dữ liệu vị trí');
+
+                    const vitriData = await responseVitri.json();
+                    const { longitude, latitude, ip_address, city } = vitriData;
+
+                    if (!longitude || !latitude) throw new Error('Dữ liệu vị trí không hợp lệ');
+
+                    // Gọi API lấy thông tin tỉnh/thành phố
+                    // const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
+
+                    const userAgent = navigator.userAgent;
+
+                    // Tạo đối tượng FormData
+                    const formData = new FormData();
+                    formData.append('iplocation', ip_address);
+                    formData.append('city', city);
+                    formData.append('lat', latitude);
+                    formData.append('lon', longitude);
+                    formData.append('device_active', detectDevice(userAgent));
+                    formData.append('he_dieu_hanh', detectOs(userAgent));
+
+                    // Gửi dữ liệu data User bằng fetch API
+                    const responseUser = await fetch('https://api.quyhoach.xyz/add_active_user_activity', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    const dataUser = await responseUser.json();
+                    console.log('Response:', dataUser);
+
+                    // Gọi API lấy thông tin quy hoạch
+                    // const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
+                    // const resQuyHoach = await fetch(apiUrl);
+                    // if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
+
+                    // const dataQuyHoach = await resQuyHoach.json();
+
+                    // Lọc danh sách quy hoạch tỉnh
+                    // const dataTinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_TINH");
+
+                    // Tìm tỉnh phù hợp với vị trí hiện tại
+                    // const tinh = dataTinh.find((item) => item.idProvince === dataProvinceCurrent.provinces);
+
+                    // Set ID nếu tìm thấy tỉnh
+                    // if (tinh?.id) setId(tinh.id);
+
+                    // Kích hoạt button Quy Hoạch Tỉnh
+                    // document.querySelectorAll(".button-item[button-type]").forEach(btn => btn.classList.remove("active"));
+                    // document.querySelector('[button-type="3"]')?.classList.add("active");
+                } catch (error) {
+                    console.error('Lỗi khi lấy vị trí:', error);
+                }
+            };
+
+            fetchLocation();
+        }, []);
 
         const [polygonPoint, setPolygonPoint] = useState(null);
         const [isShowLandAdministration, setIsShowLandAdministration] = useState(false);
@@ -358,7 +378,6 @@ const Map = forwardRef(
         const [RegulationImages, setRegulationImages] = useState(null);
         const [selectedBounds, setSelectedBounds] = useState(null);
         const [imageOverlay, setImageOverlay] = useState(null);
-        const [showPopup, setShowPopup] = useState(false);
 
         // const mapRef = useRef();
         // const sharing = searchParams.get('ups');
@@ -417,7 +436,7 @@ const Map = forwardRef(
                         // console.log(southWest);
                         // console.log(northEast);
 
-                        dispatch(getBoundingboxData({southWest: southWest, northEast: northEast}));
+                        dispatch(getBoundingboxData({ southWest: southWest, northEast: northEast }));
 
                         dispatch(
                             setCurrentBoundingBox({
@@ -455,7 +474,7 @@ const Map = forwardRef(
 
         const handleGetDistrict = useCallback(async (lat, lng) => {
             try {
-                dispatch(getDistrictIdApi({lat, lng}));
+                dispatch(getDistrictIdApi({ lat, lng }));
             } catch (error) {
                 console.log(error);
             }
@@ -474,7 +493,7 @@ const Map = forwardRef(
                     const map = e.target;
                     const center = map.getCenter();
                     const zoom = map.getZoom();
-                    const {_northEast, _southWest} = map.getBounds();
+                    const { _northEast, _southWest } = map.getBounds();
 
                     debouncedHandleGetAreaName(center.lat, center.lng);
 
@@ -482,44 +501,56 @@ const Map = forwardRef(
                     searchUrlParams.set('zoom', `${zoom}`);
                     setSearchParams(searchUrlParams);
 
-                    const vitri = searchParams.get("vitri").split(",");
-            
+                    const vitri = searchParams.get('vitri').split(',');
+
                     // Gọi API lấy thông tin tỉnh/thành phố
                     const dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
 
-                    if (zoom >= 19 && 
+                    const newParams = new URLSearchParams(searchParams);
+
+                    if (
+                        zoom >= 19 &&
                         (!RegulationImages ||
-                          (RegulationImages[0].idProvince != dataProvinceCurrent.provinces &&
-                            searchParams.get("type") === "QUYHOACH_DIACHINH"
-                          )
-                        )
-                    ){
-                      // Gọi API lấy thông tin quy hoạch
-                      const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
-                      const resQuyHoach = await fetch(apiUrl);
-                      if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
-              
-                      const dataQuyHoach = await resQuyHoach.json();
-              
-                      // Lọc danh sách quy hoạch địa chính
-                      const dataDiaChinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_DIACHINH");
+                            (RegulationImages[0].idProvince != dataProvinceCurrent.provinces &&
+                                searchParams.get('type') === 'QUYHOACH_DIACHINH'))
+                    ) {
+                        // Gọi API lấy thông tin quy hoạch
+                        const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
+                        const resQuyHoach = await fetch(apiUrl);
+                        if (!resQuyHoach.ok) throw new Error('Không thể lấy dữ liệu quy hoạch');
 
-                      // Tìm tỉnh phù hợp với vị trí hiện tại
-                      const tinh = dataDiaChinh.find((item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17);
+                        const dataQuyHoach = await resQuyHoach.json();
 
-                      searchParams.set("type", "QUYHOACH_DIACHINH");
-                      searchParams.set("id", tinh.id);
-                      searchParams.set("draw", "auto");
-                      setSearchParams(searchParams)
-                    } 
+                        // Lọc danh sách quy hoạch địa chính
+                        const dataDiaChinh = dataQuyHoach.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH');
+
+                        // Tìm tỉnh phù hợp với vị trí hiện tại
+                        const tinh = dataDiaChinh.find(
+                            (item) => item.idProvince === dataProvinceCurrent.provinces && item.min_zoom >= 17,
+                        );
+
+                        newParams.set('type', 'QUYHOACH_DIACHINH');
+                        newParams.set('id', tinh.id);
+                        newParams.set('draw', 'auto');
+                        setSearchParams(newParams);
+                    }
+
+                    if ((zoom < 18 || zoom > 22) && newParams.get('draw') === 'auto') {
+                        setRegulationImages(null);
+                        newParams.delete('type');
+                        newParams.delete('id');
+                        setSearchParams(newParams);
+                    }
 
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
                     }
-                    if (zoom >= 16) {
+                    if (zoom >= 15) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
-                        
-                        const fetchDuan = await fetch(`https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`);
+
+                        const fetchDuan = await fetch(
+                            `https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`,
+                        );
                         const resDuan = await fetchDuan.json();
 
                         // console.log(resDuan?.du_an)
@@ -566,13 +597,14 @@ const Map = forwardRef(
                         setPressTimer(timer);
                     }
                 },
-                dblclick(event) {  // Thay click bằng dblclick
-                    const {lat, lng} = event.latlng;
+                dblclick(event) {
+                    // Thay click bằng dblclick
+                    const { lat, lng } = event.latlng;
                     const map = ref.current;
 
                     if (map.getBounds().contains(event.latlng)) {
                         setLocation([lat, lng]);
-                        dispatch(getDistrictIdApi({lat, lng}));
+                        dispatch(getDistrictIdApi({ lat, lng }));
 
                         if (!isLocationInfoOpen) {
                             const timer = setTimeout(() => {
@@ -594,9 +626,6 @@ const Map = forwardRef(
                         clearTimeout(pressTimer);
                     }
                 },
-                dragstart: () => {
-                  setShowPopup(false);
-                }
             });
             return null;
         };
@@ -629,7 +658,7 @@ const Map = forwardRef(
                     setProcessedRegions((prev) => [...prev, regionKey]);
                     // setisShowListRegulation(true);
                     // Gửi thông tin vùng lên Redux store
-                    dispatch(fetchListRegulations({southWest: _southWest, northEast: _northEast}));
+                    dispatch(fetchListRegulations({ southWest: _southWest, northEast: _northEast }));
                 } catch (error) {
                     console.error('Lỗi khi gọi API:', error);
                 }
@@ -649,8 +678,8 @@ const Map = forwardRef(
         };
         // click to bounding box for list regulation
         const handleItemClick = async (item) => {
-            const vitri = searchParams.get("vitri").split(",");
-            const {boundingbox, type, map_type} = item;
+            const vitri = searchParams.get('vitri').split(',');
+            const { boundingbox, type, map_type } = item;
             const sharing = searchParams.get('ups');
             const currentBounds = ref?.current?.getBounds();
 
@@ -686,18 +715,18 @@ const Map = forwardRef(
 
             // Fly to the map center
             if (boundingbox && ref.current) {
-              const currentBoundingBox = boundingbox.split(',');
-              const lat = (Number(currentBoundingBox[1]) + Number(currentBoundingBox[3])) / 2;
-              const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
-              const point = L.latLng(lat, lng);
+                const currentBoundingBox = boundingbox.split(',');
+                const lat = (Number(currentBoundingBox[1]) + Number(currentBoundingBox[3])) / 2;
+                const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
+                const point = L.latLng(lat, lng);
 
-              const res = await getLocationInBoudingBox(vitri[0], vitri[1])
+                const res = await getLocationInBoudingBox(vitri[0], vitri[1]);
 
-              if (!currentBounds.contains(point) && res.provinces != item.idProvince) {
-                  if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
-                      ref.current.flyTo([centerLat, centerLon], 16); 
-                  }
-              }
+                if (!currentBounds.contains(point) && res.provinces != item.idProvince) {
+                    if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
+                        ref.current.flyTo([centerLat, centerLon], 16);
+                    }
+                }
             }
         };
 
@@ -787,7 +816,7 @@ const Map = forwardRef(
                             dispatch(
                                 setTreeCheckedKey([
                                     ...treeCheckedKeys,
-                                    {id: target.id, idProvince: target.idProvince},
+                                    { id: target.id, idProvince: target.idProvince },
                                 ]),
                             );
                             api.destroy();
@@ -935,7 +964,6 @@ const Map = forwardRef(
             }
         };
 
-
         const MapEventArea = () => {
             const clickCountRef = useRef(0);
             const clickTimeout = useRef(null);
@@ -945,9 +973,11 @@ const Map = forwardRef(
                     clickCountRef.current += 1;
                     const map = e.target;
 
-                    searchParams.set("vitri", `${e.latlng.lat},${e.latlng.lng}`);
+                    const newParams = new URLSearchParams(searchParams);
 
-                    setSearchParams(searchParams);
+                    newParams.set('vitri', `${e.latlng.lat},${e.latlng.lng}`);
+
+                    setSearchParams(newParams);
 
                     if (clickTimeout.current) clearTimeout(clickTimeout.current);
 
@@ -972,7 +1002,7 @@ const Map = forwardRef(
                     const res = await getAreaLocation(newLocation.lat, newLocation.lng);
                     const endTime = Date.now();
 
-                    console.log("Data địa chính: " + res.dulieu)
+                    console.log('Data địa chính: ' + res.dulieu);
 
                     console.log(`Thời gian lấy data địa chính: ${endTime - startTime} ms`);
 
@@ -1034,13 +1064,15 @@ const Map = forwardRef(
                                 </Marker>
                             ),
                         };
-                        console.log("Data Polygon: " + newPolygonArea)
+                        console.log('Data Polygon: ' + newPolygonArea);
                         setPolygonArea(newPolygonArea);
                         const endTimeAfter = Date.now();
 
-                        console.log(`Thời gian vẽ Polygon(sau khi có thông tin địa chính): ${endTimeAfter - startTimeAfter} ms`);
+                        console.log(
+                            `Thời gian vẽ Polygon(sau khi có thông tin địa chính): ${endTimeAfter - startTimeAfter} ms`,
+                        );
                     } else {
-                        setPolygonArea({...polygonArea, address: 'Không có dữ liệu ...'});
+                        setPolygonArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
                     }
                 },
             });
@@ -1051,7 +1083,7 @@ const Map = forwardRef(
         const GetMarkerInboundingBox = () => {
             const map = useMap();
             const zoom = map.getZoom();
-            const {_northEast, _southWest} = map.getBounds();
+            const { _northEast, _southWest } = map.getBounds();
             useEffect(() => {
                 if (zoom >= 1 && boundingboxDataLocation.link_image?.length < 0) {
                     dispatch(getBoundingboxData(_southWest, _northEast));
@@ -1114,7 +1146,7 @@ const Map = forwardRef(
                         dispatch(
                             setTreeCheckedKey([
                                 ...treeCheckedKeys,
-                                {id: firstPlan.id, idProvince: firstPlan.idProvince},
+                                { id: firstPlan.id, idProvince: firstPlan.idProvince },
                             ]),
                         );
                     } else {
@@ -1240,7 +1272,7 @@ const Map = forwardRef(
                         dispatch(
                             setTreeCheckedKey([
                                 ...treeCheckedKeys,
-                                ...provincePlans.map((item) => ({isProvince: true, idProvince: item.id_tinh})),
+                                ...provincePlans.map((item) => ({ isProvince: true, idProvince: item.id_tinh })),
                             ]),
                         );
                         return;
@@ -1438,8 +1470,7 @@ const Map = forwardRef(
 
         // // Hàm render các TileLayer
         const renderTileLayers = () => {
-            if (!RegulationImages || RegulationImages.length === 0 ||
-              ((searchParams.get("zoom") < 18 || searchParams.get("zoom") > 22) && searchParams.get("draw") === "auto" && RegulationImages)){
+            if (!RegulationImages || RegulationImages.length === 0) {
                 return <div></div>;
             }
 
@@ -1464,187 +1495,20 @@ const Map = forwardRef(
                 // Gọi Api lấy thông tin thành phố
                 const res = await getLocationInBoudingBox(location[0], location[1]);
                 // navigate(`/administrative-maps/${res.district}`);
-                navigate(`administrative-maps/?provinceId=${res.provinces}`)
+                navigate(`administrative-maps/?provinceId=${res.provinces}`);
             }
-        }
-
-        const antDrawOpen = document.querySelector(".ant-drawer-open");
-
-        const [latHistoryCost, setLatHistoryCost] = useState("");
-        const [lonHistoryCost, setLonHistoryCost] = useState("");
-
-        const handleShowHistoryChart = () => {
-          const vitri = searchParams.get("vitri");
-          if (vitri) {
-            const [newLat, newLon] = vitri.split(",");
-            setLatHistoryCost(newLat);
-            setLonHistoryCost(newLon);
-            const newSearchParams = new URLSearchParams(searchParams);
-            newSearchParams.set("ups", "history-cost");
-            setSearchParams(newSearchParams);
-          }
         };
 
-        const handleClickDuAnIcon = (id) => {
-          searchParams.set("id-duan", id);
-          setSearchParams(searchParams);
-        }
+        const antDrawOpen = document.querySelector('.ant-drawer-open');
 
-        const handleHeatMapSwitch = () => {
-          if(searchParams.get("heat-map") === "off"){
-            searchParams.delete("heat-map");
-            setSearchParams(searchParams);
-          }
-          else{
-            searchParams.set("heat-map", "off");
-            setSearchParams(searchParams);
-          }
-        }
+        const historyCost = useSelector((state) => state.historyCost.value);
 
-        const fetchHeatMapData = async (id, heatType) => {
-          try {
-            const now = new Date();
-            const month = now.getMonth() + 1;
-            const year = now.getFullYear();
-    
-            const responseHeat = await fetch(
-              `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
-            );
-    
-            if (!responseHeat.ok) {
-              throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
-            }
-    
-            const data = await responseHeat.json();
-    
-            if (!data?.[heatType] || !Array.isArray(data[heatType])) {
-              messageApi.open({
-                type: 'error',
-                content: 'Chưa có dữ liệu lịch sử giá đất!',
-              });
-              throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
-            }
-    
-            const getPolygonCenter = (polygon) => {
-                if (!polygon || polygon.length < 3) return null;
-                const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
-                const geoJsonPolygon = turf.polygon([convertedCoords]);
-                const center = turf.center(geoJsonPolygon).geometry.coordinates;
-                return L.latLng(center[1], center[0]);
-            };
-    
-            const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
-            
-            const polygonsByColor = data.list_polygon
-            .filter(({ WandID }) => validWandIDs.has(WandID)) 
-            .map(({ polygon, WandID }) => {
-              const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
-
-              console.log(relatedData)
-
-              return {
-                color: relatedData.color ? 
-                    `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})` : "#ccc",
-                polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
-                center: getPolygonCenter(polygon.flat(2)),
-                max: relatedData.max,
-                avg: relatedData.avg,
-                min: relatedData.min, 
-                name_xaphuong: relatedData.name_xaphuong,
-              };
-            })
-
-    
-            setPolygonHeatMap(polygonsByColor);
-    
-            searchParams.set("id-district", id);
-            searchParams.set("heat-type", heatType);
-            setSearchParams(searchParams);
-          } catch (error) {
-              console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
-          } finally {
-              setHeatMapLoading(false);
-          }
-        };
-      
-        const handleHeatMapClick = async () => {
-            setHeatMapLoading(true);
-            const vitri = searchParams.get("vitri")?.split(",");
-            if (!vitri || vitri.length < 2) {
-                throw new Error("Vị trí không hợp lệ!");
-            }
-        
-            const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
-            if (!resLocation) {
-                throw new Error("Không lấy được vị trí từ bounding box!");
-            }
-        
-            const currentDistrict = searchParams.get("id-district");
-            const heatType = searchParams.get("heat-type") || "biet_thu";
-        
-            if (resLocation.district === currentDistrict) {
-                return;
-            }
-        
-            await fetchHeatMapData(resLocation.district, heatType);
-        };      
-
-        useEffect(() => {
-          const id = searchParams.get("id-district");
-          if(searchParams.get("id-district")){
-            fetchHeatMapData(id);
-          }
-        }, [])
-      
-        
-        useEffect(() => {
-          const fetchData = async () => {
-            const id = searchParams.get("id-duan");
-
-            if(id){
-              const response = await fetch(`https://api.quyhoach.xyz/detail_du_an/${id}`);
-
-              if (!response.ok) {
-                  throw new Error(`HTTP error! Status: ${response.status}`);
-              }
-    
-              const res = await response.json();
-
-              setRegionalPrice(res?.data?.gia_cung_khu_vuc);
-    
-              if (res.data?.polygon) {
-                  const dataPolygon = JSON.parse(res.data?.polygon);
-    
-                  const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
-    
-                  // Lưu dữ liệu vào state
-                  setPolygonDuAnArea({
-                      polygon,
-                      address: res.data.diachi || "Không có địa chỉ",
-                  });
-              } else {
-                  setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
-              }
-            }
-          }
-          fetchData();
-          setShowPopup(true);
-        }, [searchParams])
-
-        const textIcon = (text) =>
-          L.divIcon({
-            className: "polygon-label",
-            html: `<div style="text-align: center; font-weight: bold; font-size: 9px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
-            iconSize: [120, 30],
-            iconAnchor: [50, 15],
-          });
-    
         return (
             <>
                 {contextHolder}
                 {contextHolderNoti}
                 {isShowListRegulation && (
-                    <ListRegulations handleItemClick={handleItemClick} RegulationsImagesList={RegulationsImagesList}/>
+                    <ListRegulations handleItemClick={handleItemClick} RegulationsImagesList={RegulationsImagesList} />
                 )}
                 {/* <Modal
                 title="Khu vực này có nhiều quy hoạch, vui lòng chọn quy hoạch để xem!"
@@ -1664,22 +1528,22 @@ const Map = forwardRef(
 
                 {/* show bounding box data button */}
                 {!antDrawOpen && (
-                  <div
-                    className={`image-list-open bg-white ${!isShowBtnOpen ? 'close' : ''}`}
-                    onClick={() => {
-                        onOpenImageList();
-                        onCloseBtnImageList();
-                    }}
-                  >
-                      {/* <img src={icons.mapIcon} alt="Ảnh danh sách quy hoạch" className="image-list-icon" /> */}
-                      <FaMapMarkedAlt className="image-list-icon"/>
-                  </div>
+                    <div
+                        className={`image-list-open bg-white ${!isShowBtnOpen ? 'close' : ''}`}
+                        onClick={() => {
+                            onOpenImageList();
+                            onCloseBtnImageList();
+                        }}
+                    >
+                        {/* <img src={icons.mapIcon} alt="Ảnh danh sách quy hoạch" className="image-list-icon" /> */}
+                        <FaMapMarkedAlt className="image-list-icon" />
+                    </div>
                 )}
 
                 <div>
                     <FaList
                         className="icon-wrapper-regulation"
-                        style={{fontSize: '16px', cursor: 'pointer'}}
+                        style={{ fontSize: '16px', cursor: 'pointer' }}
                         onClick={(event) => {
                             event.stopPropagation(); // Ngừng sự kiện lan truyền
                             toggleList(); // Toggle hiển thị danh sách
@@ -1698,22 +1562,18 @@ const Map = forwardRef(
                             onCloseImageList();
                         }}
                     >
-                        <CloseOutlined className="close-icon"/>
+                        <CloseOutlined className="close-icon" />
                     </div>
                 </ImageList>
                 {/* )} */}
 
                 <div>
-                {searchParams.get("ups") === "history-cost" && (
-                  <ChartCostHistory 
-                    lat={latHistoryCost} 
-                    lon={lonHistoryCost} 
-                  />
-                )}
-
-                {regionalPrice && (
-                  <RegionalPriceChart regionalPrice={regionalPrice} />
-                )}
+                    {searchParams.get('ups') === 'history-cost' && (
+                        <ChartCostHistory
+                            lat={searchParams.get('vitri').split(',')[0]}
+                            lon={searchParams.get('vitri').split(',')[1]}
+                        />
+                    )}
                 </div>
 
                 <MapContainer
@@ -1723,43 +1583,48 @@ const Map = forwardRef(
                     }}
                     center={initialCenter}
                     zoom={initialZoom}
+                    s
                     maxZoom={30}
                     ref={ref}
                     zoomControl={false}
                 >
                     {duAn.map((duAnItem) => {
-                      const [lat, lng] = duAnItem.toaDo.split(",").map(Number); 
+                        const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
 
-                      return (
-                        <Marker 
-                          key={duAnItem.id} 
-                          position={[lat, lng]} 
-                          icon={iconDuAn}
-                          eventHandlers={{
-                            click: () => handleClickDuAnIcon(duAnItem.id),
-                          }}
-                        >
-                          {showPopup && (
-                            <Popup onClose={() => setShowPopup(false)}>
-                              <div className="popup-duan">
-                                <img
-                                  src={duAnItem.image}
-                                  alt={duAnItem.tenDuAn}
-                                  className="popup-duan__image"
-                                />
-                                <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
-                                <p><b>Loại hình:</b> {duAnItem.loaiHinh}</p>
-                                <p><b>Trạng thái:</b> {duAnItem.trangThai}</p>
-                                <p><b>Vị trí:</b> {duAnItem.viTri}</p>
-
-                                <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
-                                  Xem chi tiết
-                                </Link>
-                              </div>
-                            </Popup>
-                          )}
-                        </Marker>
-                      );
+                        return (
+                            <Marker key={duAnItem.id} position={[lat, lng]} icon={iconDuAn}>
+                                <Popup>
+                                    <div className="popup-duan">
+                                        <img
+                                            src={duAnItem.image}
+                                            alt={duAnItem.tenDuAn}
+                                            className="popup-duan__image"
+                                        />
+                                        <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                                        <p>
+                                            <b>Loại hình:</b> {duAnItem.loaiHinh}
+                                        </p>
+                                        <p>
+                                            <b>Trạng thái:</b> {duAnItem.trangThai}
+                                        </p>
+                                        <p>
+                                            <b>Vị trí:</b> {duAnItem.viTri}
+                                        </p>
+                                        <Button
+                                            className="popup-duan__button"
+                                            onClick={() => {
+                                                handleDrawPolygon(duAnItem.id);
+                                            }}
+                                        >
+                                            Update polygon
+                                        </Button>
+                                        <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                            Xem chi tiết
+                                        </Link>
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        );
                     })}
 
                     {markerPosition && (
@@ -1786,26 +1651,6 @@ const Map = forwardRef(
                         />
                     )}
 
-                    {searchParams.get("heat-map") !== "off" && polygonHeatMap?.map((item, index) =>
-                      <>
-                        <Polygon
-                          key={`${index} - ${opacity}`}
-                          positions={item.polygons}
-                          color={item.color}
-                          fillColor={item.color}
-                          opacity={opacity}
-                          fillOpacity={opacity}
-                        />
-
-                        {item.center && (
-                          <Marker 
-                            position={[item.center.lat, item.center.lng]} 
-                            icon={textIcon(`${item.name_xaphuong} <br> Max: ${item.max} triệu/m² <br> Min: ${item.min} triệu/m² <br> Trung Bình: ${item.avg} triệu/m²`)} 
-                          />
-                        )}
-                      </>
-                    )}
-
                     {/* {polygonPoint?.points?.length > 0 && (
                         <Polygon
                             positions={polygonPoint.points.map((point) => [point.lat, point.lng])}
@@ -1816,12 +1661,12 @@ const Map = forwardRef(
                             }}
                         />
                     )} */}
-                    <ZoomControl position="bottomright"/>
-                    <UserLocationMarker/>
-                    {!isSelectedMeasure && <MapEvents/>}
-                    <GoToLocation/>
-                    {currentLocation && <ResetCenterView lat={currentLocation.lat} lon={currentLocation.lon}/>}
-                    <GetBoundingBoxOnFirstRender/>
+                    <ZoomControl position="bottomright" />
+                    <UserLocationMarker />
+                    {!isSelectedMeasure && <MapEvents />}
+                    <GoToLocation />
+                    {currentLocation && <ResetCenterView lat={currentLocation.lat} lon={currentLocation.lon} />}
+                    <GetBoundingBoxOnFirstRender />
                     <LayersControl>
                         {windowSize.windowWidth < 768 && (
                             <LayersControl.BaseLayer checked name="Map vệ tinh">
@@ -1857,7 +1702,7 @@ const Map = forwardRef(
                             />
                         </LayersControl.BaseLayer>
                     </LayersControl>
-                    <Pane name="PaneThai" style={{zIndex: 650}}>
+                    <Pane name="PaneThai" style={{ zIndex: 650 }}>
                         {plansStored &&
                             plansStored.length > 0 &&
                             plansStored.map((item, index) => {
@@ -1895,11 +1740,11 @@ const Map = forwardRef(
                             })}
 
                         {renderTileLayers()}
-                        {(RegulationImages && !((searchParams.get("zoom") < 18 || searchParams.get("zoom") > 22) && searchParams.get("draw") === "auto")) &&
-                          RegulationImages.length > 0 &&
-                          RegulationImages.map((item, index) => (
-                              <CustomTileLayer key={index} item={item} opacity={opacity} />
-                          ))}
+                        {RegulationImages &&
+                            RegulationImages.length > 0 &&
+                            RegulationImages.map((item, index) => (
+                                <CustomTileLayer key={index} item={item} opacity={opacity} />
+                            ))}
                     </Pane>
                     {/* {currentLocation && currentLocation.lat && currentLocation.lon && (
                     <Marker position={[currentLocation.lat, currentLocation.lon]} icon={customIcon}>
@@ -1931,7 +1776,7 @@ const Map = forwardRef(
                 )} */}
 
                     {/* Marker in location now */}
-                    {mapZoom >= 16 && boundingboxDataLocation?.list_image?.length > 0 && (
+                    {mapZoom >= 15 && boundingboxDataLocation?.list_image?.length > 0 && (
                         <>
                             {boundingboxDataLocation?.list_image?.map((item) => {
                                 return (
@@ -1954,8 +1799,8 @@ const Map = forwardRef(
                         <Marker key={marker.id} position={[marker.latitude, marker.longitude]} icon={customIcon}>
                             <Popup>
                                 <div>
-                                    <h3 style={{fontWeight: 600}}>{marker.description}</h3>
-                                    <p style={{fontSize: 20, fontWeight: 400, margin: '12px 0'}}>
+                                    <h3 style={{ fontWeight: 600 }}>{marker.description}</h3>
+                                    <p style={{ fontSize: 20, fontWeight: 400, margin: '12px 0' }}>
                                         Giá/m²: {formatToVND(marker.priceOnM2)}
                                     </p>
                                     <button
@@ -1999,12 +1844,8 @@ const Map = forwardRef(
                         handleItemClick={handleItemClick}
                         RegulationsImagesList={RegulationsImagesList}
                         handleWikiClick={handleWikiClick}
-                        onShowHistoryChart={handleShowHistoryChart} 
-                        handleHeatMapClick={handleHeatMapClick}
-                        handleHeatMapSwitch={handleHeatMapSwitch}
-                        heatMapLoading={heatMapLoading}
                     />
-                    <DrawerLandUsePlan/>
+                    <DrawerLandUsePlan />
 
                     {/* {polygonSessionStorage.length > 0 &&
                     isOverview &&
@@ -2057,7 +1898,30 @@ const Map = forwardRef(
                             </TooltipLeaflet>
                         </Polygon>
                     )}
-                    {isSelectedMeasure && <MapClickHandler/>}
+                    {/* {console.log(
+                        turf.centroid(turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]))
+                            .geometry.coordinates,
+                    )} */}
+                    {isSelectedMeasure && <MapClickHandler />}
+                    {isSelectedMeasure && isDrawPolygon && markers.length >= 3 && (
+                        <Marker
+                            eventHandlers={{
+                                click: (e) => {
+                                    e.originalEvent.stopPropagation();
+                                    handleSavePolygon();
+                                },
+                            }}
+                            icon={iconSavePolygon}
+                            position={[
+                                turf.centroid(
+                                    turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]),
+                                ).geometry.coordinates[1],
+                                turf.centroid(
+                                    turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]),
+                                ).geometry.coordinates[0],
+                            ]}
+                        ></Marker>
+                    )}
                     {markers.map((position, index) => (
                         <Marker
                             draggable
@@ -2096,7 +1960,7 @@ const Map = forwardRef(
                             <Marker position={middleLatLng} icon={icon}>
                                 <Tooltip key={index} direction="top" offset={[0, -10]} permanent>
                                     {`${distance.distance?.toFixed(2)} m`}
-                                    <Marker position={middleLatLng} icon={icon}/>
+                                    <Marker position={middleLatLng} icon={icon} />
                                 </Tooltip>
                             </Marker>
                         );
@@ -2123,14 +1987,13 @@ const Map = forwardRef(
                         );
                     })}
 
-                    {location.length > 0 && <Marker position={location} icon={iconLocation}/>}
-                    {!isSelectedMeasure && <MapEventArea/>}
+                    {location.length > 0 && <Marker position={location} icon={iconLocation} />}
+                    {!isSelectedMeasure && <MapEventArea />}
                     {polygonArea?.area}
-                    <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)"/>
-                    <Polygon positions={polygonArea?.polygon} color="darkred"/>
+                    <Polygon positions={polygonArea?.polygon} color="rgb(23,119,255)" />
                 </MapContainer>
                 {/* loading */}
-                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen/>}
+                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen />}
                 {/* {isShowLandAdministration && ( */}
                 {isShowLandAdministration && (
                     <LandAdministrationModal
