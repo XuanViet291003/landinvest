@@ -1583,33 +1583,36 @@ const Map = forwardRef(
               // Tạo tập hợp ID hợp lệ để dễ dàng kiểm tra
               const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
       
+              const errors = []; 
               // Lọc và chuyển đổi danh sách polygons
               const polygonsByColor = data.list_polygon
                   .filter(({ WandID }) => validWandIDs.has(WandID)) 
                   .map(({ polygon, WandID }) => {
                       const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
 
-                      const errors = []; 
-
                       const polygons = polygon[0].map((coords) => {
                           if (!Array.isArray(coords) || coords.length !== 2) {
-                              errors.push({ type: "Invalid array", data: coords });
+                              const errorObj = { 
+                                name: relatedData?.name_xaphuong, 
+                                value: relatedData?.price,
+                              };
+                              errors.push(errorObj);
                               return null;
                           }
 
                           const [lng, lat] = coords;
 
                           if (typeof lng !== "number" || typeof lat !== "number") {
-                              errors.push({ type: "Invalid number", data: coords });
+                              const errorObj = { 
+                                name: relatedData?.name_xaphuong, 
+                                value: relatedData?.price,
+                              };
+                              errors.push(errorObj);
                               return null;
                           }
 
                           return { lat, lng };
                       }).filter(Boolean); 
-
-                      if (errors.length > 0) {
-                          console.error("Dữ liệu lỗi:", errors);
-                      }
                       
                       return {
                           color: relatedData.color
@@ -1627,6 +1630,12 @@ const Map = forwardRef(
               if(!polygonsByColor || polygonsByColor.length == 0){
                 messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
               }
+
+              if (errors.length > 0) {
+                setRegionalPrice(errors);
+            } else {
+                setRegionalPrice(null)
+            }
       
               setPolygonHeatMap(polygonsByColor);
       
@@ -1861,19 +1870,6 @@ const Map = forwardRef(
                     )}
 
                     {itemSearch?.coordinates?.length > 0 && (() => {
-                        polygonOnSearch.forEach((coords, index) => {
-                          if (!Array.isArray(coords) || coords.length !== 2) {
-                              console.error(`❌ Lỗi tại index ${index}: Không phải mảng hoặc không có 2 phần tử`, coords);
-                          } else {
-                              const [lat, lng] = coords;
-                              if (typeof lng !== "number" || typeof lat !== "number") {
-                                  console.error(`❌ Lỗi tại index ${index}: Không phải số hợp lệ`, coords);
-                              } else {
-                                  console.log(`✅ Điểm hợp lệ tại ${index}:`, { lat, lng });
-                              }
-                          }
-                      });
-
                         return (
                             <Polygon
                                 positions={polygonOnSearch}
