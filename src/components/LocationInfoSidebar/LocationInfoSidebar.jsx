@@ -154,10 +154,10 @@ const LocationInfoSidebar = ({
                      style={{ width: 170 }}
                      onChange={handleHeatTypeChange} 
                   >
+                    <Option value="tho_cu">Thổ Cư</Option>
                     <Option value="biet_thu">Biệt Thự</Option>
                     <Option value="chungcu">Chung Cư</Option>
                     <Option value="shophouse">ShopHouse</Option>
-                    <Option value="tho_cu">Thổ Cư</Option>
                   </Select>
               </div>
 
