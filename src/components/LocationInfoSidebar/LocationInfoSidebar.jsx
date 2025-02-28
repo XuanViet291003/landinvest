@@ -127,27 +127,22 @@ const LocationInfoSidebar = ({
 
     useEffect(() => {
       if (!searchParams.get("heat-view")) {
-        searchParams.set("heat-view", "map,chart");
+        searchParams.set("heat-view", "map");
         setSearchParams(searchParams);
       }
     }, []);
 
-    const handleViewChange = (key, checked) => {
-      let currentViews = searchParams.get("heat-view")?.split(",") || [];
-      if (checked) {
-        if (!currentViews.includes(key)) {
-          currentViews.push(key);
-        }
+    const handleViewChange = (key) => {
+      let currentView = searchParams.get("heat-view") || ""; 
+    
+      if (currentView === key) {
+        searchParams.delete("heat-view"); 
       } else {
-        currentViews = currentViews.filter(view => view !== key);
+        searchParams.set("heat-view", key); 
       }
-      if (currentViews.length > 0) {
-        searchParams.set("heat-view", currentViews.join(","));
-      } else {
-        searchParams.delete("heat-view");
-      }
+    
       setSearchParams(searchParams);
-    };
+    };    
 
     const currentViews = searchParams.get("heat-view")?.split(",") || [];
 
@@ -192,8 +187,20 @@ const LocationInfoSidebar = ({
                   </div>
 
                   <div style={{ display: "flex", gap: "10px" }}>
-                    <Checkbox checked={currentViews.includes("map")} onChange={(e) => handleViewChange("map", e.target.checked)} style={{ color: "white" }}>Xem bản đồ</Checkbox>
-                    <Checkbox checked={currentViews.includes("chart")} onChange={(e) => handleViewChange("chart", e.target.checked)} style={{ color: "white" }}>Xem biểu đồ</Checkbox>
+                    <Checkbox
+                      checked={searchParams.get("heat-view") === "map"}
+                      onChange={() => handleViewChange("map")}
+                      style={{ color: "white" }}
+                    >
+                      Xem bản đồ
+                    </Checkbox>
+                    <Checkbox
+                      checked={searchParams.get("heat-view") === "chart"}
+                      onChange={() => handleViewChange("chart")}
+                      style={{ color: "white" }}
+                    >
+                      Xem biểu đồ
+                    </Checkbox>
                   </div>
                 </div>
 

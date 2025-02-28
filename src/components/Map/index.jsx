@@ -1797,7 +1797,7 @@ const Map = forwardRef(
 
                     {regionalPrice && <RegionalPriceChart regionalPrice={regionalPrice} />}
 
-                    {(searchParams.get('heat-view')?.includes('chart') && heatRegionalPrice) && <RegionalPriceChart regionalPrice={heatRegionalPrice} />}
+                    {(searchParams.get("heat-view") === "chart" && heatRegionalPrice) && <RegionalPriceChart regionalPrice={heatRegionalPrice} />}
                 </div>
 
                 <MapContainer
@@ -1884,7 +1884,7 @@ const Map = forwardRef(
                     })()}
 
                     {searchParams.get('heat-map') !== 'off' &&
-                        searchParams.get('heat-view')?.includes('map') &&
+                        searchParams.get("heat-view") === "map" &&
                         polygonHeatMap?.map((item, index) => (
                             <>
                                 <Polygon
