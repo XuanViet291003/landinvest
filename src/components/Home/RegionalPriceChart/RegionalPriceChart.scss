@@ -24,3 +24,27 @@
     }
   }
 }
+@media screen and (max-width: 768px) {
+  .compact-price-chart {
+    width: 90%; 
+    right: 5%; 
+    top: 50px; 
+    padding: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .compact-price-chart {
+    width: 95%; 
+    right: 2.5%; 
+    top: 40px; 
+    padding: 10px;
+    font-size: 14px; 
+  }
+
+  .close-btn {
+    top: 4px;
+    right: 4px;
+    font-size: 12px;
+  }
+}

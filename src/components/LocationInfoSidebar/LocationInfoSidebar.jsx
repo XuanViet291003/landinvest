@@ -46,6 +46,7 @@ const LocationInfoSidebar = ({
     const districtId = useSelector((state) => state.landCost.districtId);
     const [isLandAuction, setIsLandAuction] = useState(true);
     const [isShowMore, setIsShowMore] = useState(false);
+    const [heatType, setHeatType] = useState(searchParams.get("heat-type"));
 
     const historyCost = useSelector((state) => state.historyCost.value);
     const dispatch = useDispatch();
@@ -112,10 +113,17 @@ const LocationInfoSidebar = ({
 
     const { Option } = Select;
 
-  const handleHeatTypeChange = (value) => {
-    searchParams.set("heat-type", value); 
-    setSearchParams(searchParams);
-  };
+    const handleHeatTypeChange = (value) => {
+        searchParams.set("heat-type", value); 
+        setSearchParams(searchParams);
+        setHeatType(value);
+    };
+  
+    useEffect(() => {
+        if (heatType) {
+            handleHeatMapClick();
+        }
+    }, [heatType]); 
 
     return (
         <>
@@ -142,7 +150,7 @@ const LocationInfoSidebar = ({
                   </div>
 
                   <Select 
-                     defaultValue={searchParams.get("heat-type") || "biet_thu"} 
+                     defaultValue={searchParams.get("heat-type") || "tho_cu"} 
                      style={{ width: 170 }}
                      onChange={handleHeatTypeChange} 
                   >

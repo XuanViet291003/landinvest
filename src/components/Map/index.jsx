@@ -170,8 +170,7 @@ const Map = forwardRef(
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
 
         let polygonOnSearch = [];
-        if (searchParams.get('heat-map') !== 'on')
-            polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
+        polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
 
         // console.log(itemSearch)
         const [location, setLocation] = useState([0, 0]); // Vị trí hiện tại
@@ -674,7 +673,7 @@ const Map = forwardRef(
         };
         // click to bounding box for list regulation
         const handleItemClick = async (item) => {
-            const vitri = searchParams.get('vitri').split(',');
+            const vitri = searchParams.get('vitri') ? searchParams.get('vitri').split(',') : "";
             const { boundingbox, type, map_type } = item;
             const sharing = searchParams.get('ups');
             const currentBounds = ref?.current?.getBounds();
@@ -716,13 +715,21 @@ const Map = forwardRef(
                 const lng = (Number(currentBoundingBox[0]) + Number(currentBoundingBox[2])) / 2;
                 const point = L.latLng(lat, lng);
 
-                const res = await getLocationInBoudingBox(vitri[0], vitri[1]);
-
-                if (!currentBounds.contains(point) && res.provinces != item.idProvince) {
-                    if (ref.current && typeof ref.current.flyTo === 'function' && !sharing) {
-                        ref.current.flyTo([centerLat, centerLon], 16);
-                    }
-                }
+                try {
+                  let res = null;
+              
+                  if (vitri && vitri.length >= 2) {
+                      res = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                  }
+              
+                  if (!currentBounds.contains(point) || (res?.provinces !== item?.idProvince)) {
+                      if (ref.current?.flyTo && !sharing) {
+                          ref.current.flyTo([centerLat, centerLon], 16);
+                      }
+                  }
+              } catch (error) {
+                  console.error("Lỗi khi lấy vị trí từ Bounding Box:", error);
+              }              
             }
         };
 
@@ -1533,103 +1540,133 @@ const Map = forwardRef(
 
         const fetchHeatMapData = async (id, heatType) => {
           try {
-            const now = new Date();
-            const month = now.getMonth() + 1;
-            const year = now.getFullYear();
-    
-            const responseHeat = await fetch(
-              `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
-            );
-    
-            if (!responseHeat.ok) {
-              throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
-            }
-    
-            const data = await responseHeat.json();
-    
-            if (!data?.[heatType] || !Array.isArray(data[heatType])) {
-              messageApi.open({
-                type: 'error',
-                content: 'Chưa có dữ liệu lịch sử giá đất!',
-              });
-              throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
-            }
-    
-            const getPolygonCenter = (polygon) => {
-              if (!polygon || polygon.length < 3) return null; 
-              
-              try {
-                  const convertedCoords = polygon.map(([lat, lng]) => [lng, lat]);
-                  
-                  // Kiểm tra nếu điểm đầu có khớp với điểm cuối không (để tạo đa giác hợp lệ)
-                  if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
-                      convertedCoords.push(convertedCoords[0]);
-                  }
-                  
-                  const geoJsonPolygon = turf.polygon([convertedCoords]);
-                  const center = turf.center(geoJsonPolygon).geometry.coordinates;
-                  
-                  return L.latLng(center[1], center[0]); 
-              } catch (error) {
-                  console.error("Lỗi khi tính toán tâm đa giác:", error);
-                  return null;
+              const now = new Date();
+              const month = now.getMonth() + 1;
+              const year = now.getFullYear();
+      
+              const responseHeat = await fetch(
+                  `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
+              );
+      
+              if (!responseHeat.ok) {
+                  throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
               }
-          };          
-    
-            const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
-            
-            const polygonsByColor = data.list_polygon
-            .filter(({ WandID }) => validWandIDs.has(WandID)) 
-            .map(({ polygon, WandID }) => {
-              const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
-
-              console.log(relatedData)
-
-              return {
-                color: relatedData.color ? 
-                    `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})` : "#ccc",
-                polygons: polygon.flat(2).map(([lat, lng]) => ({ lat, lng })),
-                center: getPolygonCenter(polygon.flat(2)),
-                max: relatedData.max,
-                avg: relatedData.avg,
-                min: relatedData.min, 
-                name_xaphuong: relatedData.name_xaphuong,
+      
+              const data = await responseHeat.json();
+      
+              if (!data?.[heatType] || !Array.isArray(data[heatType])) {
+                  throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
+              }
+      
+              // Hàm tính tâm của polygon
+              const getPolygonCenter = (polygon) => {
+                  if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
+      
+                  try {
+                      const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
+      
+                      // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
+                      if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
+                          convertedCoords.push(convertedCoords[0]);
+                      }
+      
+                      const geoJsonPolygon = turf.polygon([convertedCoords]);
+                      const center = turf.center(geoJsonPolygon).geometry.coordinates;
+      
+                      return L.latLng(center[1], center[0]); // Chuyển về lat, lng
+                  } catch (error) {
+                      console.error("Lỗi khi tính toán tâm đa giác:", error);
+                      return null;
+                  }
               };
-            })
+      
+              // Tạo tập hợp ID hợp lệ để dễ dàng kiểm tra
+              const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
+      
+              // Lọc và chuyển đổi danh sách polygons
+              const polygonsByColor = data.list_polygon
+                  .filter(({ WandID }) => validWandIDs.has(WandID)) 
+                  .map(({ polygon, WandID }) => {
+                      const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
 
-    
-            setPolygonHeatMap(polygonsByColor);
-    
-            searchParams.set("id-district", id);
-            searchParams.set("heat-type", heatType);
-            setSearchParams(searchParams);
+                      const errors = []; 
+
+                      const polygons = polygon[0].map((coords) => {
+                          if (!Array.isArray(coords) || coords.length !== 2) {
+                              errors.push({ type: "Invalid array", data: coords });
+                              return null;
+                          }
+
+                          const [lng, lat] = coords;
+
+                          if (typeof lng !== "number" || typeof lat !== "number") {
+                              errors.push({ type: "Invalid number", data: coords });
+                              return null;
+                          }
+
+                          return { lat, lng };
+                      }).filter(Boolean); 
+
+                      if (errors.length > 0) {
+                          console.error("Dữ liệu lỗi:", errors);
+                      }
+                      
+                      return {
+                          color: relatedData.color
+                              ? `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})`
+                              : "#ccc",
+                          polygons: polygons,
+                          center: getPolygonCenter(polygon[0]),
+                          max: relatedData.max,
+                          avg: relatedData.avg,
+                          min: relatedData.min,
+                          name_xaphuong: relatedData.name_xaphuong,
+                      };
+                  });
+
+              if(!polygonsByColor || polygonsByColor.length == 0){
+                messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+              }
+      
+              setPolygonHeatMap(polygonsByColor);
+      
+              searchParams.set("id-district", id);
+              searchParams.set("heat-type", heatType);
+              setSearchParams(searchParams);
           } catch (error) {
               console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
+              messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
           } finally {
               setHeatMapLoading(false);
           }
-        };
+      };     
+      
+        const loadHeatMap = async () => {
+          setHeatMapLoading(true);
+          const vitri = searchParams.get("vitri").split(",");
+          if (!vitri || vitri.length < 2) {
+              throw new Error("Vị trí không hợp lệ!");
+          }
+      
+          const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
+          if (!resLocation) {
+              throw new Error("Không lấy được vị trí từ bounding box!");
+          }
+      
+          const currentDistrict = searchParams.get("id-district");
+          const heatType = searchParams.get("heat-type") || "tho_cu";
+      
+          if (resLocation.district === currentDistrict) {
+              return;
+          }
+      
+          await fetchHeatMapData(resLocation.district, heatType);
+
+          setHeatMapLoading(false);
+        }
       
         const handleHeatMapClick = async () => {
-            setHeatMapLoading(true);
-            const vitri = searchParams.get("vitri")?.split(",");
-            if (!vitri || vitri.length < 2) {
-                throw new Error("Vị trí không hợp lệ!");
-            }
-        
-            const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
-            if (!resLocation) {
-                throw new Error("Không lấy được vị trí từ bounding box!");
-            }
-        
-            const currentDistrict = searchParams.get("id-district");
-            const heatType = searchParams.get("heat-type") || "biet_thu";
-        
-            if (resLocation.district === currentDistrict) {
-                return;
-            }
-        
-            await fetchHeatMapData(resLocation.district, heatType);
+          await loadHeatMap();
         };      
 
         useEffect(() => {
@@ -1823,16 +1860,31 @@ const Map = forwardRef(
                         </Marker>
                     )}
 
-                    {itemSearch?.coordinates?.length > 0 && (
-                        <Polygon
-                            positions={polygonOnSearch}
-                            pathOptions={{
-                                color: 'blue',
-                                fillColor: 'rgba(0, 0, 255, 0.2)',
-                                weight: 2,
-                            }}
-                        />
-                    )}
+                    {itemSearch?.coordinates?.length > 0 && (() => {
+                        polygonOnSearch.forEach((coords, index) => {
+                          if (!Array.isArray(coords) || coords.length !== 2) {
+                              console.error(`❌ Lỗi tại index ${index}: Không phải mảng hoặc không có 2 phần tử`, coords);
+                          } else {
+                              const [lat, lng] = coords;
+                              if (typeof lng !== "number" || typeof lat !== "number") {
+                                  console.error(`❌ Lỗi tại index ${index}: Không phải số hợp lệ`, coords);
+                              } else {
+                                  console.log(`✅ Điểm hợp lệ tại ${index}:`, { lat, lng });
+                              }
+                          }
+                      });
+
+                        return (
+                            <Polygon
+                                positions={polygonOnSearch}
+                                pathOptions={{
+                                    color: 'blue',
+                                    fillColor: 'rgba(0, 0, 255, 0.2)',
+                                    weight: 2,
+                                }}
+                            />
+                        );
+                    })()}
 
                     {searchParams.get('heat-map') !== 'off' &&
                         polygonHeatMap?.map((item, index) => (
