@@ -143,3 +143,33 @@
     display: flex;
     align-items: baseline;
 }
+
+.custom-select .ant-select-selector {
+  background-color: black !important;
+  color: white !important;
+  border: 1px solid white !important;
+}
+
+.custom-select .ant-select-arrow {
+  color: white !important; 
+}
+
+.custom-select .ant-select-dropdown {
+  background-color: black !important;
+}
+
+.custom-select .ant-select-item {
+  color: white !important;
+}
+
+.custom-select .ant-select-selection-item{
+  color: white !important;
+}
+
+.custom-select .ant-select-item-option-selected {
+  background-color: grey !important;
+}
+
+[aria-selected="true"] {
+  color: black !important;
+}

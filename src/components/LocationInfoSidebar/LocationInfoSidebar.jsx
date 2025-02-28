@@ -173,12 +173,22 @@ const LocationInfoSidebar = ({
                       <Switch checked={searchParams.get("heat-map") !== "off"} onChange={handleHeatMapSwitch} />
                     </div>
 
-                    <Select defaultValue={searchParams.get("heat-type") || "tho_cu"} style={{ width: 170 }} onChange={handleHeatTypeChange}>
-                      <Option value="tho_cu">Thổ Cư</Option>
-                      <Option value="biet_thu">Biệt Thự</Option>
-                      <Option value="chungcu">Chung Cư</Option>
-                      <Option value="shophouse">ShopHouse</Option>
+                    <Select
+                      defaultValue={searchParams.get("heat-type") || "tho_cu"}
+                      className="custom-select"
+                      style={{width: 170}}
+                      dropdownStyle={{
+                        backgroundColor: "black", 
+                        color: "white"
+                      }}
+                      onChange={handleHeatTypeChange}
+                    >
+                      <Option value="tho_cu" style={{ color: "white" }}>Thổ Cư</Option>
+                      <Option value="biet_thu" style={{ color: "white" }}>Biệt Thự</Option>
+                      <Option value="chungcu" style={{ color: "white" }}>Chung Cư</Option>
+                      <Option value="shophouse" style={{ color: "white" }}>ShopHouse</Option>
                     </Select>
+
                   </div>
 
                   <div style={{ display: "flex", gap: "10px" }}>
