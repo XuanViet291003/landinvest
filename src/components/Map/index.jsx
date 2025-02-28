@@ -181,6 +181,7 @@ const Map = forwardRef(
         const [polygonHeatMap, setPolygonHeatMap] = useState(null);
         const [heatMapLoading, setHeatMapLoading] = useState(false);
         const [regionalPrice, setRegionalPrice] = useState(null);
+        const [heatRegionalPrice , setHeatRegionalPrice] = useState(null)
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
 
@@ -1580,62 +1581,59 @@ const Map = forwardRef(
                   }
               };
       
-              // Tạo tập hợp ID hợp lệ để dễ dàng kiểm tra
-              const validWandIDs = new Set(data[heatType].map(({ xaphuong_id }) => xaphuong_id));
-      
-              const errors = []; 
               // Lọc và chuyển đổi danh sách polygons
-              const polygonsByColor = data.list_polygon
-                  .filter(({ WandID }) => validWandIDs.has(WandID)) 
-                  .map(({ polygon, WandID }) => {
-                      const relatedData = data[heatType].find(({ xaphuong_id }) => xaphuong_id === WandID);
+              const priceHeatMap = [];
 
-                      const polygons = polygon[0].map((coords) => {
-                          if (!Array.isArray(coords) || coords.length !== 2) {
-                              const errorObj = { 
-                                name: relatedData?.name_xaphuong, 
-                                value: relatedData?.price,
-                              };
-                              errors.push(errorObj);
-                              return null;
-                          }
+              const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, price, color, max, avg, min }) => {
+                const obj = { 
+                  name: name_xaphuong, 
+                  value: price / 1000000,
+                };
+              
+                priceHeatMap.push(obj);
 
-                          const [lng, lat] = coords;
+                const relatedPolygon = data.list_polygon.find(({ WandID }) => WandID === xaphuong_id);
+              
+                if (!relatedPolygon) return null;
+              
+                const errors = []; 
+              
+                const polygons = relatedPolygon.polygon[0].map((coords) => {
+                    if (!Array.isArray(coords) || coords.length !== 2) {
+                        errors.push({ name: name_xaphuong, value: price });
+                        return null;
+                    }
+              
+                    const [lng, lat] = coords;
+              
+                    if (typeof lng !== "number" || typeof lat !== "number") {
+                        errors.push({ name: name_xaphuong, value: price });
+                        return null;
+                    }
+              
+                    return { lat, lng };
+                }).filter(Boolean); 
+              
+                return {
+                    color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#ccc",
+                    polygons: polygons,
+                    center: getPolygonCenter(relatedPolygon.polygon[0]),
+                    max,
+                    avg,
+                    min,
+                    name_xaphuong,
+                };
+              }).filter(Boolean);
 
-                          if (typeof lng !== "number" || typeof lat !== "number") {
-                              const errorObj = { 
-                                name: relatedData?.name_xaphuong, 
-                                value: relatedData?.price,
-                              };
-                              errors.push(errorObj);
-                              return null;
-                          }
-
-                          return { lat, lng };
-                      }).filter(Boolean); 
-                      
-                      return {
-                          color: relatedData.color
-                              ? `rgb(${relatedData.color.red}, ${relatedData.color.green}, ${relatedData.color.blue})`
-                              : "#ccc",
-                          polygons: polygons,
-                          center: getPolygonCenter(polygon[0]),
-                          max: relatedData.max,
-                          avg: relatedData.avg,
-                          min: relatedData.min,
-                          name_xaphuong: relatedData.name_xaphuong,
-                      };
-                  });
-
-              if(!polygonsByColor || polygonsByColor.length == 0){
+              if(!polygonsByColor || polygonsByColor.length == 0 || priceHeatMap.length == 0){
                 messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
               }
 
-              if (errors.length > 0) {
-                setRegionalPrice(errors);
-            } else {
-                setRegionalPrice(null)
-            }
+              if(priceHeatMap.length > 0){
+                setHeatRegionalPrice(priceHeatMap);
+              } else {
+                setHeatRegionalPrice(null);
+              }
       
               setPolygonHeatMap(polygonsByColor);
       
@@ -1797,6 +1795,8 @@ const Map = forwardRef(
                     )}
 
                     {regionalPrice && <RegionalPriceChart regionalPrice={regionalPrice} />}
+
+                    {(searchParams.get('heat-view')?.includes('chart') && heatRegionalPrice) && <RegionalPriceChart regionalPrice={heatRegionalPrice} />}
                 </div>
 
                 <MapContainer
@@ -1883,6 +1883,7 @@ const Map = forwardRef(
                     })()}
 
                     {searchParams.get('heat-map') !== 'off' &&
+                        searchParams.get('heat-view')?.includes('map') &&
                         polygonHeatMap?.map((item, index) => (
                             <>
                                 <Polygon

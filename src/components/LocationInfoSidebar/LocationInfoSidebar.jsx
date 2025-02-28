@@ -1,5 +1,5 @@
 import { CloseOutlined, EnvironmentOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { Drawer, Image, Select, Spin, Switch, message } from 'antd';
+import { Checkbox, Drawer, Image, Select, Spin, Switch, message } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { MdArrowDropDown, MdArrowDropUp, MdFileUpload } from 'react-icons/md';
 import { useMap } from 'react-leaflet';
@@ -125,6 +125,32 @@ const LocationInfoSidebar = ({
         }
     }, [heatType]); 
 
+    useEffect(() => {
+      if (!searchParams.get("heat-view")) {
+        searchParams.set("heat-view", "map,chart");
+        setSearchParams(searchParams);
+      }
+    }, []);
+
+    const handleViewChange = (key, checked) => {
+      let currentViews = searchParams.get("heat-view")?.split(",") || [];
+      if (checked) {
+        if (!currentViews.includes(key)) {
+          currentViews.push(key);
+        }
+      } else {
+        currentViews = currentViews.filter(view => view !== key);
+      }
+      if (currentViews.length > 0) {
+        searchParams.set("heat-view", currentViews.join(","));
+      } else {
+        searchParams.delete("heat-view");
+      }
+      setSearchParams(searchParams);
+    };
+
+    const currentViews = searchParams.get("heat-view")?.split(",") || [];
+
     return (
         <>
             {contextHolder}
@@ -140,26 +166,26 @@ const LocationInfoSidebar = ({
                 className={`overflow-y-hidden ${window.innerWidth > 768 && 'desktop'}`}
             >
                 {' '}
-                <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                  <div>
-                    <span style={{ fontSize: "16px", fontWeight: "500", marginRight: "10px" }}>Bật/tắt bản đồ nhiệt</span>
-                    <Switch 
-                        checked={searchParams.get("heat-map") !== "off"} 
-                        onChange={handleHeatMapSwitch} 
-                    />
+                <div style={{ padding: "10px 20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                    <div>
+                      <span style={{ fontSize: "16px", fontWeight: "500", marginRight: "10px" }}>Bật/tắt bản đồ nhiệt</span>
+                      <Switch checked={searchParams.get("heat-map") !== "off"} onChange={handleHeatMapSwitch} />
+                    </div>
+
+                    <Select defaultValue={searchParams.get("heat-type") || "tho_cu"} style={{ width: 170 }} onChange={handleHeatTypeChange}>
+                      <Option value="tho_cu">Thổ Cư</Option>
+                      <Option value="biet_thu">Biệt Thự</Option>
+                      <Option value="chungcu">Chung Cư</Option>
+                      <Option value="shophouse">ShopHouse</Option>
+                    </Select>
                   </div>
 
-                  <Select 
-                     defaultValue={searchParams.get("heat-type") || "tho_cu"} 
-                     style={{ width: 170 }}
-                     onChange={handleHeatTypeChange} 
-                  >
-                    <Option value="tho_cu">Thổ Cư</Option>
-                    <Option value="biet_thu">Biệt Thự</Option>
-                    <Option value="chungcu">Chung Cư</Option>
-                    <Option value="shophouse">ShopHouse</Option>
-                  </Select>
-              </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <Checkbox checked={currentViews.includes("map")} onChange={(e) => handleViewChange("map", e.target.checked)} style={{ color: "white" }}>Xem bản đồ</Checkbox>
+                    <Checkbox checked={currentViews.includes("chart")} onChange={(e) => handleViewChange("chart", e.target.checked)} style={{ color: "white" }}>Xem biểu đồ</Checkbox>
+                  </div>
+                </div>
 
                 <div className="ant-drawer-body-wrapper">
                 <div style={{margin: "20px auto", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
