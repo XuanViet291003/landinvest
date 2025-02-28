@@ -2,49 +2,58 @@ import React from 'react';
 import { Container } from 'react-bootstrap';
 import './About.scss';
 import { useNavigate } from 'react-router-dom';
+
+import aboutUsImg1 from '../../assets/data-info-congty/1.jpg';
+import aboutUsImg2 from '../../assets/data-info-congty/2.jpg';
+import aboutUsImg3 from '../../assets/data-info-congty/3.jpg';
+import aboutUsImg4 from '../../assets/data-info-congty/4.jpg';
+import aboutUsImg5 from '../../assets/data-info-congty/5.jpg';
+import aboutUsImg6 from '../../assets/data-info-congty/6.jpg';
+import aboutUsImg7 from '../../assets/data-info-congty/7.jpg';
+import aboutUsImg8 from '../../assets/data-info-congty/8.jpg';
+import aboutUsImg9 from '../../assets/data-info-congty/9.jpg';
+import aboutUsImg10 from '../../assets/data-info-congty/10.jpg';
+import aboutUsImg11 from '../../assets/data-info-congty/11.jpg';
+import aboutUsImg12 from '../../assets/data-info-congty/12.jpg';
+import aboutUsImg13 from '../../assets/data-info-congty/13.jpg';
+import aboutUsImg14 from '../../assets/data-info-congty/14.jpg';
+import aboutUsImg15 from '../../assets/data-info-congty/15.jpg';
+import aboutUsImg16 from '../../assets/data-info-congty/16.jpg';
+import aboutUsImg17 from '../../assets/data-info-congty/17.jpg';
+import aboutUsImg18 from '../../assets/data-info-congty/18.jpg';
+import aboutUsImg19 from '../../assets/data-info-congty/19.jpg';
+import aboutUsImg20 from '../../assets/data-info-congty/20.jpg';
+import aboutUsImg21 from '../../assets/data-info-congty/21.jpg';
+import aboutUsImg22 from '../../assets/data-info-congty/22.jpg';
+import aboutUsImg23 from '../../assets/data-info-congty/23.jpg';
+import aboutUsImg24 from '../../assets/data-info-congty/24.jpg';
+import aboutUsImg25 from '../../assets/data-info-congty/25.jpg';
+import aboutUsImg26 from '../../assets/data-info-congty/26.jpg';
+import aboutUsImg27 from '../../assets/data-info-congty/27.jpg';
+import aboutUsImg28 from '../../assets/data-info-congty/28.jpg';
+import aboutUsImg29 from '../../assets/data-info-congty/29.jpg';
+import aboutUsImg30 from '../../assets/data-info-congty/30.jpg';
+import aboutUsImg31 from '../../assets/data-info-congty/31.jpg';
+import aboutUsImg32 from '../../assets/data-info-congty/32.jpg';
+import aboutUsImg33 from '../../assets/data-info-congty/33.jpg';
+import aboutUsImg34 from '../../assets/data-info-congty/34.jpg';
+import aboutUsImg35 from '../../assets/data-info-congty/35.jpg';
+import aboutUsImg36 from '../../assets/data-info-congty/36.jpg';
+import aboutUsImg37 from '../../assets/data-info-congty/37.jpg';
+
 export default function AboutUs() {
     const navigate = useNavigate();
-    const imagesSectionOne = [
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/1.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/2.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/3.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/4.jpg',
-    ];
+    
+    const imagesSectionOne = [aboutUsImg1, aboutUsImg2, aboutUsImg3, aboutUsImg4];
+    
     const imagesTeamSection = [
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/4.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/5.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/6.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/7.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/8.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/9.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/10.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/11.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/12.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/13.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/14.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/15.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/16.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/17.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/18.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/19.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/20.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/21.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/22.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/23.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/24.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/25.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/26.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/27.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/28.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/29.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/30.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/31.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/32.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/33.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/34.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/35.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/36.jpg',
-        'https://quyhoach.xyz/image_public/comment/data-info-congty/37.jpg',
+        aboutUsImg5, aboutUsImg6, aboutUsImg7, aboutUsImg8, aboutUsImg9,
+        aboutUsImg10, aboutUsImg11, aboutUsImg12, aboutUsImg13, aboutUsImg14,
+        aboutUsImg15, aboutUsImg16, aboutUsImg17, aboutUsImg18, aboutUsImg19,
+        aboutUsImg20, aboutUsImg21, aboutUsImg22, aboutUsImg23, aboutUsImg24,
+        aboutUsImg25, aboutUsImg26, aboutUsImg27, aboutUsImg28, aboutUsImg29,
+        aboutUsImg30, aboutUsImg31, aboutUsImg32, aboutUsImg33, aboutUsImg34,
+        aboutUsImg35, aboutUsImg36, aboutUsImg37
     ];
     const handleClickStart = () => {
         navigate('/bidding?page=1&limit=10');
