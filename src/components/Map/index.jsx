@@ -1548,16 +1548,14 @@ const Map = forwardRef(
               const responseHeat = await fetch(
                   `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
               );
+
+              console.log()
       
               if (!responseHeat.ok) {
                   throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
               }
       
               const data = await responseHeat.json();
-      
-              if (!data?.[heatType] || !Array.isArray(data[heatType])) {
-                  throw new Error("Dữ liệu không hợp lệ hoặc không có lịch sử giá đất!");
-              }
       
               // Hàm tính tâm của polygon
               const getPolygonCenter = (polygon) => {
@@ -1584,10 +1582,11 @@ const Map = forwardRef(
               // Lọc và chuyển đổi danh sách polygons
               const priceHeatMap = [];
 
-              const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, price, color, max, avg, min }) => {
+              const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
                 const obj = { 
                   name: name_xaphuong, 
-                  value: price / 1000000,
+                  value: avg,
+                  color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#8884d8"
                 };
               
                 priceHeatMap.push(obj);
@@ -1600,14 +1599,14 @@ const Map = forwardRef(
               
                 const polygons = relatedPolygon.polygon[0].map((coords) => {
                     if (!Array.isArray(coords) || coords.length !== 2) {
-                        errors.push({ name: name_xaphuong, value: price });
+                        errors.push({ name: name_xaphuong });
                         return null;
                     }
               
                     const [lng, lat] = coords;
               
                     if (typeof lng !== "number" || typeof lat !== "number") {
-                        errors.push({ name: name_xaphuong, value: price });
+                        errors.push({ name: name_xaphuong });
                         return null;
                     }
               
@@ -1643,6 +1642,8 @@ const Map = forwardRef(
           } catch (error) {
               console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
               messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+              setPolygonHeatMap(null);
+              setHeatRegionalPrice(null);
           } finally {
               setHeatMapLoading(false);
           }
@@ -1720,7 +1721,7 @@ const Map = forwardRef(
         const textIcon = (text) =>
             L.divIcon({
                 className: 'polygon-label',
-                html: `<div style="text-align: center; font-weight: bold; font-size: 8.5px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
+                html: `<div style="text-align: center; font-weight: bold; font-size: 9px; color: black; background: rgba(255,255,255,0.7); padding: 3px 5px; border-radius: 5px;">${text}</div>`,
                 iconSize: [100, 30],
                 iconAnchor: [50, 15],
             });
@@ -1899,7 +1900,7 @@ const Map = forwardRef(
                                     <Marker
                                         position={[item.center.lat, item.center.lng]}
                                         icon={textIcon(
-                                            `${item.name_xaphuong} <br> Max: ${item.max} Min: ${item.min} <br> Trung Bình: ${item.avg}`,
+                                            `${item.name_xaphuong} <br> Max: ${item.max} triệu/m² <br> Min: ${item.min} triệu/m² <br> Trung Bình: ${item.avg} triệu/m²`,
                                         )}
                                     />
                                 )}
