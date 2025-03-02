@@ -26,7 +26,8 @@ const LocationInfoSidebar = ({
     onShowHistoryChart,
     handleHeatMapClick,
     handleHeatMapSwitch,
-    heatMapLoading
+    heatMapLoading,
+    handleInfraMutationClick
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -145,7 +146,7 @@ const LocationInfoSidebar = ({
     };    
 
     const currentViews = searchParams.get("heat-view")?.split(",") || [];
-
+    
     return (
         <>
             {contextHolder}
@@ -205,14 +206,27 @@ const LocationInfoSidebar = ({
                 </div>
 
                 <div className="ant-drawer-body-wrapper">
-                <div style={{margin: "20px auto", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
-                  <button style={{width: "calc(50%-5px)"}} onClick={onShowHistoryChart}>
+                <div style={{
+                  margin: "20px auto",
+                  marginTop: "0",
+                  width: "90%",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <button style={{ width: "calc(50% - 32px)" }} onClick={onShowHistoryChart}>
                     Xem lịch sử giá đất
                   </button>
-                  <button style={{width: "calc(50%-5px)"}} onClick={handleHeatMapClick}  disabled={heatMapLoading}>
+                  <button style={{ width: "calc(50% - 32px)" }} onClick={handleHeatMapClick} disabled={heatMapLoading}>
                     {heatMapLoading ? "Đang tải bản đồ nhiệt..." : "Xem bản đồ nhiệt tại đây"}
                   </button>
+                  <button style={{ width: "100%" }} onClick={handleInfraMutationClick}>
+                    Xem đột biến hạ tầng
+                  </button>
                 </div>
+
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>

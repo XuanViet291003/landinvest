@@ -121,6 +121,7 @@ const Map = forwardRef(
             distances,
             setDistances,
             setIsShowModalUpload,
+            polygonCoords
         },
         ref,
     ) => {
@@ -184,7 +185,6 @@ const Map = forwardRef(
         const [heatRegionalPrice , setHeatRegionalPrice] = useState(null)
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
-
         // const [firstTime, setFirstTime] = useState(true);
 
         // const [id, setId] = useState(searchParams.get('id'));
@@ -1539,6 +1539,28 @@ const Map = forwardRef(
             }
         };
 
+        // Hàm tính tâm của polygon
+        const getPolygonCenter = (polygon) => {
+          if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
+
+          try {
+              const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
+
+              // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
+              if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
+                  convertedCoords.push(convertedCoords[0]);
+              }
+
+              const geoJsonPolygon = turf.polygon([convertedCoords]);
+              const center = turf.center(geoJsonPolygon).geometry.coordinates;
+
+              return L.latLng(center[1], center[0]); // Chuyển về lat, lng
+          } catch (error) {
+              console.error("Lỗi khi tính toán tâm đa giác:", error);
+              return null;
+          }
+      };
+
         const fetchHeatMapData = async (id, heatType) => {
           try {
               const now = new Date();
@@ -1556,28 +1578,6 @@ const Map = forwardRef(
               }
       
               const data = await responseHeat.json();
-      
-              // Hàm tính tâm của polygon
-              const getPolygonCenter = (polygon) => {
-                  if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
-      
-                  try {
-                      const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
-      
-                      // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
-                      if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
-                          convertedCoords.push(convertedCoords[0]);
-                      }
-      
-                      const geoJsonPolygon = turf.polygon([convertedCoords]);
-                      const center = turf.center(geoJsonPolygon).geometry.coordinates;
-      
-                      return L.latLng(center[1], center[0]); // Chuyển về lat, lng
-                  } catch (error) {
-                      console.error("Lỗi khi tính toán tâm đa giác:", error);
-                      return null;
-                  }
-              };
       
               // Lọc và chuyển đổi danh sách polygons
               const priceHeatMap = [];
@@ -1726,6 +1726,28 @@ const Map = forwardRef(
                 iconAnchor: [50, 15],
             });
 
+            const convertToPolygonArray = (data) => {
+              return data
+                  .replace(/[()]/g, "") 
+                  .trim()
+                  .split(" ") 
+                  .reduce((acc, val, index, array) => {
+                      if (index % 2 === 0) {
+                          acc.push([parseFloat(array[index + 1]), parseFloat(val)]);
+                      }
+                      return acc;
+                  }, []);
+            };         
+
+            const handleInfraMutationClick = async () => {
+              try {
+                const response = await fetch("https://api.gachmen.org/get_polygon/badinh");
+                const data = await response.json();
+                console.log("Dữ liệu polygon:", data);
+              } catch (error) {
+                console.error("Lỗi khi fetch API:", error);
+              }
+            };            
         return (
             <>
                 {contextHolder}
@@ -1882,6 +1904,8 @@ const Map = forwardRef(
                             />
                         );
                     })()}
+
+                    {polygonCoords && <Polygon positions={polygonCoords} pathOptions={{ color: "blue" }} />}
 
                     {searchParams.get('heat-map') !== 'off' &&
                         searchParams.get("heat-view") === "map" &&
@@ -2109,6 +2133,7 @@ const Map = forwardRef(
                         handleHeatMapClick={handleHeatMapClick}
                         handleHeatMapSwitch={handleHeatMapSwitch}
                         heatMapLoading={heatMapLoading}
+                        handleInfraMutationClick={handleInfraMutationClick}
                     />
                     <DrawerLandUsePlan />
 

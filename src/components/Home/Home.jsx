@@ -3,6 +3,7 @@ import { FiPlus } from 'react-icons/fi';
 import { GiPathDistance } from 'react-icons/gi';
 import { MdIntegrationInstructions } from 'react-icons/md';
 import { RiSubtractLine } from 'react-icons/ri';
+import { BiShapePolygon } from "react-icons/bi";
 import './Home.scss';
 
 import ios1 from '../../assets/shareLocationPopup/ios-1.png';
@@ -28,7 +29,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GrLocation } from 'react-icons/gr';
 
 import { AimOutlined, FundOutlined } from '@ant-design/icons';
-import { Button, Drawer, message, Modal, notification, Tooltip } from 'antd';
+import { Button, Drawer, Input, message, Modal, notification, Tooltip } from 'antd';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -71,6 +72,7 @@ import { LAND_BIDDING_KEY } from '../../constants/LandBiddingKey';
 import { LAND_AUCTION_KEYS } from '../../constants/LandAuctionKey';
 import SelectLocationModal from '../SelectLocationModal/SelectLocationModal';
 import { onChangeDrawer } from '../../redux/landUsePlanSlice/lanUsePlanSlice';
+import * as turf from '@turf/turf';
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -129,6 +131,10 @@ function Home() {
     const [isSelectLocationModalOpen, setIsOpenSelectLocation] = useState(false);
 
     const [openShareLoCationPopup, setOpenShareLoCationPopup] = useState(false);
+
+    const [isModalPoygonVisible, setIsModalPolygonVisible] = useState(false);
+    const [polygon, setPolygon] = useState("");
+    const [tempPolygon, setTempPolygon] = useState("");
 
     // Device = 1: IOS, Device = 2: Android
     const [device, setDevice] = useState(1);
@@ -223,6 +229,7 @@ function Home() {
             messageApi.info('Hiện tại chưa có quy hoạch nào cần xóa');
         }
     };
+
     const handleShareClick = () => {
         const urlParams = new URLSearchParams(location.search);
         if (selectedPosition) {
@@ -496,6 +503,69 @@ function Home() {
         dispatch(onChangeDrawer(false));
     }
 
+    const handleTypePolygon = () => {
+      setIsModalPolygonVisible(true);
+    };
+
+    const convertToPolygonArray = (data) => {
+      return data
+          .replace(/[()]/g, "") 
+          .trim()
+          .split(" ") 
+          .reduce((acc, val, index, array) => {
+              if (index % 2 === 0) {
+                  acc.push([parseFloat(array[index + 1]), parseFloat(val)]);
+              }
+              return acc;
+          }, []);
+    };    
+
+    // Hàm tính tâm của polygon
+    const getPolygonCenter = (polygon) => {
+      if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
+
+      try {
+          const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
+
+          // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
+          if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
+              convertedCoords.push(convertedCoords[0]);
+          }
+
+          const geoJsonPolygon = turf.polygon([convertedCoords]);
+          const center = turf.center(geoJsonPolygon).geometry.coordinates;
+
+          return L.latLng(center[1], center[0]); // Chuyển về lat, lng
+      } catch (error) {
+          console.error("Lỗi khi tính toán tâm đa giác:", error);
+          return null;
+      }
+  };
+  
+    const handlePolygonOk = () => {
+      setPolygon(tempPolygon); 
+      
+      const center = getPolygonCenter(convertToPolygonArray(tempPolygon));
+    
+      const convertLatLng = (latLng) => ({
+        lat: latLng.lng, 
+        lng: latLng.lat
+      });
+
+      const formatCenter = convertLatLng(center);
+
+      const map = mapRef.current;
+        if (map && formatCenter) {
+            map.flyTo([formatCenter.lat, formatCenter.lng], 16);
+        }
+      setIsModalPolygonVisible(false);
+    };
+  
+    const handlePolygonCancel = () => {
+      setTempPolygon(polygon);
+      setIsModalPolygonVisible(false);
+    };
+
     return (
         <>
             {openShareLoCationPopup && (
@@ -705,6 +775,11 @@ function Home() {
                                     <FaArrowRotateLeft size={20} onClick={handleRemoveAllPlans} />
                                 </Tooltip>
                             </div>
+                            <div className="nav-icon-arrow" onClick={handleTypePolygon}>
+                                <Tooltip title="Nhập text polygon" placement="left">
+                                    <BiShapePolygon size={20} />
+                                </Tooltip>
+                            </div>
                             {/* <div className="nav-icon-arrow" onClick={handleLocationArrowClick}>
                                 <FaLocationArrow size={18} />
                             </div> */}
@@ -766,6 +841,21 @@ function Home() {
                         </div>
                     </div>
                 </div>
+
+                <Modal
+                  title="Nhập polygon vào"
+                  open={isModalPoygonVisible}
+                  onOk={handlePolygonOk}
+                  onCancel={handlePolygonCancel}
+                  okText="Xác nhận"
+                  cancelText="Hủy"
+                >
+                   <Input
+                      placeholder="Nhập polygon vào đây"
+                      value={tempPolygon}
+                      onChange={(e) => setTempPolygon(e.target.value)} 
+                    />
+                </Modal>
 
                 {/* Header Container */}
                 <div className="menu-overlay_index">
@@ -832,6 +922,7 @@ function Home() {
                         distances={distances}
                         setDistances={setDistances}
                         setIsShowModalUpload={setIsShowModalUpload}
+                        polygonCoords={polygon ? convertToPolygonArray(polygon) : ""}
                     />
                 )}
 
