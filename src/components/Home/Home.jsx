@@ -507,7 +507,7 @@ function Home() {
       setIsModalPolygonVisible(true);
     };
 
-    const convertToPolygonArray = (data) => {
+    const mergePolygonArray = (data) => {
       return data
           .replace(/[()]/g, "") 
           .trim()
@@ -519,6 +519,21 @@ function Home() {
               return acc;
           }, []);
     };    
+
+    const convertToPolygonArray = (data) => {
+      return data
+          .split("),") 
+          .map(polygon =>
+              polygon
+                  .replace(/[()]/g, "") 
+                  .trim()
+                  .split(", ") 
+                  .map(coord => {
+                      const [lng, lat] = coord.split(" ").map(parseFloat);
+                      return [lat, lng]; 
+                  })
+          );
+  };
 
     // Hàm tính tâm của polygon
     const getPolygonCenter = (polygon) => {
@@ -545,7 +560,7 @@ function Home() {
     const handlePolygonOk = () => {
       setPolygon(tempPolygon); 
       
-      const center = getPolygonCenter(convertToPolygonArray(tempPolygon));
+      const center = getPolygonCenter(mergePolygonArray(tempPolygon));
     
       const convertLatLng = (latLng) => ({
         lat: latLng.lng, 
