@@ -33,7 +33,7 @@ function ListPostUser() {
             <h4 className="main-post__title">Các bài viết của {username} : </h4>
             {totalPage > 0 && (
                 <ReactPaginate
-                    containerClassName="pagination"
+                    containerClassName="pagination-news"
                     previousLabel="<"
                     nextLabel=">"
                     breakLabel="..."

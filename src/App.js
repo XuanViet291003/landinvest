@@ -56,6 +56,7 @@ import './styles/listRegulation.scss';
 import './styles/map.scss';
 import Investor from './pages/Investor/Investor.jsx';
 import DetailInvestor from './pages/Investor/DetailInvestor/DetailInvestor.jsx';
+import ProFileNews from './pages/ProfileNews/index.jsx';
 const Layout = () => {
     return (
         <div className="App" style={{ position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
@@ -112,6 +113,10 @@ function App() {
                 {
                     path: '/detail_du_an/:projectId',
                     element: <Detail />,
+                },
+                {
+                    path: '/profile/:id',
+                    element: <ProFileNews />,
                 },
                 {
                     path: '/news',
@@ -226,17 +231,17 @@ function App() {
                     element: <DetailAdministrativeMap />,
                 },
                 {
-                  path: '/investor',
-                  element: <Investor />,
+                    path: '/investor',
+                    element: <Investor />,
                 },
                 {
-                  path: '/investor/:orgCode',
-                  element: <DetailInvestor />,
+                    path: '/investor/:orgCode',
+                    element: <DetailInvestor />,
                 },
                 {
-                  path: '/login-user',
-                  element: <LoginUserPage />,
-                }
+                    path: '/login-user',
+                    element: <LoginUserPage />,
+                },
             ],
         },
         {

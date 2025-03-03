@@ -648,3 +648,11 @@ export const postPolyGonForDuAn = async (id, value) => {
     const res = await instance.post(`edit_polygon_du_an_bds/${id}`, value);
     return res.data;
 };
+export const getListNewsByIdUser = async (id, page = 1) => {
+    const res = await instance.get(`/api/forum/list_all_post_by_user/${id}/${page}`);
+    return res.data;
+};
+export const getDataUserById = async (id) => {
+    const res = await instance.get(`/api/profile/other_user/${id}`);
+    return res.data;
+};

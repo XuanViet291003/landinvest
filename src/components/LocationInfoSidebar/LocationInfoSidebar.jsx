@@ -9,7 +9,7 @@ import { getUrlMapLayer } from '../../services/api';
 import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistrictProvinces.jsx';
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
-import { FaWikipediaW } from "react-icons/fa";
+import { FaWikipediaW } from 'react-icons/fa';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -26,7 +26,7 @@ const LocationInfoSidebar = ({
     onShowHistoryChart,
     handleHeatMapClick,
     handleHeatMapSwitch,
-    heatMapLoading
+    heatMapLoading,
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -112,10 +112,10 @@ const LocationInfoSidebar = ({
 
     const { Option } = Select;
 
-  const handleHeatTypeChange = (value) => {
-    searchParams.set("heat-type", value); 
-    setSearchParams(searchParams);
-  };
+    const handleHeatTypeChange = (value) => {
+        searchParams.set('heat-type', value);
+        setSearchParams(searchParams);
+    };
 
     return (
         <>
@@ -132,36 +132,55 @@ const LocationInfoSidebar = ({
                 className={`overflow-y-hidden ${window.innerWidth > 768 && 'desktop'}`}
             >
                 {' '}
-                <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                  <div>
-                    <span style={{ fontSize: "16px", fontWeight: "500", marginRight: "10px" }}>Bật/tắt bản đồ nhiệt</span>
-                    <Switch 
-                        checked={searchParams.get("heat-map") !== "off"} 
-                        onChange={handleHeatMapSwitch} 
-                    />
-                  </div>
+                <div
+                    style={{
+                        padding: '10px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '10px',
+                    }}
+                >
+                    <div>
+                        <span style={{ fontSize: '16px', fontWeight: '500', marginRight: '10px' }}>
+                            Bật/tắt bản đồ nhiệt
+                        </span>
+                        <Switch checked={searchParams.get('heat-map') !== 'off'} onChange={handleHeatMapSwitch} />
+                    </div>
 
-                  <Select 
-                     defaultValue={searchParams.get("heat-type") || "biet_thu"} 
-                     style={{ width: 170 }}
-                     onChange={handleHeatTypeChange} 
-                  >
-                    <Option value="biet_thu">Biệt Thự</Option>
-                    <Option value="chungcu">Chung Cư</Option>
-                    <Option value="shophouse">ShopHouse</Option>
-                    <Option value="tho_cu">Thổ Cư</Option>
-                  </Select>
-              </div>
-
-                <div className="ant-drawer-body-wrapper">
-                <div style={{margin: "20px auto", marginTop: "0", width: "80%", display: "flex", gap: "10px", alignItems: "center" }}>
-                  <button style={{width: "calc(50%-5px)"}} onClick={onShowHistoryChart}>
-                    Xem lịch sử giá đất
-                  </button>
-                  <button style={{width: "calc(50%-5px)"}} onClick={handleHeatMapClick}  disabled={heatMapLoading}>
-                    {heatMapLoading ? "Đang tải bản đồ nhiệt..." : "Xem bản đồ nhiệt tại đây"}
-                  </button>
+                    <Select
+                        defaultValue={searchParams.get('heat-type') || 'biet_thu'}
+                        style={{ width: 170 }}
+                        onChange={handleHeatTypeChange}
+                    >
+                        <Option value="biet_thu">Biệt Thự</Option>
+                        <Option value="chungcu">Chung Cư</Option>
+                        <Option value="shophouse">ShopHouse</Option>
+                        <Option value="tho_cu">Thổ Cư</Option>
+                    </Select>
                 </div>
+                <div className="ant-drawer-body-wrapper">
+                    <div
+                        style={{
+                            margin: '20px auto',
+                            marginTop: '0',
+                            width: '80%',
+                            display: 'flex',
+                            gap: '10px',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <button style={{ width: 'calc(50%-5px)' }} onClick={onShowHistoryChart}>
+                            Xem lịch sử giá đất
+                        </button>
+                        <button
+                            style={{ width: 'calc(50%-5px)' }}
+                            onClick={handleHeatMapClick}
+                            disabled={heatMapLoading}
+                        >
+                            {heatMapLoading ? 'Đang tải bản đồ nhiệt...' : 'Xem bản đồ nhiệt tại đây'}
+                        </button>
+                    </div>
                     {isShowMore && (
                         <>
                             <div>{tileLayer && <Image src={tileLayer} style={{ width: '100%' }} />}</div>
@@ -234,7 +253,7 @@ const LocationInfoSidebar = ({
                                     <FaWikipediaW color="#1d4ed8" />
                                 </div>
                                 <span className="ant-drawer-body-function-item-text">Wiki</span>
-                            </div>   
+                            </div>
 
                             <div
                                 className="ant-drawer-body-function-item-wrapper"
