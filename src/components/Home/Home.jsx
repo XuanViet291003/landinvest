@@ -522,6 +522,8 @@ function Home() {
 
     const convertToPolygonArray = (data) => {
       return data
+          .replace(/^[A-Z]+\s*\(\(/i, "")  
+          .replace(/\)\)$/, "")            
           .split("),") 
           .map(polygon =>
               polygon

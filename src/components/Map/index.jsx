@@ -187,6 +187,8 @@ const Map = forwardRef(
         const userAgent = navigator.userAgent;
         // const [firstTime, setFirstTime] = useState(true);
 
+        const [infraMutation, setInfraMutation] = useState(null);
+
         // const [id, setId] = useState(searchParams.get('id'));
         const [isDrawPolygon, setIsDrawPolygon] = useState(false);
         const id = searchParams.get('id');
@@ -1728,22 +1730,38 @@ const Map = forwardRef(
 
             const convertToPolygonArray = (data) => {
               return data
-                  .replace(/[()]/g, "") 
-                  .trim()
-                  .split(" ") 
-                  .reduce((acc, val, index, array) => {
-                      if (index % 2 === 0) {
-                          acc.push([parseFloat(array[index + 1]), parseFloat(val)]);
-                      }
-                      return acc;
-                  }, []);
-            };         
+                  .replace(/^[A-Z]+\s*\(\(/i, "")  
+                  .replace(/\)\)$/, "")            
+                  .split("),") 
+                  .map(polygon =>
+                      polygon
+                          .replace(/[()]/g, "") 
+                          .trim()
+                          .split(", ") 
+                          .map(coord => {
+                              const [lng, lat] = coord.split(" ").map(parseFloat);
+                              return [lat, lng]; 
+                          })
+                  );
+          };      
 
             const handleInfraMutationClick = async () => {
               try {
-                const response = await fetch("https://api.gachmen.org/get_polygon/badinh");
-                const data = await response.json();
-                console.log("Dữ liệu polygon:", data);
+                const response = await fetch("/badinh.json");
+                const res = await response.json();
+                const formatPolygon = res.data?.map(item => convertToPolygonArray(item));
+                const processedPolygons = [];
+                console.log(formatPolygon) 
+                formatPolygon.forEach((group, groupIndex) => {
+                  group.forEach((polygon, polygonIndex) => {
+                    processedPolygons.push({
+                      id: `group-${groupIndex}-polygon-${polygonIndex}`,
+                      coordinates: polygon
+                    });
+                  });
+                });
+                console.log("Dữ liệu polygon:", processedPolygons);
+                setInfraMutation(processedPolygons);
               } catch (error) {
                 console.error("Lỗi khi fetch API:", error);
               }
@@ -1891,6 +1909,11 @@ const Map = forwardRef(
                             </Popup>
                         </Marker>
                     )}
+
+                    {(infraMutation && infraMutation?.length > 0) && 
+                    infraMutation.map(({ id, coordinates }) => (
+                      <Polygon key={id} positions={coordinates} color="red" />
+                    ))}
 
                     {itemSearch?.coordinates?.length > 0 && (() => {
                         return (
