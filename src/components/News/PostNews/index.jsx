@@ -200,9 +200,10 @@ function PostNews() {
                             <div className="comment-content">
                                 <div className="comment-content__info">
                                     <h4 className="comment-content__username">
-                                        <Link to={`/news/list-post/${comment.idUser}/${comment.username}`}>
+                                        {/* <Link to={`/news/list-post/${comment.idUser}/${comment.username}`}>
                                             {comment.username}
-                                        </Link>
+                                        </Link> */}
+                                        <Link to={`/profile/${comment.idUser}`}>{comment.username}</Link>
                                     </h4>
                                     <p className="comment-content__time">{comment.actionAt}</p>
                                 </div>

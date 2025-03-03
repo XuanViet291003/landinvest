@@ -55,7 +55,7 @@ function ModalCreateNew({ isShowModalCreate, setIsShowModalCreate, groupId, setA
                 message.error('Tạo bài viết thất bại');
             }
         } catch (error) {
-            message.error('Tạo bài viết thất bại');
+            message.error('Cần đăng nhập lại để tạo bài viết !');
             console.error('Error creating article:', error);
         }
         setLoading(false);

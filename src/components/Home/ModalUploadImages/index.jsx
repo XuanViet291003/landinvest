@@ -32,6 +32,7 @@ function ModalUploadImages({ isShowModalUpload, setIsShowModalUpload }) {
     const [error, setError] = useState('');
     const [form] = Form.useForm();
     const [isVideo, setIsVideo] = useState(false);
+    console.log(isShowModalUpload);
     const props = {
         multiple: true,
         accept: 'image/*',
@@ -154,12 +155,12 @@ function ModalUploadImages({ isShowModalUpload, setIsShowModalUpload }) {
         setIsTypeLink(false);
         setIsVideo(false);
     };
-    useLayoutEffect(() => {
+    useEffect(() => {
         const fetchApi = async () => {
             if (isShowModalUpload.location) {
                 const getDistric = await getLocationInBoudingBox(
                     isShowModalUpload.location[0],
-                    isShowModalUpload.location,
+                    isShowModalUpload.location[1],
                 );
                 form.setFieldsValue({
                     address: getDistric.diachi,
@@ -171,6 +172,11 @@ function ModalUploadImages({ isShowModalUpload, setIsShowModalUpload }) {
     useEffect(() => {
         setImageList([]);
     }, [isVideo]);
+    useEffect(() => {
+        form.setFieldsValue({
+            type: 0,
+        });
+    }, []);
     return (
         <>
             <Modal

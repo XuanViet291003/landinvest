@@ -9,7 +9,7 @@ import { getUrlMapLayer } from '../../services/api';
 import ListGetDistrictProvinces from '../ListGetDistrictProvinces/ListGetDistrictProvinces.jsx';
 import './LocationInfoSidebar.css';
 import { IoIosMore } from 'react-icons/io';
-import { FaWikipediaW } from "react-icons/fa";
+import { FaWikipediaW } from 'react-icons/fa';
 
 const LocationInfoSidebar = ({
     inforArea,
@@ -27,7 +27,7 @@ const LocationInfoSidebar = ({
     handleHeatMapClick,
     handleHeatMapSwitch,
     heatMapLoading,
-    handleInfraMutationClick
+    handleInfraMutationClick,
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -47,7 +47,7 @@ const LocationInfoSidebar = ({
     const districtId = useSelector((state) => state.landCost.districtId);
     const [isLandAuction, setIsLandAuction] = useState(true);
     const [isShowMore, setIsShowMore] = useState(false);
-    const [heatType, setHeatType] = useState(searchParams.get("heat-type"));
+    const [heatType, setHeatType] = useState(searchParams.get('heat-type'));
 
     const historyCost = useSelector((state) => state.historyCost.value);
     const dispatch = useDispatch();
@@ -115,38 +115,38 @@ const LocationInfoSidebar = ({
     const { Option } = Select;
 
     const handleHeatTypeChange = (value) => {
-        searchParams.set("heat-type", value); 
+        searchParams.set('heat-type', value);
         setSearchParams(searchParams);
         setHeatType(value);
     };
-  
+
     useEffect(() => {
         if (heatType) {
             handleHeatMapClick();
         }
-    }, [heatType]); 
+    }, [heatType]);
 
     useEffect(() => {
-      if (!searchParams.get("heat-view")) {
-        searchParams.set("heat-view", "map");
-        setSearchParams(searchParams);
-      }
+        if (!searchParams.get('heat-view')) {
+            searchParams.set('heat-view', 'map');
+            setSearchParams(searchParams);
+        }
     }, []);
 
     const handleViewChange = (key) => {
-      let currentView = searchParams.get("heat-view") || ""; 
-    
-      if (currentView === key) {
-        searchParams.delete("heat-view"); 
-      } else {
-        searchParams.set("heat-view", key); 
-      }
-    
-      setSearchParams(searchParams);
-    };    
+        let currentView = searchParams.get('heat-view') || '';
 
-    const currentViews = searchParams.get("heat-view")?.split(",") || [];
-    
+        if (currentView === key) {
+            searchParams.delete('heat-view');
+        } else {
+            searchParams.set('heat-view', key);
+        }
+
+        setSearchParams(searchParams);
+    };
+
+    const currentViews = searchParams.get('heat-view')?.split(',') || [];
+
     return (
         <>
             {contextHolder}
@@ -162,70 +162,86 @@ const LocationInfoSidebar = ({
                 className={`overflow-y-hidden ${window.innerWidth > 768 && 'desktop'}`}
             >
                 {' '}
-                <div style={{ padding: "10px 20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                    <div>
-                      <span style={{ fontSize: "16px", fontWeight: "500", marginRight: "10px" }}>Bật/tắt bản đồ nhiệt</span>
-                      <Switch checked={searchParams.get("heat-map") !== "off"} onChange={handleHeatMapSwitch} />
+                <div style={{ padding: '10px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
+                    >
+                        <div>
+                            <span style={{ fontSize: '16px', fontWeight: '500', marginRight: '10px' }}>
+                                Bật/tắt bản đồ nhiệt
+                            </span>
+                            <Switch checked={searchParams.get('heat-map') !== 'off'} onChange={handleHeatMapSwitch} />
+                        </div>
+
+                        <Select
+                            defaultValue={searchParams.get('heat-type') || 'tho_cu'}
+                            className="custom-select"
+                            style={{ width: 170 }}
+                            dropdownStyle={{
+                                backgroundColor: 'black',
+                                color: 'white',
+                            }}
+                            onChange={handleHeatTypeChange}
+                        >
+                            <Option value="tho_cu" style={{ color: 'white' }}>
+                                Thổ Cư
+                            </Option>
+                            <Option value="biet_thu" style={{ color: 'white' }}>
+                                Biệt Thự
+                            </Option>
+                            <Option value="chungcu" style={{ color: 'white' }}>
+                                Chung Cư
+                            </Option>
+                            <Option value="shophouse" style={{ color: 'white' }}>
+                                ShopHouse
+                            </Option>
+                        </Select>
                     </div>
 
-                    <Select
-                      defaultValue={searchParams.get("heat-type") || "tho_cu"}
-                      className="custom-select"
-                      style={{width: 170}}
-                      dropdownStyle={{
-                        backgroundColor: "black", 
-                        color: "white"
-                      }}
-                      onChange={handleHeatTypeChange}
-                    >
-                      <Option value="tho_cu" style={{ color: "white" }}>Thổ Cư</Option>
-                      <Option value="biet_thu" style={{ color: "white" }}>Biệt Thự</Option>
-                      <Option value="chungcu" style={{ color: "white" }}>Chung Cư</Option>
-                      <Option value="shophouse" style={{ color: "white" }}>ShopHouse</Option>
-                    </Select>
-
-                  </div>
-
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <Checkbox
-                      checked={searchParams.get("heat-view") === "map"}
-                      onChange={() => handleViewChange("map")}
-                      style={{ color: "white" }}
-                    >
-                      Xem bản đồ
-                    </Checkbox>
-                    <Checkbox
-                      checked={searchParams.get("heat-view") === "chart"}
-                      onChange={() => handleViewChange("chart")}
-                      style={{ color: "white" }}
-                    >
-                      Xem biểu đồ
-                    </Checkbox>
-                  </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <Checkbox
+                            checked={searchParams.get('heat-view') === 'map'}
+                            onChange={() => handleViewChange('map')}
+                            style={{ color: 'white' }}
+                        >
+                            Xem bản đồ
+                        </Checkbox>
+                        <Checkbox
+                            checked={searchParams.get('heat-view') === 'chart'}
+                            onChange={() => handleViewChange('chart')}
+                            style={{ color: 'white' }}
+                        >
+                            Xem biểu đồ
+                        </Checkbox>
+                    </div>
                 </div>
-
                 <div className="ant-drawer-body-wrapper">
-                <div style={{
-                  margin: "20px auto",
-                  marginTop: "0",
-                  width: "90%",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}>
-                  <button style={{ width: "calc(50% - 32px)" }} onClick={onShowHistoryChart}>
-                    Xem lịch sử giá đất
-                  </button>
-                  <button style={{ width: "calc(50% - 32px)" }} onClick={handleHeatMapClick} disabled={heatMapLoading}>
-                    {heatMapLoading ? "Đang tải bản đồ nhiệt..." : "Xem bản đồ nhiệt tại đây"}
-                  </button>
-                  <button style={{ width: "100%" }} onClick={handleInfraMutationClick}>
-                    Xem đột biến hạ tầng
-                  </button>
-                </div>
+                    <div
+                        style={{
+                            margin: '20px auto',
+                            marginTop: '0',
+                            width: '90%',
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '10px',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <button style={{ width: 'calc(50% - 32px)' }} onClick={onShowHistoryChart}>
+                            Xem lịch sử giá đất
+                        </button>
+                        <button
+                            style={{ width: 'calc(50% - 32px)' }}
+                            onClick={handleHeatMapClick}
+                            disabled={heatMapLoading}
+                        >
+                            {heatMapLoading ? 'Đang tải bản đồ nhiệt...' : 'Xem bản đồ nhiệt tại đây'}
+                        </button>
+                        <button style={{ width: '100%' }} onClick={handleInfraMutationClick}>
+                            Xem đột biến hạ tầng
+                        </button>
+                    </div>
 
                     {isShowMore && (
                         <>
@@ -299,7 +315,7 @@ const LocationInfoSidebar = ({
                                     <FaWikipediaW color="#1d4ed8" />
                                 </div>
                                 <span className="ant-drawer-body-function-item-text">Wiki</span>
-                            </div>   
+                            </div>
 
                             <div
                                 className="ant-drawer-body-function-item-wrapper"
