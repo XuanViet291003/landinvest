@@ -28,6 +28,7 @@ const LocationInfoSidebar = ({
     handleHeatMapSwitch,
     heatMapLoading,
     handleInfraMutationClick,
+    handleRegionSearchClick
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -238,8 +239,11 @@ const LocationInfoSidebar = ({
                         >
                             {heatMapLoading ? 'Đang tải bản đồ nhiệt...' : 'Xem bản đồ nhiệt tại đây'}
                         </button>
-                        <button style={{ width: '100%' }} onClick={handleInfraMutationClick}>
+                        <button style={{ width: 'calc(50% - 32px)'}} onClick={handleInfraMutationClick}>
                             Xem đột biến hạ tầng
+                        </button>
+                        <button style={{ width: 'calc(50% - 32px)'}} onClick={handleRegionSearchClick }>
+                            Tra cứu theo tọa độ
                         </button>
                     </div>
 

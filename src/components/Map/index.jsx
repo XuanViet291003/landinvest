@@ -170,6 +170,8 @@ const Map = forwardRef(
         const itemQuyHoach = useSelector((state) => state.getquyhoach.itemQuyHoach);
         const itemSearch = useSelector((state) => state.searchQuery.searchResult);
 
+        const [regionPolygon, setRegionPolygon] = useState(null);
+
         let polygonOnSearch = [];
         polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
 
@@ -1765,7 +1767,54 @@ const Map = forwardRef(
               } catch (error) {
                 console.error("Lỗi khi fetch API:", error);
               }
-            };            
+            };         
+
+            const fetchAllJSON = async () => {
+              const folderPath = "/traCuuTheoToaDo/"; 
+              const fileNames = [
+                "traCuuTheoToaDo_badinh.json",
+                "traCuuTheoToaDo_bavi.json",
+                "traCuuTheoToaDo_caugiay.json",
+                "traCuuTheoToaDo_danphuong.json",
+                "traCuuTheoToaDo_donganh.json",
+                "traCuuTheoToaDo_dongda.json",
+                "traCuuTheoToaDo_hadong.json",
+                "traCuuTheoToaDo_haibatrung.json",
+                "traCuuTheoToaDo_hoaiduc.json",
+                "traCuuTheoToaDo_hoangmai.json",
+                "traCuuTheoToaDo_hoankiem.json",
+                "traCuuTheoToaDo_longbien.json",
+                "traCuuTheoToaDo_melinh.json",
+                "traCuuTheoToaDo_myduc.json",
+                "traCuuTheoToaDo_phuctho.json",
+                "traCuuTheoToaDo_phuxuyen.json",
+                "traCuuTheoToaDo_quocoai.json",
+                "traCuuTheoToaDo_socson.json",
+                "traCuuTheoToaDo_sontay.json",
+                "traCuuTheoToaDo_tayho.json",
+                "traCuuTheoToaDo_thachthat.json",
+                "traCuuTheoToaDo_thanhoai.json",
+                "traCuuTheoToaDo_thanhtri.json",
+                "traCuuTheoToaDo_thanhxuan.json"
+              ];
+            
+              try {
+                const fetchPromises = fileNames.map(fileName =>
+                  fetch(folderPath + fileName).then(res => res.json())
+                );
+            
+                const jsonData = await Promise.all(fetchPromises);
+                const allPolygons = jsonData.map(item => convertToPolygonArray(item[0].geom));
+                console.log(allPolygons.flat(2))
+                setRegionPolygon(allPolygons.flat(1));
+              } catch (error) {
+                console.error("Lỗi khi tải JSON:", error);
+              }
+            };
+
+            const handleRegionSearchClick = async () => {
+              await fetchAllJSON();
+            }   
         return (
             <>
                 {contextHolder}
@@ -1913,6 +1962,14 @@ const Map = forwardRef(
                     {(infraMutation && infraMutation?.length > 0) && 
                     infraMutation.map(({ id, coordinates }) => (
                       <Polygon key={id} positions={coordinates} color="red" />
+                    ))}
+
+                    {regionPolygon && regionPolygon.map((polygon, index) => (
+                      <Polygon key={index} positions={polygon} pathOptions={{
+                        color: 'blue',
+                        fillColor: 'rgba(0, 0, 255, 0.2)',
+                        weight: 2,
+                    }} />
                     ))}
 
                     {itemSearch?.coordinates?.length > 0 && (() => {
@@ -2157,6 +2214,7 @@ const Map = forwardRef(
                         handleHeatMapSwitch={handleHeatMapSwitch}
                         heatMapLoading={heatMapLoading}
                         handleInfraMutationClick={handleInfraMutationClick}
+                        handleRegionSearchClick={handleRegionSearchClick}
                     />
                     <DrawerLandUsePlan />
 
