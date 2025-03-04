@@ -44,8 +44,12 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose, lat, lo
         setLoading(true);
         console.log('change province');
         try {
-            const province = allProvinces?.find((item) => item.ProvinceID === id);
-            const boundingBox = province?.bounding_box ? JSON.parse(province.bounding_box) : [];
+            const province = allProvinces?.find((item, index) => index + 1 == id);
+            const bboxString = province?.bbox;
+            const bboxJSON = bboxString.replace(/'/g, '"');
+
+            const boundingBox = JSON.parse(bboxJSON);
+
             const [lng, lat] = calculateLocation([
                 [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
             ]);
@@ -156,12 +160,15 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose, lat, lo
     useEffect(() => {
         (async () => {
             try {
-                const res = await getAllProvinces();
+                // const res = await getAllProvinces();
                 // const boundingBox = JSON.parse(res.dulieu?.[0]?.bounding_box || []);
                 // const [lng, lat] = calculateLocation([
                 //     [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
                 // ]);
-                setAllProvinces(res.dulieu);
+                // setAllProvinces(res.dulieu);
+                const res = await fetch('/progame.json');
+                const response = await res.json();
+                setAllProvinces(response);
                 // setCurrentLocation({
                 //     locationId: defaultSelectProvince,
                 //     locationType: LOCATION_KEYS.PROVINCE,
@@ -253,9 +260,9 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose, lat, lo
                             value={defaultSelectProvince}
                             className="select-location__modal--select"
                             filterOption={filterLocation}
-                            options={allProvinces?.map((item) => ({
-                                label: item.ProvinceName,
-                                value: item.ProvinceID,
+                            options={allProvinces?.map((item, index) => ({
+                                label: item.name_province,
+                                value: index + 1,
                             }))}
                         />
                     </div>
