@@ -69,6 +69,7 @@ import CustomTileLayer from '../CustomLayer';
 import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
 import { Button } from 'react-bootstrap';
 import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
+import EstatePricePopUp from '../EstatePricePopUp/EstatePricePopUp';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -196,6 +197,10 @@ const Map = forwardRef(
         const id = searchParams.get('id');
         const type = searchParams.get('type');
         const [idDuAn, setIdDuAn] = useState(null);
+
+        const [estatePrice, setEstatePrice] = useState(null);
+        const [estateLoading, setEstateLoading] = useState(false);
+
         const handleDrawPolygon = (id) => {
             setMarkers([]);
             setDistances([]);
@@ -1815,6 +1820,32 @@ const Map = forwardRef(
             const handleRegionSearchClick = async () => {
               await fetchAllJSON();
             }   
+
+            const fetchRealEstatePrice = async (lat, lng) => {
+              try {
+                  const response = await fetch(
+                      `https://api.quyhoach.xyz/lay_gia_bat_dong_san_location/${lat}/${lng}`
+                  );
+          
+                  if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+          
+                  const data = await response.json();
+                  setEstatePrice(data);
+              } catch (error) {
+                  console.error("Error fetching real estate price:", error);
+              }
+            };
+
+            const handleEstatePriceClick = async () => {
+              setEstateLoading(true);
+              const vitri = searchParams.get("vitri").split(",");
+              await fetchRealEstatePrice(vitri[0], vitri[1]);    
+              searchParams.set("estate-price", "tat-ca");
+              setSearchParams(searchParams);
+              setEstateLoading(false);
+            }
         return (
             <>
                 {contextHolder}
@@ -1887,6 +1918,8 @@ const Map = forwardRef(
                     {regionalPrice && <RegionalPriceChart regionalPrice={regionalPrice} />}
 
                     {(searchParams.get("heat-view") === "chart" && heatRegionalPrice) && <RegionalPriceChart regionalPrice={heatRegionalPrice} />}
+
+                    {estatePrice && <EstatePricePopUp estatePrice={estatePrice} />}
                 </div>
 
                 <MapContainer
@@ -2215,6 +2248,8 @@ const Map = forwardRef(
                         heatMapLoading={heatMapLoading}
                         handleInfraMutationClick={handleInfraMutationClick}
                         handleRegionSearchClick={handleRegionSearchClick}
+                        handleEstatePriceClick={handleEstatePriceClick}
+                        estateLoading={estateLoading}
                     />
                     <DrawerLandUsePlan />
 

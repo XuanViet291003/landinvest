@@ -192,33 +192,40 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose, lat, lo
         //     setLoading(false);
         // })();
     }, []);
+    // useEffect(() => {
+    //     (async () => {
+    //         setLoading(true);
+    //         try {
+    //             const vitri = searchParams.get('vitri');
+    //             if (!vitri) {
+    //                 console.warn('Không tìm thấy "vitri" trong URL');
+    //                 return;
+    //             }
+
+    //             const point = vitri.split(',');
+    //             if (point.length < 2) {
+    //                 console.warn('Dữ liệu vị trí không hợp lệ:', point);
+    //                 return;
+    //             }
+
+    //             const location = await getLocationInBoudingBox(point[0], point[1]);
+    //             console.log('Location found:', location);
+
+    //             if (location?.provinces) await onChangeProvince(location.provinces);
+    //             if (location?.district) await onChangeDistrict(location.district);
+    //         } catch (e) {
+    //             console.log(e);
+    //         }
+    //         setLoading(false);
+    //     })();
+    // }, [isOpen]);
+
     useEffect(() => {
-        (async () => {
-            setLoading(true);
-            try {
-                const vitri = searchParams.get('vitri');
-                if (!vitri) {
-                    console.warn('Không tìm thấy "vitri" trong URL');
-                    return;
-                }
-
-                const point = vitri.split(',');
-                if (point.length < 2) {
-                    console.warn('Dữ liệu vị trí không hợp lệ:', point);
-                    return;
-                }
-
-                const location = await getLocationInBoudingBox(point[0], point[1]);
-                console.log('Location found:', location);
-
-                if (location?.provinces) await onChangeProvince(location.provinces);
-                if (location?.district) await onChangeDistrict(location.district);
-            } catch (e) {
-                console.log(e);
-            }
-            setLoading(false);
-        })();
-    }, [isOpen]);
+      (async () => {
+        const res = await getAllDistrictInProvince(1);
+        setAllDistricts(res);
+      })();
+  }, []);
 
     const removeVietnameseTones = (str) => {
         return str

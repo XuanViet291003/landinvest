@@ -28,7 +28,9 @@ const LocationInfoSidebar = ({
     handleHeatMapSwitch,
     heatMapLoading,
     handleInfraMutationClick,
-    handleRegionSearchClick
+    handleRegionSearchClick,
+    handleEstatePriceClick,
+    estateLoading
 }) => {
     const map = useMap();
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -242,8 +244,12 @@ const LocationInfoSidebar = ({
                         <button style={{ width: 'calc(50% - 32px)'}} onClick={handleInfraMutationClick}>
                             Xem đột biến hạ tầng
                         </button>
-                        <button style={{ width: 'calc(50% - 32px)'}} onClick={handleRegionSearchClick }>
-                            Tra cứu theo tọa độ
+                        <button 
+                          style={{ width: 'calc(50% - 32px)'}} 
+                          onClick={handleEstatePriceClick}
+                          disabled={estateLoading}
+                        >
+                            {estateLoading? 'Đang tải dữ liệu giá đât...' : 'Xem giá đất đang bán'}
                         </button>
                     </div>
 
