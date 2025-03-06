@@ -137,6 +137,9 @@ function Home() {
     const [polygon, setPolygon] = useState("");
     const [tempPolygon, setTempPolygon] = useState("");
 
+    const dataCache = useRef(null);
+    const [rawQuyHoachData, setRawQuyHoachData] = useState(null);
+
     // Device = 1: IOS, Device = 2: Android
     const [device, setDevice] = useState(1);
 
@@ -420,68 +423,70 @@ function Home() {
     // }, [searchParams]);
 
     useEffect(() => {
-        const vitriParam = searchParams.get('vitri');
-
-        if (vitriParam) {
-            const [lat, lon] = vitriParam.split(',').map(Number);
-
-            if (lat && lon) {
-                const apiUrl = `/quyhoach_toanbo.json`;
-            
-                const fetchData = async () => {
-                    try {
-                        const response = await fetch(apiUrl);
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        const data = await response.json();
-            
-                        const filterByBoundingBox = (items) => {
-                            return items.filter(item => {
-                                if (!item.boundingbox) return false; 
-            
-                                const bbox = item.boundingbox.split(',').map(num => parseFloat(num.trim()));
-                                if (bbox.length !== 4) return false;
-            
-                                const [minLon, minLat, maxLon, maxLat] = bbox;
-                                return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
-                            });
-                        };
-            
-                        const categorizedData = {
-                            QUAN_HUYEN: filterByBoundingBox(data.quanhuyen).map(item => ({
-                                ...item,
-                                type: "QUAN_HUYEN",
-                                type_link: item.type_link ?? "1_link"
-                            })),
-                            QUYHOACH_DIACHINH: filterByBoundingBox(data.diachinh).map(item => ({
-                                ...item,
-                                type: "QUYHOACH_DIACHINH",
-                                type_link: item.type_link ?? "1_link"
-                            })),
-                            QUYHOACH_TINH: filterByBoundingBox(data.tinh).map(item => ({
-                                ...item,
-                                type: "QUYHOACH_TINH",
-                                type_link: item.type_link ?? "1_link"
-                            })),
-                            QUYHOACH_PHANKHU: filterByBoundingBox(data.phankhu).map(item => ({
-                                ...item,
-                                type: "QUYHOACH_PHANKHU",
-                                type_link: item.type_link ?? "1_link"
-                            }))
-                        };
-            
-                        console.log(categorizedData);
-                        setDataByType(categorizedData);
-                    } catch (error) {
-                        console.error('Error fetching data:', error);
-                    }
-                };
-
-                fetchData();
+        const fetchData = async () => {
+            try {
+                const response = await fetch("/quyhoach_toanbo.json");
+                if (!response.ok) throw new Error("Network response was not ok");
+    
+                const data = await response.json();
+                dataCache.current = data;
+                setRawQuyHoachData(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
+        };
+    
+        if (!dataCache.current) {
+            fetchData();
+        } else {
+            setRawQuyHoachData(dataCache.current);
         }
-    }, [searchParams]);
+    }, []);
+    
+    useEffect(() => {
+        const vitriParam = searchParams.get("vitri");
+        if (!vitriParam || !rawQuyHoachData) return;
+    
+        const [lat, lon] = vitriParam.split(",").map(Number);
+        if (!lat || !lon) return;
+    
+        const filterByBoundingBox = (items) => {
+            return items.filter((item) => {
+                if (!item.boundingbox) return false;
+    
+                const bbox = item.boundingbox.split(",").map(num => parseFloat(num.trim()));
+                if (bbox.length !== 4) return false;
+    
+                const [minLon, minLat, maxLon, maxLat] = bbox;
+                return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
+            });
+        };
+    
+        const categorizedData = {
+            QUAN_HUYEN: filterByBoundingBox(rawQuyHoachData.quanhuyen).map(item => ({
+                ...item,
+                type: "QUAN_HUYEN",
+                type_link: item.type_link ?? "1_link"
+            })),
+            QUYHOACH_DIACHINH: filterByBoundingBox(rawQuyHoachData.diachinh).map(item => ({
+                ...item,
+                type: "QUYHOACH_DIACHINH",
+                type_link: item.type_link ?? "1_link"
+            })),
+            QUYHOACH_TINH: filterByBoundingBox(rawQuyHoachData.tinh).map(item => ({
+                ...item,
+                type: "QUYHOACH_TINH",
+                type_link: item.type_link ?? "1_link"
+            })),
+            QUYHOACH_PHANKHU: filterByBoundingBox(rawQuyHoachData.phankhu).map(item => ({
+                ...item,
+                type: "QUYHOACH_PHANKHU",
+                type_link: item.type_link ?? "1_link"
+            }))
+        };
+    
+        setDataByType(categorizedData);
+    }, [searchParams, rawQuyHoachData]);
 
     useEffect(() => {
         const priorities = [
