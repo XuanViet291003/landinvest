@@ -73,6 +73,7 @@ import { LAND_AUCTION_KEYS } from '../../constants/LandAuctionKey';
 import SelectLocationModal from '../SelectLocationModal/SelectLocationModal';
 import { onChangeDrawer } from '../../redux/landUsePlanSlice/lanUsePlanSlice';
 import * as turf from '@turf/turf';
+import { NULL } from 'sass';
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -118,7 +119,7 @@ function Home() {
         QUAN_HUYEN: [],
         QUYHOACH_DIACHINH: [],
         QUYHOACH_TINH: [],
-        QUYHOACH_XAYDUNG: [],
+        // QUYHOACH_XAYDUNG: [],
         QUYHOACH_PHANKHU: [],
     });
     const [buttonLabels, setButtonLabels] = useState([]);
@@ -406,7 +407,8 @@ function Home() {
     //                         QUYHOACH_XAYDUNG: data.dulieu.filter((item) => item.type === 'QUYHOACH_XAYDUNG'),
     //                         QUYHOACH_PHANKHU: data.dulieu.filter((item) => item.type === 'QUYHOACH_PHANKHU'),
     //                     };
-    //                     setDataByType(categorizedData);
+    //                     console.log(categorizedData)
+    //                     // setDataByType(categorizedData);
     //                 } catch (error) {
     //                     console.error('Error fetching data:', error);
     //                 }
@@ -425,7 +427,7 @@ function Home() {
 
             if (lat && lon) {
                 const apiUrl = `/quyhoach_toanbo.json`;
-
+            
                 const fetchData = async () => {
                     try {
                         const response = await fetch(apiUrl);
@@ -433,17 +435,44 @@ function Home() {
                             throw new Error('Network response was not ok');
                         }
                         const data = await response.json();
-
-                        console.log(data)
-
-                        // const categorizedData = {
-                        //     QUAN_HUYEN: data.dulieu.filter((item) => item.type === 'QUAN_HUYEN'),
-                        //     QUYHOACH_DIACHINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH'),
-                        //     QUYHOACH_TINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_TINH'),
-                        //     QUYHOACH_XAYDUNG: data.dulieu.filter((item) => item.type === 'QUYHOACH_XAYDUNG'),
-                        //     QUYHOACH_PHANKHU: data.dulieu.filter((item) => item.type === 'QUYHOACH_PHANKHU'),
-                        // };
-                        // setDataByType(categorizedData);
+            
+                        const filterByBoundingBox = (items) => {
+                            return items.filter(item => {
+                                if (!item.boundingbox) return false; 
+            
+                                const bbox = item.boundingbox.split(',').map(num => parseFloat(num.trim()));
+                                if (bbox.length !== 4) return false;
+            
+                                const [minLon, minLat, maxLon, maxLat] = bbox;
+                                return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
+                            });
+                        };
+            
+                        const categorizedData = {
+                            QUAN_HUYEN: filterByBoundingBox(data.quanhuyen).map(item => ({
+                                ...item,
+                                type: "QUAN_HUYEN",
+                                type_link: item.type_link ?? "1_link"
+                            })),
+                            QUYHOACH_DIACHINH: filterByBoundingBox(data.diachinh).map(item => ({
+                                ...item,
+                                type: "QUYHOACH_DIACHINH",
+                                type_link: item.type_link ?? "1_link"
+                            })),
+                            QUYHOACH_TINH: filterByBoundingBox(data.tinh).map(item => ({
+                                ...item,
+                                type: "QUYHOACH_TINH",
+                                type_link: item.type_link ?? "1_link"
+                            })),
+                            QUYHOACH_PHANKHU: filterByBoundingBox(data.phankhu).map(item => ({
+                                ...item,
+                                type: "QUYHOACH_PHANKHU",
+                                type_link: item.type_link ?? "1_link"
+                            }))
+                        };
+            
+                        console.log(categorizedData);
+                        setDataByType(categorizedData);
                     } catch (error) {
                         console.error('Error fetching data:', error);
                     }
@@ -459,11 +488,13 @@ function Home() {
             { key: 'QUAN_HUYEN', label: 'QH Quận Huyện', type: 1 },
             { key: 'QUYHOACH_DIACHINH', label: 'QH Địa Chính', type: 2 },
             { key: 'QUYHOACH_TINH', label: 'QH Tỉnh', type: 3 },
-            { key: 'QUYHOACH_XAYDUNG', label: 'QH Xây Dựng', type: 5 },
+            // { key: 'QUYHOACH_XAYDUNG', label: 'QH Xây Dựng', type: 5 },
             { key: 'QUYHOACH_PHANKHU', label: 'QH Phân Khu', type: 4 },
         ];
 
-        const mergedData = [...dataByType.QUYHOACH_XAYDUNG, ...dataByType.QUYHOACH_PHANKHU];
+        // const mergedData = [...dataByType.QUYHOACH_XAYDUNG, ...dataByType.QUYHOACH_PHANKHU];
+
+        const mergedData = [...dataByType.QUYHOACH_PHANKHU];
 
         const extendedDataByType = {
             ...dataByType,
@@ -480,7 +511,8 @@ function Home() {
                 { label: 'QH Quận Huyện', type: 1 },
                 { label: 'QH Địa Chính', type: 2 },
                 { label: 'QH Tỉnh', type: 3 },
-                { label: 'QH Khác', type: 6 },
+                // { label: 'QH Khác', type: 6 },
+                { label: 'QH Phân Khu', type: 6 }
             );
         } else {
             priorities.forEach((priority) => {
@@ -516,11 +548,12 @@ function Home() {
             case 4:
                 filteredData = dataByType.QUYHOACH_PHANKHU;
                 break;
-            case 5:
-                filteredData = dataByType.QUYHOACH_XAYDUNG;
-                break;
+            // case 5:
+            //     filteredData = dataByType.QUYHOACH_XAYDUNG;
+            //     break;
             case 6:
-                filteredData = [...dataByType.QUYHOACH_PHANKHU, ...dataByType.QUYHOACH_XAYDUNG];
+                // filteredData = [...dataByType.QUYHOACH_PHANKHU, ...dataByType.QUYHOACH_XAYDUNG];
+                filteredData = [...dataByType.QUYHOACH_PHANKHU];
                 break;
             default:
                 break;
@@ -977,6 +1010,7 @@ function Home() {
                         setDistances={setDistances}
                         setIsShowModalUpload={setIsShowModalUpload}
                         polygonCoords={polygon ? convertToPolygonArray(polygon) : ""}
+                        dataByType={dataByType}
                     />
                 )}
 

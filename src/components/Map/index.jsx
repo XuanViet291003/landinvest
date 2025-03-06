@@ -122,7 +122,8 @@ const Map = forwardRef(
             distances,
             setDistances,
             setIsShowModalUpload,
-            polygonCoords
+            polygonCoords,
+            dataByType
         },
         ref,
     ) => {
@@ -744,7 +745,7 @@ const Map = forwardRef(
         };
 
         useEffect(() => {
-            if (id && type) {
+            if (id && type && dataByType) {
                 // Gọi API khi có id và type và chưa có itemQuyHoach
                 axios
                     .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
