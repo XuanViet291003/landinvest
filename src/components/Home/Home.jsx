@@ -382,6 +382,41 @@ function Home() {
         }
     }, []);
 
+    // useEffect(() => {
+    //     const vitriParam = searchParams.get('vitri');
+
+    //     if (vitriParam) {
+    //         const [lat, lon] = vitriParam.split(',').map(Number);
+
+    //         if (lat && lon) {
+    //             const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${lat}/${lon}`;
+
+    //             const fetchData = async () => {
+    //                 try {
+    //                     const response = await fetch(apiUrl);
+    //                     if (!response.ok) {
+    //                         throw new Error('Network response was not ok');
+    //                     }
+    //                     const data = await response.json();
+
+    //                     const categorizedData = {
+    //                         QUAN_HUYEN: data.dulieu.filter((item) => item.type === 'QUAN_HUYEN'),
+    //                         QUYHOACH_DIACHINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH'),
+    //                         QUYHOACH_TINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_TINH'),
+    //                         QUYHOACH_XAYDUNG: data.dulieu.filter((item) => item.type === 'QUYHOACH_XAYDUNG'),
+    //                         QUYHOACH_PHANKHU: data.dulieu.filter((item) => item.type === 'QUYHOACH_PHANKHU'),
+    //                     };
+    //                     setDataByType(categorizedData);
+    //                 } catch (error) {
+    //                     console.error('Error fetching data:', error);
+    //                 }
+    //             };
+
+    //             fetchData();
+    //         }
+    //     }
+    // }, [searchParams]);
+
     useEffect(() => {
         const vitriParam = searchParams.get('vitri');
 
@@ -389,7 +424,7 @@ function Home() {
             const [lat, lon] = vitriParam.split(',').map(Number);
 
             if (lat && lon) {
-                const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${lat}/${lon}`;
+                const apiUrl = `/quyhoach_toanbo.json`;
 
                 const fetchData = async () => {
                     try {
@@ -399,14 +434,16 @@ function Home() {
                         }
                         const data = await response.json();
 
-                        const categorizedData = {
-                            QUAN_HUYEN: data.dulieu.filter((item) => item.type === 'QUAN_HUYEN'),
-                            QUYHOACH_DIACHINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH'),
-                            QUYHOACH_TINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_TINH'),
-                            QUYHOACH_XAYDUNG: data.dulieu.filter((item) => item.type === 'QUYHOACH_XAYDUNG'),
-                            QUYHOACH_PHANKHU: data.dulieu.filter((item) => item.type === 'QUYHOACH_PHANKHU'),
-                        };
-                        setDataByType(categorizedData);
+                        console.log(data)
+
+                        // const categorizedData = {
+                        //     QUAN_HUYEN: data.dulieu.filter((item) => item.type === 'QUAN_HUYEN'),
+                        //     QUYHOACH_DIACHINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH'),
+                        //     QUYHOACH_TINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_TINH'),
+                        //     QUYHOACH_XAYDUNG: data.dulieu.filter((item) => item.type === 'QUYHOACH_XAYDUNG'),
+                        //     QUYHOACH_PHANKHU: data.dulieu.filter((item) => item.type === 'QUYHOACH_PHANKHU'),
+                        // };
+                        // setDataByType(categorizedData);
                     } catch (error) {
                         console.error('Error fetching data:', error);
                     }
@@ -504,83 +541,83 @@ function Home() {
     }
 
     const handleTypePolygon = () => {
-      setIsModalPolygonVisible(true);
+        setIsModalPolygonVisible(true);
     };
 
     const mergePolygonArray = (data) => {
-      return data
-          .replace(/[()]/g, "") 
-          .trim()
-          .split(" ") 
-          .reduce((acc, val, index, array) => {
-              if (index % 2 === 0) {
-                  acc.push([parseFloat(array[index + 1]), parseFloat(val)]);
-              }
-              return acc;
-          }, []);
-    };    
+        return data
+            .replace(/[()]/g, "")
+            .trim()
+            .split(" ")
+            .reduce((acc, val, index, array) => {
+                if (index % 2 === 0) {
+                    acc.push([parseFloat(array[index + 1]), parseFloat(val)]);
+                }
+                return acc;
+            }, []);
+    };
 
     const convertToPolygonArray = (data) => {
-      return data
-          .replace(/^[A-Z]+\s*\(\(/i, "")  
-          .replace(/\)\)$/, "")            
-          .split("),") 
-          .map(polygon =>
-              polygon
-                  .replace(/[()]/g, "") 
-                  .trim()
-                  .split(", ") 
-                  .map(coord => {
-                      const [lng, lat] = coord.split(" ").map(parseFloat);
-                      return [lat, lng]; 
-                  })
-          );
-  };
+        return data
+            .replace(/^[A-Z]+\s*\(\(/i, "")
+            .replace(/\)\)$/, "")
+            .split("),")
+            .map(polygon =>
+                polygon
+                    .replace(/[()]/g, "")
+                    .trim()
+                    .split(", ")
+                    .map(coord => {
+                        const [lng, lat] = coord.split(" ").map(parseFloat);
+                        return [lat, lng];
+                    })
+            );
+    };
 
     // Hàm tính tâm của polygon
     const getPolygonCenter = (polygon) => {
-      if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
+        if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
 
-      try {
-          const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
+        try {
+            const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
 
-          // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
-          if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
-              convertedCoords.push(convertedCoords[0]);
-          }
+            // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
+            if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
+                convertedCoords.push(convertedCoords[0]);
+            }
 
-          const geoJsonPolygon = turf.polygon([convertedCoords]);
-          const center = turf.center(geoJsonPolygon).geometry.coordinates;
+            const geoJsonPolygon = turf.polygon([convertedCoords]);
+            const center = turf.center(geoJsonPolygon).geometry.coordinates;
 
-          return L.latLng(center[1], center[0]); // Chuyển về lat, lng
-      } catch (error) {
-          console.error("Lỗi khi tính toán tâm đa giác:", error);
-          return null;
-      }
-  };
-  
+            return L.latLng(center[1], center[0]); // Chuyển về lat, lng
+        } catch (error) {
+            console.error("Lỗi khi tính toán tâm đa giác:", error);
+            return null;
+        }
+    };
+
     const handlePolygonOk = () => {
-      setPolygon(tempPolygon); 
-      
-      const center = getPolygonCenter(mergePolygonArray(tempPolygon));
-    
-      const convertLatLng = (latLng) => ({
-        lat: latLng.lng, 
-        lng: latLng.lat
-      });
+        setPolygon(tempPolygon);
 
-      const formatCenter = convertLatLng(center);
+        const center = getPolygonCenter(mergePolygonArray(tempPolygon));
 
-      const map = mapRef.current;
+        const convertLatLng = (latLng) => ({
+            lat: latLng.lng,
+            lng: latLng.lat
+        });
+
+        const formatCenter = convertLatLng(center);
+
+        const map = mapRef.current;
         if (map && formatCenter) {
             map.flyTo([formatCenter.lat, formatCenter.lng], 16);
         }
-      setIsModalPolygonVisible(false);
+        setIsModalPolygonVisible(false);
     };
-  
+
     const handlePolygonCancel = () => {
-      setTempPolygon(polygon);
-      setIsModalPolygonVisible(false);
+        setTempPolygon(polygon);
+        setIsModalPolygonVisible(false);
     };
 
     return (
@@ -860,17 +897,17 @@ function Home() {
                 </div>
 
                 <Modal
-                  title="Nhập polygon vào"
-                  open={isModalPoygonVisible}
-                  onOk={handlePolygonOk}
-                  onCancel={handlePolygonCancel}
-                  okText="Xác nhận"
-                  cancelText="Hủy"
+                    title="Nhập polygon vào"
+                    open={isModalPoygonVisible}
+                    onOk={handlePolygonOk}
+                    onCancel={handlePolygonCancel}
+                    okText="Xác nhận"
+                    cancelText="Hủy"
                 >
-                   <Input
-                      placeholder="Nhập polygon vào đây"
-                      value={tempPolygon}
-                      onChange={(e) => setTempPolygon(e.target.value)} 
+                    <Input
+                        placeholder="Nhập polygon vào đây"
+                        value={tempPolygon}
+                        onChange={(e) => setTempPolygon(e.target.value)}
                     />
                 </Modal>
 

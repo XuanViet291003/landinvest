@@ -69,7 +69,7 @@ import CustomTileLayer from '../CustomLayer';
 import ChartCostHistory from '../Home/ChartHistoryCost/ChartHistoryCost';
 import { Button } from 'react-bootstrap';
 import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
-import EstatePricePopUp from '../EstatePricePopUp/EstatePricePopUp';
+import EstatePricePopUp from '../Home/EstatePricePopUp/EstatePricePopUp';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -185,7 +185,7 @@ const Map = forwardRef(
         const [polygonHeatMap, setPolygonHeatMap] = useState(null);
         const [heatMapLoading, setHeatMapLoading] = useState(false);
         const [regionalPrice, setRegionalPrice] = useState(null);
-        const [heatRegionalPrice , setHeatRegionalPrice] = useState(null)
+        const [heatRegionalPrice, setHeatRegionalPrice] = useState(null)
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
         // const [firstTime, setFirstTime] = useState(true);
@@ -726,20 +726,20 @@ const Map = forwardRef(
                 const point = L.latLng(lat, lng);
 
                 try {
-                  let res = null;
-              
-                  if (vitri && vitri.length >= 2) {
-                      res = await getLocationInBoudingBox(vitri[0], vitri[1]);
-                  }
-              
-                  if (!currentBounds.contains(point) || (res?.provinces !== item?.idProvince)) {
-                      if (ref.current?.flyTo && !sharing) {
-                          ref.current.flyTo([centerLat, centerLon], 16);
-                      }
-                  }
-              } catch (error) {
-                  console.error("Lỗi khi lấy vị trí từ Bounding Box:", error);
-              }              
+                    let res = null;
+
+                    if (vitri && vitri.length >= 2) {
+                        res = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                    }
+
+                    if (!currentBounds.contains(point) || (res?.provinces !== item?.idProvince)) {
+                        if (ref.current?.flyTo && !sharing) {
+                            ref.current.flyTo([centerLat, centerLon], 16);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi lấy vị trí từ Bounding Box:", error);
+                }
             }
         };
 
@@ -1550,141 +1550,141 @@ const Map = forwardRef(
 
         // Hàm tính tâm của polygon
         const getPolygonCenter = (polygon) => {
-          if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
+            if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
 
-          try {
-              const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
+            try {
+                const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
 
-              // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
-              if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
-                  convertedCoords.push(convertedCoords[0]);
-              }
+                // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
+                if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
+                    convertedCoords.push(convertedCoords[0]);
+                }
 
-              const geoJsonPolygon = turf.polygon([convertedCoords]);
-              const center = turf.center(geoJsonPolygon).geometry.coordinates;
+                const geoJsonPolygon = turf.polygon([convertedCoords]);
+                const center = turf.center(geoJsonPolygon).geometry.coordinates;
 
-              return L.latLng(center[1], center[0]); // Chuyển về lat, lng
-          } catch (error) {
-              console.error("Lỗi khi tính toán tâm đa giác:", error);
-              return null;
-          }
-      };
+                return L.latLng(center[1], center[0]); // Chuyển về lat, lng
+            } catch (error) {
+                console.error("Lỗi khi tính toán tâm đa giác:", error);
+                return null;
+            }
+        };
 
         const fetchHeatMapData = async (id, heatType) => {
-          try {
-              const now = new Date();
-              const month = now.getMonth() + 1;
-              const year = now.getFullYear();
-      
-              const responseHeat = await fetch(
-                  `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
-              );
+            try {
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                const year = now.getFullYear();
 
-              console.log()
-      
-              if (!responseHeat.ok) {
-                  throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
-              }
-      
-              const data = await responseHeat.json();
-      
-              // Lọc và chuyển đổi danh sách polygons
-              const priceHeatMap = [];
+                const responseHeat = await fetch(
+                    `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
+                );
 
-              const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
-                const obj = { 
-                  name: name_xaphuong, 
-                  value: avg,
-                  color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#8884d8"
-                };
-              
-                priceHeatMap.push(obj);
+                console.log()
 
-                const relatedPolygon = data.list_polygon.find(({ WandID }) => WandID === xaphuong_id);
-              
-                if (!relatedPolygon) return null;
-              
-                const errors = []; 
-              
-                const polygons = relatedPolygon.polygon[0].map((coords) => {
-                    if (!Array.isArray(coords) || coords.length !== 2) {
-                        errors.push({ name: name_xaphuong });
-                        return null;
-                    }
-              
-                    const [lng, lat] = coords;
-              
-                    if (typeof lng !== "number" || typeof lat !== "number") {
-                        errors.push({ name: name_xaphuong });
-                        return null;
-                    }
-              
-                    return { lat, lng };
-                }).filter(Boolean); 
-              
-                return {
-                    color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#ccc",
-                    polygons: polygons,
-                    center: getPolygonCenter(relatedPolygon.polygon[0]),
-                    max,
-                    avg,
-                    min,
-                    name_xaphuong,
-                };
-              }).filter(Boolean);
+                if (!responseHeat.ok) {
+                    throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
+                }
 
-              if(!polygonsByColor || polygonsByColor.length == 0 || priceHeatMap.length == 0){
+                const data = await responseHeat.json();
+
+                // Lọc và chuyển đổi danh sách polygons
+                const priceHeatMap = [];
+
+                const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
+                    const obj = {
+                        name: name_xaphuong,
+                        value: avg,
+                        color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#8884d8"
+                    };
+
+                    priceHeatMap.push(obj);
+
+                    const relatedPolygon = data.list_polygon.find(({ WandID }) => WandID === xaphuong_id);
+
+                    if (!relatedPolygon) return null;
+
+                    const errors = [];
+
+                    const polygons = relatedPolygon.polygon[0].map((coords) => {
+                        if (!Array.isArray(coords) || coords.length !== 2) {
+                            errors.push({ name: name_xaphuong });
+                            return null;
+                        }
+
+                        const [lng, lat] = coords;
+
+                        if (typeof lng !== "number" || typeof lat !== "number") {
+                            errors.push({ name: name_xaphuong });
+                            return null;
+                        }
+
+                        return { lat, lng };
+                    }).filter(Boolean);
+
+                    return {
+                        color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#ccc",
+                        polygons: polygons,
+                        center: getPolygonCenter(relatedPolygon.polygon[0]),
+                        max,
+                        avg,
+                        min,
+                        name_xaphuong,
+                    };
+                }).filter(Boolean);
+
+                if (!polygonsByColor || polygonsByColor.length == 0 || priceHeatMap.length == 0) {
+                    messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+                }
+
+                if (priceHeatMap.length > 0) {
+                    setHeatRegionalPrice(priceHeatMap);
+                } else {
+                    setHeatRegionalPrice(null);
+                }
+
+                setPolygonHeatMap(polygonsByColor);
+
+                searchParams.set("id-district", id);
+                searchParams.set("heat-type", heatType);
+                setSearchParams(searchParams);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
                 messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
-              }
-
-              if(priceHeatMap.length > 0){
-                setHeatRegionalPrice(priceHeatMap);
-              } else {
+                setPolygonHeatMap(null);
                 setHeatRegionalPrice(null);
-              }
-      
-              setPolygonHeatMap(polygonsByColor);
-      
-              searchParams.set("id-district", id);
-              searchParams.set("heat-type", heatType);
-              setSearchParams(searchParams);
-          } catch (error) {
-              console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
-              messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
-              setPolygonHeatMap(null);
-              setHeatRegionalPrice(null);
-          } finally {
-              setHeatMapLoading(false);
-          }
-      };     
-      
-        const loadHeatMap = async () => {
-          setHeatMapLoading(true);
-          const vitri = searchParams.get("vitri").split(",");
-          if (!vitri || vitri.length < 2) {
-              throw new Error("Vị trí không hợp lệ!");
-          }
-      
-          const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
-          if (!resLocation) {
-              throw new Error("Không lấy được vị trí từ bounding box!");
-          }
-      
-          const currentDistrict = searchParams.get("id-district");
-          const heatType = searchParams.get("heat-type") || "tho_cu";
-      
-          if (resLocation.district === currentDistrict) {
-              return;
-          }
-      
-          await fetchHeatMapData(resLocation.district, heatType);
+            } finally {
+                setHeatMapLoading(false);
+            }
+        };
 
-          setHeatMapLoading(false);
+        const loadHeatMap = async () => {
+            setHeatMapLoading(true);
+            const vitri = searchParams.get("vitri").split(",");
+            if (!vitri || vitri.length < 2) {
+                throw new Error("Vị trí không hợp lệ!");
+            }
+
+            const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
+            if (!resLocation) {
+                throw new Error("Không lấy được vị trí từ bounding box!");
+            }
+
+            const currentDistrict = searchParams.get("id-district");
+            const heatType = searchParams.get("heat-type") || "tho_cu";
+
+            if (resLocation.district === currentDistrict) {
+                return;
+            }
+
+            await fetchHeatMapData(resLocation.district, heatType);
+
+            setHeatMapLoading(false);
         }
-      
+
         const handleHeatMapClick = async () => {
-          await loadHeatMap();
-        };      
+            await loadHeatMap();
+        };
 
         useEffect(() => {
             const id = searchParams.get('id-district');
@@ -1735,48 +1735,48 @@ const Map = forwardRef(
                 iconAnchor: [50, 15],
             });
 
-            const convertToPolygonArray = (data) => {
-              return data
-                  .replace(/^[A-Z]+\s*\(\(/i, "")  
-                  .replace(/\)\)$/, "")            
-                  .split("),") 
-                  .map(polygon =>
-                      polygon
-                          .replace(/[()]/g, "") 
-                          .trim()
-                          .split(", ") 
-                          .map(coord => {
-                              const [lng, lat] = coord.split(" ").map(parseFloat);
-                              return [lat, lng]; 
-                          })
-                  );
-          };      
+        const convertToPolygonArray = (data) => {
+            return data
+                .replace(/^[A-Z]+\s*\(\(/i, "")
+                .replace(/\)\)$/, "")
+                .split("),")
+                .map(polygon =>
+                    polygon
+                        .replace(/[()]/g, "")
+                        .trim()
+                        .split(", ")
+                        .map(coord => {
+                            const [lng, lat] = coord.split(" ").map(parseFloat);
+                            return [lat, lng];
+                        })
+                );
+        };
 
-            const handleInfraMutationClick = async () => {
-              try {
+        const handleInfraMutationClick = async () => {
+            try {
                 const response = await fetch("/badinh.json");
                 const res = await response.json();
                 const formatPolygon = res.data?.map(item => convertToPolygonArray(item));
                 const processedPolygons = [];
-                console.log(formatPolygon) 
+                console.log(formatPolygon)
                 formatPolygon.forEach((group, groupIndex) => {
-                  group.forEach((polygon, polygonIndex) => {
-                    processedPolygons.push({
-                      id: `group-${groupIndex}-polygon-${polygonIndex}`,
-                      coordinates: polygon
+                    group.forEach((polygon, polygonIndex) => {
+                        processedPolygons.push({
+                            id: `group-${groupIndex}-polygon-${polygonIndex}`,
+                            coordinates: polygon
+                        });
                     });
-                  });
                 });
                 console.log("Dữ liệu polygon:", processedPolygons);
                 setInfraMutation(processedPolygons);
-              } catch (error) {
+            } catch (error) {
                 console.error("Lỗi khi fetch API:", error);
-              }
-            };         
+            }
+        };
 
-            const fetchAllJSON = async () => {
-              const folderPath = "/traCuuTheoToaDo/"; 
-              const fileNames = [
+        const fetchAllJSON = async () => {
+            const folderPath = "/traCuuTheoToaDo/";
+            const fileNames = [
                 "traCuuTheoToaDo_badinh.json",
                 "traCuuTheoToaDo_bavi.json",
                 "traCuuTheoToaDo_caugiay.json",
@@ -1801,51 +1801,51 @@ const Map = forwardRef(
                 "traCuuTheoToaDo_thanhoai.json",
                 "traCuuTheoToaDo_thanhtri.json",
                 "traCuuTheoToaDo_thanhxuan.json"
-              ];
-            
-              try {
+            ];
+
+            try {
                 const fetchPromises = fileNames.map(fileName =>
-                  fetch(folderPath + fileName).then(res => res.json())
+                    fetch(folderPath + fileName).then(res => res.json())
                 );
-            
+
                 const jsonData = await Promise.all(fetchPromises);
                 const allPolygons = jsonData.map(item => convertToPolygonArray(item[0].geom));
                 console.log(allPolygons.flat(2))
                 setRegionPolygon(allPolygons.flat(1));
-              } catch (error) {
+            } catch (error) {
                 console.error("Lỗi khi tải JSON:", error);
-              }
-            };
-
-            const handleRegionSearchClick = async () => {
-              await fetchAllJSON();
-            }   
-
-            const fetchRealEstatePrice = async (lat, lng) => {
-              try {
-                  const response = await fetch(
-                      `https://api.quyhoach.xyz/lay_gia_bat_dong_san_location/${lat}/${lng}`
-                  );
-          
-                  if (!response.ok) {
-                      throw new Error(`HTTP error! Status: ${response.status}`);
-                  }
-          
-                  const data = await response.json();
-                  setEstatePrice(data);
-              } catch (error) {
-                  console.error("Error fetching real estate price:", error);
-              }
-            };
-
-            const handleEstatePriceClick = async () => {
-              setEstateLoading(true);
-              const vitri = searchParams.get("vitri").split(",");
-              await fetchRealEstatePrice(vitri[0], vitri[1]);    
-              searchParams.set("estate-price", "tat-ca");
-              setSearchParams(searchParams);
-              setEstateLoading(false);
             }
+        };
+
+        const handleRegionSearchClick = async () => {
+            await fetchAllJSON();
+        }
+
+        const fetchRealEstatePrice = async (lat, lng) => {
+            try {
+                const response = await fetch(
+                    `https://api.quyhoach.xyz/lay_gia_bat_dong_san_location/${lat}/${lng}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setEstatePrice(data);
+            } catch (error) {
+                console.error("Error fetching real estate price:", error);
+            }
+        };
+
+        const handleEstatePriceClick = async () => {
+            setEstateLoading(true);
+            const vitri = searchParams.get("vitri").split(",");
+            await fetchRealEstatePrice(vitri[0], vitri[1]);
+            searchParams.set("estate-price", "tat-ca");
+            setSearchParams(searchParams);
+            setEstateLoading(false);
+        }
         return (
             <>
                 {contextHolder}
@@ -1992,17 +1992,17 @@ const Map = forwardRef(
                         </Marker>
                     )}
 
-                    {(infraMutation && infraMutation?.length > 0) && 
-                    infraMutation.map(({ id, coordinates }) => (
-                      <Polygon key={id} positions={coordinates} color="red" />
-                    ))}
+                    {(infraMutation && infraMutation?.length > 0) &&
+                        infraMutation.map(({ id, coordinates }) => (
+                            <Polygon key={id} positions={coordinates} color="red" />
+                        ))}
 
                     {regionPolygon && regionPolygon.map((polygon, index) => (
-                      <Polygon key={index} positions={polygon} pathOptions={{
-                        color: 'blue',
-                        fillColor: 'rgba(0, 0, 255, 0.2)',
-                        weight: 2,
-                    }} />
+                        <Polygon key={index} positions={polygon} pathOptions={{
+                            color: 'blue',
+                            fillColor: 'rgba(0, 0, 255, 0.2)',
+                            weight: 2,
+                        }} />
                     ))}
 
                     {itemSearch?.coordinates?.length > 0 && (() => {
