@@ -2047,8 +2047,8 @@ const Map = forwardRef(
 
                     {searchParams.get("regionPolygon") === "on" && regionPolygon && regionPolygon.map((polygon, index) => (
                         <Polygon key={index} positions={polygon} pathOptions={{
-                            color: '#E57373',
-                            fillColor: 'transparent',
+                            color: '#D32F2F', 
+                            fillColor: '#FFCDD2', 
                             weight: 2,
                         }} />
                     ))}
