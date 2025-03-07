@@ -533,11 +533,11 @@ const Map = forwardRef(
                                 searchParams.get('type') === 'QUYHOACH_DIACHINH'))
                     ) {
                         // Gọi API lấy thông tin quy hoạch
-                        const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
-                        const resQuyHoach = await fetch(apiUrl);
-                        if (!resQuyHoach.ok) throw new Error('Không thể lấy dữ liệu quy hoạch');
+                        // const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
+                        // const resQuyHoach = await fetch(apiUrl);
+                        // if (!resQuyHoach.ok) throw new Error('Không thể lấy dữ liệu quy hoạch');
 
-                        const dataQuyHoach = await resQuyHoach.json();
+                        // const dataQuyHoach = await resQuyHoach.json();
 
                         searchParams.set('type', 'QUYHOACH_DIACHINH');
                         //searchParams.set('id', tinh.id);
@@ -747,25 +747,37 @@ const Map = forwardRef(
         useEffect(() => {
             if (id && type && dataByType) {
                 // Gọi API khi có id và type và chưa có itemQuyHoach
-                axios
-                    .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
-                    .then((response) => {
-                        const data = response.data;
+                const data = dataByType[type];
 
-                        if (data && data.dulieu) {
-                            handleItemClick(data.dulieu[0]);
-                            handleItemClick(
-                                data.dulieu[0].boundingbox,
-                                data.dulieu[0].type,
-                                data.dulieu[0].nam_het_han,
-                            );
-                        } else {
-                            console.error('No valid data received from API');
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error fetching data from API:', error);
-                    });
+                if (data) {
+                    handleItemClick(data);
+                    handleItemClick(
+                        data.boundingbox,
+                        data.type,
+                        data.nam_het_han,
+                    );
+                } else {
+                    console.error('No valid data received from API');
+                }
+                // axios
+                //     .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
+                //     .then((response) => {
+                //         const data = response.data;
+
+                //         if (data && data.dulieu) {
+                //             handleItemClick(data.dulieu[0]);
+                //             handleItemClick(
+                //                 data.dulieu[0].boundingbox,
+                //                 data.dulieu[0].type,
+                //                 data.dulieu[0].nam_het_han,
+                //             );
+                //         } else {
+                //             console.error('No valid data received from API');
+                //         }
+                //     })
+                //     .catch((error) => {
+                //         console.error('Error fetching data from API:', error);
+                //     });
             }
         }, [id, type]);
 

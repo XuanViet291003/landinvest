@@ -25,10 +25,10 @@ const CustomTileLayer = ({ item, opacity }) => {
     useEffect(() => {
         if (item.type_link === "1_link") {
             if (tileLayerRef.current) {
-                updateTileLayer(tileLayerRef.current, item.link_quyhoach);
+                updateTileLayer(tileLayerRef.current, item.link_server);
             }
         } else {
-            const links = item.link_quyhoach
+            const links = item.link_server
                 .split(",")
                 .map((link) => link.trim().replace(/[^a-zA-Z0-9:/._-]/g, ""));
 
@@ -38,14 +38,14 @@ const CustomTileLayer = ({ item, opacity }) => {
                 }
             });
         }
-    }, [item.type_load_anh, item.link_quyhoach]);
+    }, [item.type_load_anh, item.link_server]);
 
     return (
         <>
             {item.type_link === "1_link" ? (
                 <TileLayer
                     ref={tileLayerRef}
-                    url={`${item.link_quyhoach}/{z}/{x}/{y}.png`}
+                    url={`${item.link_server}/{z}/{x}/{y}.png`}
                     pane="overlayPane"
                     minNativeZoom={item.min_zoom || 12}
                     maxNativeZoom={item.zoom || 18}
@@ -54,7 +54,7 @@ const CustomTileLayer = ({ item, opacity }) => {
                     opacity={opacity}
                 />
             ) : (
-                item.link_quyhoach
+                item.link_server
                     .split(",")
                     .map((link, index) => (
                         <TileLayer

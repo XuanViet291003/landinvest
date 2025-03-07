@@ -486,6 +486,7 @@ function Home() {
         };
     
         setDataByType(categorizedData);
+        console.log(categorizedData)
     }, [searchParams, rawQuyHoachData]);
 
     useEffect(() => {
