@@ -521,15 +521,18 @@ const Map = forwardRef(
                     searchUrlParams.set('zoom', `${zoom}`);
                     setSearchParams(searchUrlParams);
 
-                    const vitri = searchParams.get('vitri').split(',');
+                    let dataProvinceCurrent = ''
+                    if(searchParams.get('vitri')){
+                        const vitri = searchParams.get('vitri').split(',');
 
-                    // Gọi API lấy thông tin tỉnh/thành phố
-                    const dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                        // Gọi API lấy thông tin tỉnh/thành phố
+                        dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                    }
 
                     if (
                         zoom >= 19 &&
                         (!RegulationImages ||
-                            (RegulationImages[0].idProvince != dataProvinceCurrent.provinces &&
+                            (RegulationImages[0].idProvince != dataProvinceCurrent?.provinces &&
                                 searchParams.get('type') === 'QUYHOACH_DIACHINH'))
                     ) {
                         // Gọi API lấy thông tin quy hoạch
@@ -751,11 +754,11 @@ const Map = forwardRef(
 
                 if (data) {
                     handleItemClick(data);
-                    handleItemClick(
-                        data.boundingbox,
-                        data.type,
-                        data.nam_het_han,
-                    );
+                    // handleItemClick(
+                    //     data.boundingbox,
+                    //     data.type,
+                    //     data.nam_het_han,
+                    // );
                 } else {
                     console.error('No valid data received from API');
                 }
@@ -1508,7 +1511,7 @@ const Map = forwardRef(
                 return (
                     <TileLayer
                         key={index}
-                        url={getTileUrl(item.link_quyhoach, '{x}', '{y}', '{z}')} // Gọi hàm với x, y, z từ tileCoords
+                        url={getTileUrl(item.link_server, '{x}', '{y}', '{z}')} // Gọi hàm với x, y, z từ tileCoords
                         pane="overlayPane"
                         minNativeZoom={item.min_zoom ? item.min_zoom : 12}
                         maxNativeZoom={item.zoom ? item.zoom : 18}
@@ -1857,6 +1860,7 @@ const Map = forwardRef(
             setSearchParams(searchParams);
             setEstateLoading(false);
         }
+
         return (
             <>
                 {contextHolder}
@@ -2088,7 +2092,7 @@ const Map = forwardRef(
                             </LayersControl.BaseLayer>
                         )}
                         {windowSize.windowWidth > 768 && (
-                            <LayersControl.BaseLayer checked={activeLayer === 'VE_TINH' && true} name="Map vệ tinh">
+                            <LayersControl.BaseLayer checked={true} name="Map vệ tinh">
                                 <TileLayer
                                     url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
                                     subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
