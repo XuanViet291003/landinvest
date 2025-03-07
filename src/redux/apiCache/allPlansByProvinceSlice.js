@@ -5,7 +5,7 @@ import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
 const fetchAllPlansByProvince = createAsyncThunk('api/fetchAllPlansByProvince', async (_, { rejectWithValue }) => {
     try {
         const data = await getALLPlansByProvince();
-        console.log(data);
+        // console.log(data);
         return data;
     } catch (error) {
         return rejectWithValue(error);

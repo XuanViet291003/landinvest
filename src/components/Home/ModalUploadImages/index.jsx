@@ -32,7 +32,7 @@ function ModalUploadImages({ isShowModalUpload, setIsShowModalUpload }) {
     const [error, setError] = useState('');
     const [form] = Form.useForm();
     const [isVideo, setIsVideo] = useState(false);
-    console.log(isShowModalUpload);
+    // console.log(isShowModalUpload);
     const props = {
         multiple: true,
         accept: 'image/*',

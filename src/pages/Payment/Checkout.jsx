@@ -43,11 +43,10 @@ const Checkout = () => {
         };
         const { data, code } = await createCheckout(dataCheckout);
 
-        console.log(data);
+        // console.log(data);
         if (code === '00') {
             window.location.href = data.checkoutUrl;
         } else {
-            console.log();
             messageApi.open({ type: 'error', content: 'Có lỗi xảy ra!' });
         }
     };

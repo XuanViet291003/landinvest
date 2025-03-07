@@ -49,9 +49,8 @@ const Investor = () => {
                     result = await response.json();
                     setData(result.data);
                 } else {
-                    console.log(1);
                     const res = await getListSearchInvestor(keySearch, currentPage);
-                    console.log(res);
+                    // console.log(res);
                     result = res.data;
                     setData(result);
                 }

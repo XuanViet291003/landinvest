@@ -119,7 +119,7 @@ const TreeDirectory = ({ doRefreshTreeData, isRefreshTreeData }) => {
                                     return item.location?.replace(/[\[\]]/g, '').split(',');
                                 }
                             });
-                        console.log(allProvinceNow);
+                        // console.log(allProvinceNow);
 
                         center = calculateLocation(allProvinceNow);
                     } else if (currentNode.key.includes('district')) {
@@ -138,7 +138,7 @@ const TreeDirectory = ({ doRefreshTreeData, isRefreshTreeData }) => {
                                     return item.location?.replace(/[\[\]]/g, '').split(',');
                                 }
                             });
-                        console.log(districtPlansFilltered);
+                        // console.log(districtPlansFilltered);
                         center = calculateLocation(districtPlansFilltered);
                     } else {
                         const currentPlan = Number(currentNode.key.split('-')[currentLocationIndex]);
@@ -158,7 +158,7 @@ const TreeDirectory = ({ doRefreshTreeData, isRefreshTreeData }) => {
                             });
 
                         center = calculateLocation(currentPlansFilltered);
-                        console.log(plansFilteredLocation.filter((item) => currentPlan === item.id));
+                        // console.log(plansFilteredLocation.filter((item) => currentPlan === item.id));
                     }
                     const locationInfo = await fetchProvinceName(center[latitudeIndex], center[longitudeIndex]);
                     dispatch(

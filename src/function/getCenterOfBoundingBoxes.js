@@ -5,17 +5,17 @@ function getCenterOfBoundingBoxes(boundingBoxes) {
     } else {
         boundingTake = boundingBoxes;
     }
-    console.log(boundingTake);
+    // console.log(boundingTake);
 
     const minLon = Math.min(...boundingTake.map((box) => box[0]));
     const minLat = Math.min(...boundingTake.map((box) => box[1]));
     const maxLon = Math.max(...boundingTake.map((box) => box[2]));
     const maxLat = Math.max(...boundingTake.map((box) => box[3]));
 
-    console.log("Min lon",minLon);
-    console.log("Min lat",minLat);
-    console.log("Max lon",maxLon);
-    console.log("Max lat",maxLat);
+    // console.log("Min lon",minLon);
+    // console.log("Min lat",minLat);
+    // console.log("Max lon",maxLon);
+    // console.log("Max lat",maxLat);
 
     // Tính trung điểm
     const centerLon = (minLon + maxLon) / 2;

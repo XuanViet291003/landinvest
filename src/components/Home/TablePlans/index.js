@@ -25,8 +25,8 @@ const TablePlans = ({ handleCloseTableList, buttonMoRong }) => {
     const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
 
     const handleSetItem = (item) => {
-        console.log('item', item);
-        console.log('????', isAuthenticated);
+        // console.log('item', item);
+        // console.log('????', isAuthenticated);
 
         if (!isAuthenticated) {
             setIsShowLoginModal(true);
@@ -128,7 +128,7 @@ const TablePlans = ({ handleCloseTableList, buttonMoRong }) => {
             filters: districts
                 .filter((item) => {
                     if (filteredProvinces) {
-                        console.log(filteredProvinces, 'filteredProvinces');
+                        // console.log(filteredProvinces, 'filteredProvinces');
                         return filteredProvinces.includes(String(item.ProvinceID));
                     }
                     return true;

@@ -22,7 +22,7 @@ function ListPostUser() {
     };
     useEffect(() => {
         (async () => {
-            console.log(id);
+            // console.log(id);
             const res = await getPostByUserId(id, 1);
             setListPost(res.data);
             setTotalPage(Math.ceil(res.numberPage));

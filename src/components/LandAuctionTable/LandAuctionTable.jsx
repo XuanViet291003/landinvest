@@ -23,7 +23,7 @@ const LandAuctionTable = ({ tableType, handleClose }) => {
     const limit = useSelector((state) => state.landAuctions.limit);
     const [searchParams, setSearchParams] = useSearchParams();
     const allLandAuctionsData = allLandAuctions.filter((item) => getTimeLeft(item?.RegistrationEndTime));
-    console.log(allLandAuctionsData);
+    // console.log(allLandAuctionsData);
     const handleChange = (paginate) => {
         const { current } = paginate;
         dispatch(setCurrentPage(current));

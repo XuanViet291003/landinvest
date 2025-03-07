@@ -214,7 +214,7 @@ const Map = forwardRef(
             try {
                 const newMarkers = [...markers, markers[0]].map((item) => [item.lat, item.lng]);
                 const formData = new FormData();
-                console.log(typeof JSON.stringify(newMarkers));
+                // console.log(typeof JSON.stringify(newMarkers));
                 formData.append('polygon', JSON.stringify(newMarkers));
                 await postPolyGonForDuAn(idDuAn, formData);
                 message.success('Bạn đã lưu thành công !');
@@ -289,7 +289,7 @@ const Map = forwardRef(
                         body: formData,
                     });
                     const dataUser = await responseUser.json();
-                    console.log('Response:', dataUser);
+                    // console.log('Response:', dataUser);
 
                     // Gọi API lấy thông tin quy hoạch
                     // const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
@@ -656,7 +656,7 @@ const Map = forwardRef(
                     });
                     // Kiểm tra dữ liệu trả về từ API
                     if (!response || response.length === 0) {
-                        console.log('Không có vùng quy hoạch.');
+                        // console.log('Không có vùng quy hoạch.');
                         setisShowListRegulation(false);
                         return;
                     }
@@ -1026,9 +1026,9 @@ const Map = forwardRef(
                     const res = await getAreaLocation(newLocation.lat, newLocation.lng);
                     const endTime = Date.now();
 
-                    console.log('Data địa chính: ' + res.dulieu);
+                    // console.log('Data địa chính: ' + res.dulieu);
 
-                    console.log(`Thời gian lấy data địa chính: ${endTime - startTime} ms`);
+                    // console.log(`Thời gian lấy data địa chính: ${endTime - startTime} ms`);
 
                     setIsLandAdministationLoading(false);
                     setLandAdministrationData(res.dulieu);
@@ -1088,13 +1088,13 @@ const Map = forwardRef(
                                 </Marker>
                             ),
                         };
-                        console.log('Data Polygon: ' + newPolygonArea);
+                        // console.log('Data Polygon: ' + newPolygonArea);
                         setPolygonArea(newPolygonArea);
                         const endTimeAfter = Date.now();
 
-                        console.log(
-                            `Thời gian vẽ Polygon(sau khi có thông tin địa chính): ${endTimeAfter - startTimeAfter} ms`,
-                        );
+                        // console.log(
+                        //     `Thời gian vẽ Polygon(sau khi có thông tin địa chính): ${endTimeAfter - startTimeAfter} ms`,
+                        // );
                     } else {
                         setPolygonArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
                     }
@@ -1186,7 +1186,7 @@ const Map = forwardRef(
             fetchData();
         }, [listenDblClick]);
         const handleUndo = useCallback(() => {
-            console.log('ctrl z');
+            // console.log('ctrl z');
             if (undoStack.length > 0) {
                 const previousState = undoStack[undoStack.length - 1];
                 handleUpdateDistance(previousState);
@@ -1593,8 +1593,6 @@ const Map = forwardRef(
                     `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
                 );
 
-                console.log()
-
                 if (!responseHeat.ok) {
                     throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
                 }
@@ -1771,7 +1769,7 @@ const Map = forwardRef(
                 const res = await response.json();
                 const formatPolygon = res.data?.map(item => convertToPolygonArray(item));
                 const processedPolygons = [];
-                console.log(formatPolygon)
+                // console.log(formatPolygon)
                 formatPolygon.forEach((group, groupIndex) => {
                     group.forEach((polygon, polygonIndex) => {
                         processedPolygons.push({
@@ -1780,7 +1778,7 @@ const Map = forwardRef(
                         });
                     });
                 });
-                console.log("Dữ liệu polygon:", processedPolygons);
+                // console.log("Dữ liệu polygon:", processedPolygons);
                 setInfraMutation(processedPolygons);
             } catch (error) {
                 console.error("Lỗi khi fetch API:", error);
@@ -1823,7 +1821,7 @@ const Map = forwardRef(
 
                 const jsonData = await Promise.all(fetchPromises);
                 const allPolygons = jsonData.map(item => convertToPolygonArray(item[0].geom));
-                console.log(allPolygons.flat(2))
+                // console.log(allPolygons.flat(2))
                 setRegionPolygon(allPolygons.flat(1));
             } catch (error) {
                 console.error("Lỗi khi tải JSON:", error);

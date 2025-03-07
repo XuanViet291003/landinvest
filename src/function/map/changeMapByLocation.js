@@ -22,7 +22,7 @@ export const handleChangeMapByLocation = async (id, locationType = LAND_AUCTION_
         mapRef.current?.flyTo([lat, lng], currentZoom, options);
     } else {
         const res = await getLocationByDistrict(id);
-        console.log(res);
+        // console.log(res);
         const districtId = res.districts_data.DistrictID;
         const boundingBox = JSON.parse(res.districts_data.bounding_box);
         const [lng, lat] = calculateLocation([
@@ -30,7 +30,7 @@ export const handleChangeMapByLocation = async (id, locationType = LAND_AUCTION_
         ]);
 
         dispatch(setDistrictId(districtId));
-        console.log(lat,lng)
+        // console.log(lat,lng)
         mapRef.current?.flyTo([lat, lng], currentZoom || 15, options);
     }
 };

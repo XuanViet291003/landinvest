@@ -44,7 +44,7 @@ function PostNews() {
             searchParam.set('page', e.selected + 1);
             setSearchParam(searchParam);
             const res = await getCommentsByIdPost(id, e.selected + 1);
-            console.log(res);
+            // console.log(res);
             const newData = res.data.map((item) => {
                 const content = item.content.split('[/QUOTE]');
                 const time = item.actionAt;
@@ -173,7 +173,7 @@ function PostNews() {
             setDetail(res[0]);
         })();
     }, [id]);
-    console.log('detail', detail);
+    // console.log('detail', detail);
     return (
         <div className="post-news">
             <h4 className="post-news__title">{detail?.Title}</h4>

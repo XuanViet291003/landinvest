@@ -43,7 +43,7 @@ const landBiddingSlice = createSlice({
                 state.landBiddingStatus = THUNK_API_STATUS.PENDING;
             })
             .addCase(getLandBiddingApi.fulfilled, (state, action) => {
-                console.log(action.payload.data)
+                // console.log(action.payload.data)
                 const totalPage = Math.ceil(action.payload.data.dauthau_info.total_page);
                 const totalDocs = totalPage * action.payload.data.dauthau_info.data.length;
                 const currentPage = action.payload.currentPage;

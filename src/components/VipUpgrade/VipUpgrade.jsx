@@ -32,7 +32,7 @@ const VipUpgrade = () => {
         CHECKOUT_URL: '',
         embedded: false,
         onSuccess: (event) => {
-            console.log(event);
+            // console.log(event);
             messageApi.open({ type: 'success', content: 'Thanh toán thành công!' });
             setItemClicked(null);
             setIsPayOsOpen(false);

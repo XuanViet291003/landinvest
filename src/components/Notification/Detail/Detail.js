@@ -95,7 +95,7 @@ const Detail = () => {
     }, [projectId, dataExtension]); // Chỉ lắng nghe `projectId` và `dataExtension`
 
     useEffect(() => {
-        console.log('>>> Check data: ', JSON.stringify(results));
+        // console.log('>>> Check data: ', JSON.stringify(results));
     }, [results]); // Log kết quả mỗi khi `results` thay đổi
     const fetchDetailData = async () => {
         const res = await getAllDetail(projectId);
@@ -107,8 +107,8 @@ const Detail = () => {
             setImageHeader(res.data.images);
             const lat = parseFloat(res.data.toaDo.split(",")[0]);
             const lon = parseFloat(res.data.toaDo.split(",")[1]);
-            console.log(lat);
-            console.log(lon)
+            // console.log(lat);
+            // console.log(lon)
             setLocation({lat, lon});
         } else {
             setDetailData({});

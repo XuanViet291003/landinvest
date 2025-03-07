@@ -20,7 +20,7 @@ function ModalCreateNew({ isShowModalCreate, setIsShowModalCreate, groupId, setA
     const [title, setTitle] = useState('');
     const [fileList, setFileList] = useState([]);
     const dataUser = useSelector((state) => state.account.dataUser);
-    console.log(dataUser);
+    // console.log(dataUser);
     const handleCancel = () => {
         setIsShowModalCreate(false);
     };

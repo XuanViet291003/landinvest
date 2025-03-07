@@ -459,7 +459,7 @@ const Map = forwardRef(
                     });
                     // Kiểm tra dữ liệu trả về từ API
                     if (!response || response.length === 0) {
-                        console.log('Không có vùng quy hoạch.');
+                        // console.log('Không có vùng quy hoạch.');
                         setisShowListRegulation(false);
                         return;
                     }
@@ -928,7 +928,7 @@ const Map = forwardRef(
             fetchData();
         }, [listenDblClick]);
         const handleUndo = useCallback(() => {
-            console.log('ctrl z');
+            // console.log('ctrl z');
             if (undoStack.length > 0) {
                 const previousState = undoStack[undoStack.length - 1];
                 handleUpdateDistance(previousState);

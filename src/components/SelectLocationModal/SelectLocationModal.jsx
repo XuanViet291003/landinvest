@@ -42,7 +42,7 @@ const SelectLocationModal = forwardRef(({ isOpen, handleOk, handleClose, lat, lo
 
     const onChangeProvince = async (id) => {
         setLoading(true);
-        console.log('change province');
+        // console.log('change province');
         try {
             const province = allProvinces?.find((item, index) => index + 1 == id);
             const bboxString = province?.bbox;

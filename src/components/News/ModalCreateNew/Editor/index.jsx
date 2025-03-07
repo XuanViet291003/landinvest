@@ -83,7 +83,7 @@ const buttons = [
             function onSelected(e) {
                 let mergeField = e.target.value;
                 if (mergeField) {
-                    console.log(mergeField);
+                    // console.log(mergeField);
                     editor.selection.insertNode(editor.create.inside.fromHTML('{{' + mergeField + '}}'));
                 }
             }
@@ -101,7 +101,7 @@ const buttons = [
             selectElement.onchange = onSelected;
             divElement.appendChild(selectElement);
 
-            console.log(divElement);
+            // console.log(divElement);
             return divElement;
         },
     },

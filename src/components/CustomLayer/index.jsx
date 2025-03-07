@@ -5,7 +5,7 @@ const CustomTileLayer = ({ item, opacity }) => {
     const tileLayerRef = useRef(null);
     const tileLayerRefs = useRef([]);
 
-    console.log(item)
+    // console.log(item)
 
     const updateTileLayer = (tileLayer, link) => {
         if (!tileLayer) return;

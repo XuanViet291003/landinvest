@@ -212,7 +212,7 @@ const Header = () => {
                 coordinates = await getPolygonsTinh(item.ProvinceID);
             } else if (item.Type === 'XA_PHUONG') {
                 coordinates = await getWardPolygon(item.WandID);
-                console.log(coordinates);
+                // console.log(coordinates);
             }
 
             const info = await fetchProvinceName(centerLat, centerLon);

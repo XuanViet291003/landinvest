@@ -51,7 +51,7 @@ function GroupNews() {
         };
         fetchApi();
     }, []);
-    console.log(dataUser);
+    // console.log(dataUser);
     return (
         <div className="group-news">
             <ReactPaginate

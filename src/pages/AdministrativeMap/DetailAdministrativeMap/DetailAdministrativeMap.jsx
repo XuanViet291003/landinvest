@@ -28,7 +28,7 @@ const DetailAdministrativeMap = () => {
     const titles = ["Vị trí địa lý", "Diện tích và dân số", "Cơ sở hạ tầng"];
     const introduce = {};
 
-    console.log(sections)
+    // console.log(sections)
 
     let currentKey = "intro";
     introduce[currentKey] = "";
@@ -38,7 +38,7 @@ const DetailAdministrativeMap = () => {
       if (titles.includes(line.trim())) {
         currentKey = line.trim();
         introduce[currentKey] = { title: line.trim(), details: "" };
-        console.log(introduce[currentKey])
+        // console.log(introduce[currentKey])
       } else {
         if (currentKey === "intro") {
           introduce.intro += line + " ";

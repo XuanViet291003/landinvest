@@ -6,7 +6,6 @@ function BoxNews() {
     useEffect(() => {
         const fetchApi = async () => {
             const res = await getBoxNews();
-            console.log(1);
             setBoxNews(res);
         };
         fetchApi();

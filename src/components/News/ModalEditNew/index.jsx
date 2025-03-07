@@ -35,7 +35,7 @@ function ModalEditNew({ isShowModalEdit, setIsShowModalEdit, news, setArticles }
         formData.append('remove_image', removeImage);
         try {
             const res = await editNews(news.id, formData);
-            console.log('res', res);
+            // console.log('res', res);
             if (res) {
                 setIsShowModalEdit(false);
                 message.success('Sữa thành công !');

@@ -26,13 +26,13 @@ function ProFileNews() {
     const { id } = useParams();
     const [totalPage, setTotalPage] = useState(null);
     const [dataUser, setDataUser] = useState({});
-    console.log(id);
+    // console.log(id);
     useEffect(() => {
         try {
             (async () => {
                 const response = await getListNewsByIdUser(id, 1);
                 const resUser = await getDataUserById(id);
-                console.log(resUser);
+                // console.log(resUser);
                 setDataUser(resUser.data);
                 setNews(response.data);
                 setTotalPage(Math.ceil(response.numberPage));

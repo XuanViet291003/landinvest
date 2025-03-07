@@ -88,7 +88,7 @@ const ChartCostHistory = (props) => {
 
   useEffect(() => {
     if (data) {
-      console.log(data)
+    //   console.log(data)
       const selectedLocation = data[selectedTab];
       if (selectedLocation && selectedLocation.list_gia) {
         let proData = selectedLocation.list_gia.map((item) => ({
