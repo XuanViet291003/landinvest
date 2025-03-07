@@ -69,7 +69,6 @@ const fetchProvinceName = async (lat, lon) => {
         // Bước 2: Tìm tỉnh chứa tọa độ trong bbox
         let matchedProvince = provincesList.find(province => {
             let bbox = JSON.parse(province.bbox.replace(/'/g, '"')); // Fix định dạng JSON lỗi
-            console.log(bbox)
             return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east;
         });
 

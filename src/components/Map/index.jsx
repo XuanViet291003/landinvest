@@ -737,9 +737,11 @@ const Map = forwardRef(
 
                     if (vitri && vitri.length >= 2) {
                         res = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                        console.log(res)
+                        console.log(item)
                     }
 
-                    if (!currentBounds.contains(point) || (res?.provinces !== item?.idProvince)) {
+                    if (!currentBounds.contains(point) || (res?.provinces != item?.idProvince)) {
                         if (ref.current?.flyTo && !sharing) {
                             ref.current.flyTo([centerLat, centerLon], 16);
                         }
