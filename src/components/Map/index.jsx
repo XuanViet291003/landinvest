@@ -1965,7 +1965,7 @@ const Map = forwardRef(
                 >
                     {duAn.map((duAnItem) => {
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
-
+                        
                         return (
                             <Marker
                                 key={duAnItem.id}
@@ -1994,14 +1994,18 @@ const Map = forwardRef(
                                                 <b>Vị trí:</b> {duAnItem.viTri}
                                             </p>
                                             <div style={{ display: "flex", gap: "8px" }}>
-                                                <Button
-                                                    style={{ fontSize: "11px", padding: "6px 10px" }}
-                                                    onClick={() => {
-                                                        handleDrawPolygon(duAnItem.id);
-                                                    }}
-                                                >
-                                                    Update polygon
-                                                </Button>
+                                            <Button
+                                                style={{
+                                                    fontSize: "11px",
+                                                    padding: "6px 10px",
+                                                    backgroundColor: polygonDuAnArea?.polygon?.length ? "" : "red",
+                                                }}
+                                                onClick={() => {
+                                                    handleDrawPolygon(duAnItem.id);
+                                                }}
+                                            >
+                                                Update polygon
+                                            </Button>
 
                                                 {regionalPrice && (
                                                     <Button

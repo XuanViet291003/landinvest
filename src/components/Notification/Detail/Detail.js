@@ -1,6 +1,6 @@
 import parse from 'html-react-parser';
 import L from 'leaflet';
-import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Polygon, TileLayer } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import React, { useEffect, useState } from 'react';
 import { CiLocationOn } from 'react-icons/ci';
@@ -9,19 +9,20 @@ import { getAllDetail } from '../../../services/api';
 import './Detail.scss';
 import { FaLocationDot } from 'react-icons/fa6';
 import ReactDOMServer from 'react-dom/server';
+import LocationUpdateModal from './LocationUpdateModal/LocationUpdateModal';
 
 const iconHtml = ReactDOMServer.renderToStaticMarkup(
-    <div style={{color: 'red', fontSize: '30px'}}>
-        <FaLocationDot/>
+    <div style={{ color: 'red', fontSize: '30px' }}>
+        <FaLocationDot />
     </div>,
 );
 
 const icon = L.divIcon({
     html: iconHtml,
-    className: '', 
+    className: '',
     iconSize: [30, 30],
-    iconAnchor: [15, 30], 
-  
+    iconAnchor: [15, 30],
+
 });
 
 const Detail = () => {
@@ -33,14 +34,16 @@ const Detail = () => {
     const [imageHeader, setImageHeader] = useState('');
     const [results, setResults] = useState([]);
     const [location, setLocation] = useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [polygonDuAnArea, setPolygonDuAnArea] = useState({ polygon: [] });
     const navigate = useNavigate();
 
     const handleNavigate = () => {
-      if (location.lat && location.lon) {
-        navigate(`/?vitri=${location.lat},${location.lon}&ups=sharing`);
-      }
+        if (location.lat && location.lon) {
+            navigate(`/?vitri=${location.lat},${location.lon}&ups=sharing`);
+        }
     };
-    
+
     const handleConvert = (string) => {
         if (!string) return '';
 
@@ -105,11 +108,22 @@ const Detail = () => {
             setDataPosition(res.data.viTriDesc || '');
             setDataImageRepresent(res.data.images || '');
             setImageHeader(res.data.images);
+            if (res.data?.polygon) {
+                const dataPolygon = JSON.parse(res.data?.polygon);
+
+                const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
+
+                // Lưu dữ liệu vào state
+                setPolygonDuAnArea({
+                    polygon,
+                    address: res.data.diachi || 'Không có địa chỉ',
+                });
+            }
             const lat = parseFloat(res.data.toaDo.split(",")[0]);
             const lon = parseFloat(res.data.toaDo.split(",")[1]);
             // console.log(lat);
             // console.log(lon)
-            setLocation({lat, lon});
+            setLocation({ lat, lon });
         } else {
             setDetailData({});
             setDataPosition('');
@@ -158,11 +172,11 @@ const Detail = () => {
         <div style={{ backgroundColor: '#343a40', paddingBottom: "150px" }}>
             <div className="container-md">
                 <div className="detail-container">
-                        {contentHeader && contentHeader.image && (
-                            <div className="detail-image">
-                                <img src={contentHeader.image} alt={contentHeader.description} />
-                            </div>
-                        )}
+                    {contentHeader && contentHeader.image && (
+                        <div className="detail-image">
+                            <img src={contentHeader.image} alt={contentHeader.description} />
+                        </div>
+                    )}
                     {detailData && (
                         <div className="row" key={detailData.id}>
                             <div className="detail-content">
@@ -231,35 +245,51 @@ const Detail = () => {
                                     <h2 className="content-location-name">Vị trí</h2>
                                     <div className="location-content">{parse(handleConvert(dataPosition))}</div>
                                     {(location.lat && location.lon) && (
-                                      <MapContainer 
-                                          center={[location.lat, location.lon]} 
-                                          zoom={17} 
-                                          style={{ margin: "10px auto", height: "50vh", width: "70%" }}
-                                      >
-                                        <TileLayer
-                                            url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
-                                            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-                                            maxZoom={30}
-                                            attribution="&copy; <a href='https://www.google.com/maps'>Google Maps</a> contributors"
-                                        />
-                                          <Marker position={[location.lat, location.lon]} icon={icon}/>
-                                      </MapContainer>
+                                        <MapContainer
+                                            center={[location.lat, location.lon]}
+                                            zoom={17}
+                                            style={{ margin: "10px auto", height: "50vh", width: "80%" }}
+                                        >
+                                            <TileLayer
+                                                url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
+                                                subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                                                maxZoom={30}
+                                            />
+                                            <Marker position={[location.lat, location.lon]} icon={icon} />
+                                            <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)" />
+                                        </MapContainer>
                                     )}
-                                     <button 
-                                        onClick={handleNavigate} 
-                                        style={{
-                                            display: "block", 
-                                            margin: "10px 0 0auto", 
-                                            padding: "10px 20px", 
-                                            background: "#007bff", 
-                                            color: "#fff", 
-                                            border: "none", 
-                                            borderRadius: "5px", 
-                                            cursor: "pointer"
-                                        }}
-                                    >
-                                        Điều hướng tới vị trí này
-                                    </button>
+                                    <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                                        <button
+                                            onClick={handleNavigate}
+                                            style={{
+                                                padding: "10px 20px",
+                                                background: "#007bff",
+                                                color: "#fff",
+                                                border: "none",
+                                                borderRadius: "5px",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Điều hướng tới vị trí này
+                                        </button>
+
+                                        <button
+                                            onClick={() => setShowModal(true)}
+                                            style={{
+                                                padding: "10px 20px",
+                                                background: "#28a745",
+                                                color: "#fff",
+                                                border: "none",
+                                                borderRadius: "5px",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            Cập nhật lại Vị trí
+                                        </button>
+                                    </div>
+
+                                    <LocationUpdateModal show={showModal} handleClose={() => setShowModal(false)} duAnId={projectId} />
                                 </div>
 
                                 <div className="extension-container">
