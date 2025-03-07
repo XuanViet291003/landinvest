@@ -1,6 +1,7 @@
 [
     {
         "name_province": "An Giang",
+        "province__id": 1,
         "bbox": "{'north': 10.9622749480001, 'south': 10.1835572730001, 'east': 105.575770017, 'west': 104.778319178}",
         "polygon": [
             [
@@ -1658,6 +1659,7 @@
     },
     {
         "name_province": "B\u00e0 R\u1ecba - V\u0169ng T\u00e0u",
+        "province__id": 2,
         "bbox": "{'north': 10.8044010420001, 'south': 8.57782026100006, 'east': 107.570941156, 'west': 106.081159102}",
         "polygon": [
             [
@@ -8937,6 +8939,7 @@
     },
     {
         "name_province": "B\u1ea1c Li\u00eau",
+        "province__id": 3,
         "bbox": "{'north': 9.63766639100004, 'south': 9.01805618700007, 'east': 105.860180989, 'west': 105.232721452}",
         "polygon": [
             [
@@ -14666,6 +14669,7 @@
     },
     {
         "name_province": "B\u1eafc K\u1ea1n",
+        "province__id": 4,
         "bbox": "{'north': 22.740892644, 'south': 21.8044205790001, 'east': 106.246931899, 'west': 105.431530613}",
         "polygon": [
             [
@@ -23607,6 +23611,7 @@
     },
     {
         "name_province": "B\u1eafc Giang",
+        "province__id": 5,
         "bbox": "{'north': 21.6262008730001, 'south': 21.1219011360001, 'east': 107.032914125, 'west': 105.880524532}",
         "polygon": [
             [
@@ -36180,6 +36185,7 @@
     },
     {
         "name_province": "B\u1eafc Ninh",
+        "province__id": 6,
         "bbox": "{'north': 21.263975062, 'south': 20.968238797, 'east': 106.311518107, 'west': 105.90472447}",
         "polygon": [
             [
@@ -39701,6 +39707,7 @@
     },
     {
         "name_province": "B\u1ebfn Tre",
+        "province__id": 7,
         "bbox": "{'north': 10.339954359, 'south': 9.79530306600003, 'east': 106.834344883, 'west': 106.028762448}",
         "polygon": [
             [
@@ -41860,6 +41867,7 @@
     },
     {
         "name_province": "B\u00ecnh D\u01b0\u01a1ng",
+        "province__id": 8,
         "bbox": "{'north': 11.501245915, 'south': 10.8641862530001, 'east': 106.966944974, 'west': 106.326752365}",
         "polygon": [
             [
@@ -47585,6 +47593,7 @@
     },
     {
         "name_province": "B\u00ecnh \u0110\u1ecbnh",
+        "province__id": 9,
         "bbox": "{'north': 14.703046923, 'south': 13.515079563, 'east': 109.363428736, 'west': 108.602247652}",
         "polygon": [
             [
@@ -57272,6 +57281,7 @@
     },
     {
         "name_province": "B\u00ecnh Ph\u01b0\u1edbc",
+        "province__id": 10,
         "bbox": "{'north': 12.2974861480001, 'south': 11.3015604230001, 'east': 107.427258418, 'west': 106.410852572}",
         "polygon": [
             [
@@ -65869,6 +65879,7 @@
     },
     {
         "name_province": "B\u00ecnh Thu\u1eadn",
+        "province__id": 11,
         "bbox": "{'north': 11.5560837790001, 'south': 9.96425497900003, 'east': 109.084516322, 'west': 107.394570011}",
         "polygon": [
             [
@@ -76616,6 +76627,7 @@
     },
     {
         "name_province": "C\u00e0 Mau",
+        "province__id": 12,
         "bbox": "{'north': 9.56169640100006, 'south': 8.38138655200004, 'east': 105.419331018, 'west': 104.522193708}",
         "polygon": [
             [
@@ -85123,6 +85135,7 @@
     },
     {
         "name_province": "Cao B\u1eb1ng",
+        "province__id": 13,
         "bbox": "{'north': 23.121518909, 'south': 22.3569975460001, 'east': 106.838947114, 'west': 105.270511383}",
         "polygon": [
             [
@@ -97128,6 +97141,7 @@
     },
     {
         "name_province": "C\u1ea7n Th\u01a1",
+        "province__id": 14,
         "bbox": "{'north': 10.3268664240001, 'south': 9.91912794800004, 'east': 105.844687245, 'west': 105.225786387}",
         "polygon": [
             [
@@ -98333,6 +98347,7 @@
     },
     {
         "name_province": "\u0110\u00e0 N\u1eb5ng",
+        "province__id": 15,
         "bbox": "{'north': 16.9858449330001, 'south': 15.7776774770001, 'east': 112.740550488, 'west': 107.81867521}",
         "polygon": [
             [
@@ -104792,6 +104807,7 @@
     },
     {
         "name_province": "\u0110\u1eafk L\u1eafk",
+        "province__id": 16,
         "bbox": "{'north': 13.4168573010001, 'south': 12.161139242, 'east': 108.994821448, 'west': 107.484515791}",
         "polygon": [
             [
@@ -115381,6 +115397,7 @@
     },
     {
         "name_province": "\u0110\u1eafk N\u00f4ng",
+        "province__id": 17,
         "bbox": "{'north': 12.812405615000001, 'south': 11.749138462000106, 'east': 108.11393725, 'west': 107.20459804}",
         "polygon": [
             [
@@ -125840,6 +125857,7 @@
     },
     {
         "name_province": "\u0110i\u1ec7n Bi\u00ean",
+        "province__id": 18,
         "bbox": "{'north': 22.548380771, 'south': 20.892719297, 'east': 103.598771905, 'west': 102.144028483}",
         "polygon": [
             [
@@ -141949,6 +141967,7 @@
     },
     {
         "name_province": "\u0110\u1ed3ng Nai",
+        "province__id": 19,
         "bbox": "{'north': 11.5822075620001, 'south': 10.5790132560001, 'east': 107.577017152, 'west': 106.751401199}",
         "polygon": [
             [
@@ -150754,6 +150773,7 @@
     },
     {
         "name_province": "\u0110\u1ed3ng Th\u00e1p",
+        "province__id": 20,
         "bbox": "{'north': 10.973570662, 'south': 10.1340348410001, 'east': 105.942162749, 'west': 105.188918283}",
         "polygon": [
             [
@@ -153691,6 +153711,7 @@
     },
     {
         "name_province": "Gia Lai",
+        "province__id": 21,
         "bbox": "{'north': 14.601887237, 'south': 12.995682985, 'east': 108.873361115, 'west': 107.450321162}",
         "polygon": [
             [
@@ -166064,6 +166085,7 @@
     },
     {
         "name_province": "H\u00e0 Giang",
+        "province__id": 22,
         "bbox": "{'north': 23.3928505600001, 'south': 22.1661925440001, 'east': 105.591439702, 'west': 104.334192828}",
         "polygon": [
             [
@@ -181721,6 +181743,7 @@
     },
     {
         "name_province": "H\u00e0 Nam",
+        "province__id": 23,
         "bbox": "{'north': 20.704222401, 'south': 20.3631382670001, 'east': 106.185507925, 'west': 105.769778262}",
         "polygon": [
             [
@@ -184218,6 +184241,7 @@
     },
     {
         "name_province": "H\u00e0 N\u1ed9i",
+        "province__id": 24,
         "bbox": "{'north': 21.3855144820001, 'south': 20.5642508770001, 'east': 106.020154616, 'west': 105.28500419}",
         "polygon": [
             [
@@ -192607,6 +192631,7 @@
     },
     {
         "name_province": "H\u00e0 T\u0129nh",
+        "province__id": 25,
         "bbox": "{'north': 18.8110884050001, 'south': 17.9106663430001, 'east': 106.510773576, 'west': 105.104149375}",
         "polygon": [
             [
@@ -204486,6 +204511,7 @@
     },
     {
         "name_province": "H\u1ea3i D\u01b0\u01a1ng",
+        "province__id": 26,
         "bbox": "{'north': 21.236878217, 'south': 20.6841224030001, 'east': 106.611762111, 'west': 106.124641012}",
         "polygon": [
             [
@@ -210835,6 +210861,7 @@
     },
     {
         "name_province": "H\u1ea3i Ph\u00f2ng",
+        "province__id": 27,
         "bbox": "{'north': 21.0212140360001, 'south': 20.1271484690001, 'east': 107.738599776, 'west': 106.400876677}",
         "polygon": [
             [
@@ -233398,6 +233425,7 @@
     },
     {
         "name_province": "H\u00f2a B\u00ecnh",
+        "province__id": 28,
         "bbox": "{'north': 21.1129641840001, 'south': 20.3053927550001, 'east': 105.857450786, 'west': 104.835278997}",
         "polygon": [
             [
@@ -241631,6 +241659,7 @@
     },
     {
         "name_province": "H\u1ed3 Ch\u00ed Minh",
+        "province__id": 29,
         "bbox": "{'north': 11.159677189, 'south': 10.377192445, 'east': 107.013237776, 'west': 106.356874837}",
         "polygon": [
             [
@@ -246230,6 +246259,7 @@
     },
     {
         "name_province": "H\u1eadu Giang",
+        "province__id": 30,
         "bbox": "{'north': 9.99430218300006, 'south': 9.58238303900004, 'east': 105.897154322, 'west': 105.328279413}",
         "polygon": [
             [
@@ -250767,6 +250797,7 @@
     },
     {
         "name_province": "H\u01b0ng Y\u00ean",
+        "province__id": 31,
         "bbox": "{'north': 21.007305624, 'south': 20.6032446670001, 'east': 106.269508376, 'west': 105.895388504}",
         "polygon": [
             [
@@ -253400,6 +253431,7 @@
     },
     {
         "name_province": "Kh\u00e1nh H\u00f2a",
+        "province__id": 32,
         "bbox": "{'north': 12.86823071, 'south': 7.89146445900019, 'east': 115.836420367, 'west': 108.669676534}",
         "polygon": [
             [
@@ -284639,6 +284671,7 @@
     },
     {
         "name_province": "Ki\u00ean Giang",
+        "province__id": 33,
         "bbox": "{'north': 10.5400795690001, 'south': 9.26284935800004, 'east': 105.539332671, 'west': 103.419762249}",
         "polygon": [
             [
@@ -304906,6 +304939,7 @@
     },
     {
         "name_province": "Kon Tum",
+        "province__id": 34,
         "bbox": "{'north': 15.4173303050001, 'south': 13.9209134330001, 'east': 108.547102888, 'west': 107.332476685}",
         "polygon": [
             [
@@ -317607,6 +317641,7 @@
     },
     {
         "name_province": "Lai Ch\u00e2u",
+        "province__id": 35,
         "bbox": "{'north': 22.8164851720001, 'south': 21.685561106, 'east': 103.985043705, 'west': 102.320986282}",
         "polygon": [
             [
@@ -328412,6 +328447,7 @@
     },
     {
         "name_province": "L\u00e0o Cai",
+        "province__id": 36,
         "bbox": "{'north': 22.84488996, 'south': 21.876484039, 'east': 104.628864054, 'west': 103.527395007}",
         "polygon": [
             [
@@ -336269,6 +336305,7 @@
     },
     {
         "name_province": "L\u1ea1ng S\u01a1n",
+        "province__id": 37,
         "bbox": "{'north': 22.459914387, 'south': 21.32519968, 'east': 107.364043463, 'west': 106.094903299}",
         "polygon": [
             [
@@ -355194,6 +355231,7 @@
     },
     {
         "name_province": "L\u00e2m \u0110\u1ed3ng",
+        "province__id": 38,
         "bbox": "{'north': 12.317606187, 'south': 11.215566645, 'east': 108.728928867, 'west': 107.265863652}",
         "polygon": [
             [
@@ -368355,6 +368393,7 @@
     },
     {
         "name_province": "Long An",
+        "province__id": 39,
         "bbox": "{'north': 11.0318708770001, 'south': 10.3956199950001, 'east': 106.748713866, 'west': 105.499035248}",
         "polygon": [
             [
@@ -373604,6 +373643,7 @@
     },
     {
         "name_province": "Nam \u0110\u1ecbnh",
+        "province__id": 40,
         "bbox": "{'north': 20.499461969, 'south': 19.8898377780001, 'east': 106.599596212, 'west': 105.924254006}",
         "polygon": [
             [
@@ -379559,6 +379599,7 @@
     },
     {
         "name_province": "Ngh\u1ec7 An",
+        "province__id": 41,
         "bbox": "{'north': 19.997678869, 'south': 18.5531138630001, 'east': 105.805080943, 'west': 103.874272909}",
         "polygon": [
             [
@@ -395218,6 +395259,7 @@
     },
     {
         "name_province": "Ninh B\u00ecnh",
+        "province__id": 42,
         "bbox": "{'north': 20.4546385460001, 'south': 19.9174696900001, 'east': 106.168072145, 'west': 105.542850372}",
         "polygon": [
             [
@@ -398411,6 +398453,7 @@
     },
     {
         "name_province": "Ninh Thu\u1eadn",
+        "province__id": 43,
         "bbox": "{'north': 12.168061456, 'south': 11.3068508700001, 'east': 109.232840475, 'west': 108.552482227}",
         "polygon": [
             [
@@ -406346,6 +406389,7 @@
     },
     {
         "name_province": "Ph\u00fa Th\u1ecd",
+        "province__id": 44,
         "bbox": "{'north': 21.7200973710001, 'south': 20.916935134, 'east': 105.457103258, 'west': 104.813587009}",
         "polygon": [
             [
@@ -411859,6 +411903,7 @@
     },
     {
         "name_province": "Ph\u00fa Y\u00ean",
+        "province__id": 45,
         "bbox": "{'north': 13.6951889590001, 'south': 12.7054069060001, 'east': 109.459648254, 'west': 108.673091784}",
         "polygon": [
             [
@@ -420282,6 +420327,7 @@
     },
     {
         "name_province": "Qu\u1ea3ng B\u00ecnh",
+        "province__id": 46,
         "bbox": "{'north': 18.0898426970001, 'south': 16.9219646070001, 'east': 106.990923198, 'west': 105.608365247}",
         "polygon": [
             [
@@ -430125,6 +430171,7 @@
     },
     {
         "name_province": "Qu\u1ea3ng Nam",
+        "province__id": 47,
         "bbox": "{'north': 16.067267503, 'south': 14.9511242190001, 'east': 108.738732278, 'west': 107.210226215}",
         "polygon": [
             [
@@ -442848,6 +442895,7 @@
     },
     {
         "name_province": "Qu\u1ea3ng Ng\u00e3i",
+        "province__id": 48,
         "bbox": "{'north': 15.4323035250001, 'south': 14.5329867460001, 'east': 109.142985652, 'west': 108.235223317}",
         "polygon": [
             [
@@ -453219,6 +453267,7 @@
     },
     {
         "name_province": "Qu\u1ea3ng Ninh",
+        "province__id": 49,
         "bbox": "{'north': 21.6638266260001, 'south': 20.687306697000103, 'east': 108.097032647, 'west': 106.439197076}",
         "polygon": [
             [
@@ -584666,6 +584715,7 @@
     },
     {
         "name_province": "Qu\u1ea3ng Tr\u1ecb",
+        "province__id": 50,
         "bbox": "{'north': 17.166508477, 'south': 16.2966460170001, 'east': 107.388103632, 'west': 106.515453464}",
         "polygon": [
             [
@@ -592817,6 +592867,7 @@
     },
     {
         "name_province": "S\u00f3c Tr\u0103ng",
+        "province__id": 51,
         "bbox": "{'north': 9.93806359500007, 'south': 9.24470426500005, 'east': 106.315211049, 'west': 105.54391623}",
         "polygon": [
             [
@@ -595850,6 +595901,7 @@
     },
     {
         "name_province": "S\u01a1n La",
+        "province__id": 52,
         "bbox": "{'north': 22.030006859, 'south': 20.57357935, 'east': 105.0248402, 'west': 103.212374227}",
         "polygon": [
             [
@@ -609399,6 +609451,7 @@
     },
     {
         "name_province": "T\u00e2y Ninh",
+        "province__id": 53,
         "bbox": "{'north': 11.779981902, 'south': 10.962814398, 'east': 106.490834809, 'west': 105.807316673}",
         "polygon": [
             [
@@ -613104,6 +613157,7 @@
     },
     {
         "name_province": "Th\u00e1i B\u00ecnh",
+        "province__id": 54,
         "bbox": "{'north': 20.728943702, 'south': 20.253033293, 'east': 106.63057299, 'west': 106.110002917}",
         "polygon": [
             [
@@ -617967,6 +618021,7 @@
     },
     {
         "name_province": "Th\u00e1i Nguy\u00ean",
+        "province__id": 55,
         "bbox": "{'north': 22.0476148440001, 'south': 21.3255286350001, 'east': 106.23803219, 'west': 105.477545578}",
         "polygon": [
             [
@@ -628704,6 +628759,7 @@
     },
     {
         "name_province": "Thanh H\u00f3a",
+        "province__id": 56,
         "bbox": "{'north': 20.670170637000105, 'south': 19.287686881000106, 'east': 106.075127184, 'west': 104.374316969}",
         "polygon": [
             [
@@ -643573,6 +643629,7 @@
     },
     {
         "name_province": "Th\u1eeba Thi\u00ean Hu\u1ebf",
+        "province__id": 57,
         "bbox": "{'north': 16.7427493610001, 'south': 15.9948714070001, 'east': 108.194645016, 'west': 107.056590179}",
         "polygon": [
             [
@@ -651812,6 +651869,7 @@
     },
     {
         "name_province": "Ti\u1ec1n Giang",
+        "province__id": 58,
         "bbox": "{'north': 10.586653234, 'south': 10.194952911, 'east': 106.806202229, 'west': 105.815813145}",
         "polygon": [
             [
@@ -654667,6 +654725,7 @@
     },
     {
         "name_province": "Tr\u00e0 Vinh",
+        "province__id": 59,
         "bbox": "{'north': 10.0817410720001, 'south': 9.52732079100002, 'east': 106.601985988, 'west': 105.953660628}",
         "polygon": [
             [
@@ -659816,6 +659875,7 @@
     },
     {
         "name_province": "Tuy\u00ean Quang",
+        "province__id": 60,
         "bbox": "{'north': 22.6907118290001, 'south': 21.497128006, 'east': 105.597950396, 'west': 104.848861693}",
         "polygon": [
             [
@@ -672097,6 +672157,7 @@
     },
     {
         "name_province": "V\u0129nh Long",
+        "province__id": 61,
         "bbox": "{'north': 10.3308957530001, 'south': 9.88326256200003, 'east': 106.289297428, 'west': 105.682628098}",
         "polygon": [
             [
@@ -673742,6 +673803,7 @@
     },
     {
         "name_province": "V\u0129nh Ph\u00fac",
+        "province__id": 62,
         "bbox": "{'north': 21.5740463490001, 'south': 21.152331781, 'east': 105.786593877, 'west': 105.322688363}",
         "polygon": [
             [
@@ -678259,6 +678321,7 @@
     },
     {
         "name_province": "Y\u00ean B\u00e1i",
+        "province__id": 63,
         "bbox": "{'north': 22.291257473, 'south': 21.3256638180001, 'east': 105.100177027, 'west': 103.886407839}",
         "polygon": [
             [

@@ -89,7 +89,9 @@ const fetchProvinceName = async (lat, lon) => {
 
         let districtName = matchedDistrict ? matchedDistrict.name_District : 'Unknown';
 
-        return { provinceName, districtName };
+        const provinceId = matchedProvince ? matchedProvince.province__id : 0;
+
+        return { provinceName, districtName, provinceId };
     } catch (error) {
         console.error('Error fetching province/district:', error);
         return 'Unknown';

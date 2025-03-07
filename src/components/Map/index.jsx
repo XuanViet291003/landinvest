@@ -583,11 +583,11 @@ const Map = forwardRef(
                         setMapZoom(zoom);
                     }
 
-                    if (zoom >= 15) {
-                        handleGetListRegulation(_southWest, _northEast);
-                    } else {
-                        setisShowListRegulation(false);
-                    }
+                    // if (zoom >= 15) {
+                    //     handleGetListRegulation(_southWest, _northEast);
+                    // } else {
+                    //     setisShowListRegulation(false);
+                    // }
                 },
                 zoomend: async () => {
                     const zoom = map.getZoom();
@@ -736,12 +736,11 @@ const Map = forwardRef(
                     let res = null;
 
                     if (vitri && vitri.length >= 2) {
-                        res = await getLocationInBoudingBox(vitri[0], vitri[1]);
-                        console.log(res)
-                        console.log(item)
+                        res = await fetchProvinceName(vitri[0], vitri[1]);
                     }
 
-                    if (!currentBounds.contains(point) || (res?.provinces != item?.idProvince)) {
+                    if (!(res?.provinceId == item?.idProvince && 
+                        (searchParams.get("type") === "QUYHOACH_TINH" || searchParams.get("type") === "QUYHOACH_DIACHINH"))) {
                         if (ref.current?.flyTo && !sharing) {
                             ref.current.flyTo([centerLat, centerLon], 16);
                         }
