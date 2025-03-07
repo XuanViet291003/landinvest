@@ -202,6 +202,8 @@ const Map = forwardRef(
         const [estatePrice, setEstatePrice] = useState(null);
         const [estateLoading, setEstateLoading] = useState(false);
 
+        const [showRegionalPrice, setShowRegionalPrice] = useState(false);
+
         const handleDrawPolygon = (id) => {
             setMarkers([]);
             setDistances([]);
@@ -522,11 +524,11 @@ const Map = forwardRef(
                     setSearchParams(searchUrlParams);
 
                     let dataProvinceCurrent = ''
-                    if(searchParams.get('vitri')){
+                    if (searchParams.get('vitri')) {
                         const vitri = searchParams.get('vitri').split(',');
 
                         // Gọi API lấy thông tin tỉnh/thành phố
-                        dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                        // dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
                     }
 
                     if (
@@ -634,6 +636,7 @@ const Map = forwardRef(
                 },
                 dragstart: () => {
                     setShowPopup(false);
+                    setShowRegionalPrice(false);
                 },
             });
             return null;
@@ -1766,28 +1769,6 @@ const Map = forwardRef(
                 );
         };
 
-        const handleInfraMutationClick = async () => {
-            try {
-                const response = await fetch("/badinh.json");
-                const res = await response.json();
-                const formatPolygon = res.data?.map(item => convertToPolygonArray(item));
-                const processedPolygons = [];
-                // console.log(formatPolygon)
-                formatPolygon.forEach((group, groupIndex) => {
-                    group.forEach((polygon, polygonIndex) => {
-                        processedPolygons.push({
-                            id: `group-${groupIndex}-polygon-${polygonIndex}`,
-                            coordinates: polygon
-                        });
-                    });
-                });
-                // console.log("Dữ liệu polygon:", processedPolygons);
-                setInfraMutation(processedPolygons);
-            } catch (error) {
-                console.error("Lỗi khi fetch API:", error);
-            }
-        };
-
         const fetchAllJSON = async () => {
             const folderPath = "/traCuuTheoToaDo/";
             const fileNames = [
@@ -1828,6 +1809,39 @@ const Map = forwardRef(
                 setRegionPolygon(allPolygons.flat(1));
             } catch (error) {
                 console.error("Lỗi khi tải JSON:", error);
+            }
+        };
+
+        const handleInfraMutationClick = async () => {
+            // try {
+            //     const response = await fetch("/badinh.json");
+            //     const res = await response.json();
+            //     const formatPolygon = res.data?.map(item => convertToPolygonArray(item));
+            //     const processedPolygons = [];
+            //     // console.log(formatPolygon)
+            //     formatPolygon.forEach((group, groupIndex) => {
+            //         group.forEach((polygon, polygonIndex) => {
+            //             processedPolygons.push({
+            //                 id: `group-${groupIndex}-polygon-${polygonIndex}`,
+            //                 coordinates: polygon
+            //             });
+            //         });
+            //     });
+            //     // console.log("Dữ liệu polygon:", processedPolygons);
+            //     setInfraMutation(processedPolygons);
+            // } catch (error) {
+            //     console.error("Lỗi khi fetch API:", error);
+            // }
+            if (!regionPolygon) {
+                await fetchAllJSON();
+            }
+
+            if (searchParams.get("regionPolygon")) {
+                searchParams.delete("regionPolygon");
+                setSearchParams(searchParams);
+            } else {
+                searchParams.set("regionPolygon", "on");
+                setSearchParams(searchParams);
             }
         };
 
@@ -1930,7 +1944,7 @@ const Map = forwardRef(
                         <ChartCostHistory lat={latHistoryCost} lon={lonHistoryCost} />
                     )}
 
-                    {regionalPrice && <RegionalPriceChart regionalPrice={regionalPrice} />}
+                    {showRegionalPrice && regionalPrice && <RegionalPriceChart setShowRegionalPrice={setShowRegionalPrice} regionalPrice={regionalPrice} />}
 
                     {(searchParams.get("heat-view") === "chart" && heatRegionalPrice) && <RegionalPriceChart regionalPrice={heatRegionalPrice} />}
 
@@ -1960,36 +1974,55 @@ const Map = forwardRef(
                                     click: () => handleClickDuAnIcon(duAnItem.id),
                                 }}
                             >
-                                <Popup>
-                                    <div className="popup-duan">
-                                        <img
-                                            src={duAnItem.image}
-                                            alt={duAnItem.tenDuAn}
-                                            className="popup-duan__image"
-                                        />
-                                        <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
-                                        <p>
-                                            <b>Loại hình:</b> {duAnItem.loaiHinh}
-                                        </p>
-                                        <p>
-                                            <b>Trạng thái:</b> {duAnItem.trangThai}
-                                        </p>
-                                        <p>
-                                            <b>Vị trí:</b> {duAnItem.viTri}
-                                        </p>
-                                        <Button
-                                            className="popup-duan__button"
-                                            onClick={() => {
-                                                handleDrawPolygon(duAnItem.id);
-                                            }}
-                                        >
-                                            Update polygon
-                                        </Button>
-                                        <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
-                                            Xem chi tiết
-                                        </Link>
-                                    </div>
-                                </Popup>
+                                {showPopup && (
+                                    <Popup>
+                                        <div className="popup-duan">
+                                            <img
+                                                src={duAnItem.image}
+                                                alt={duAnItem.tenDuAn}
+                                                className="popup-duan__image"
+                                            />
+                                            <h3 className="popup-duan__title">{duAnItem.tenDuAn}</h3>
+                                            <p>
+                                                <b>Loại hình:</b> {duAnItem.loaiHinh}
+                                            </p>
+                                            <p>
+                                                <b>Trạng thái:</b> {duAnItem.trangThai}
+                                            </p>
+                                            <p>
+                                                <b>Vị trí:</b> {duAnItem.viTri}
+                                            </p>
+                                            <div style={{ display: "flex", gap: "8px" }}>
+                                                <Button
+                                                    style={{ fontSize: "11px", padding: "6px 10px" }}
+                                                    onClick={() => {
+                                                        handleDrawPolygon(duAnItem.id);
+                                                    }}
+                                                >
+                                                    Update polygon
+                                                </Button>
+
+                                                {regionalPrice && (
+                                                    <Button
+                                                        style={{
+                                                            fontSize: "11px",
+                                                            padding: "6px 10px",
+                                                        }}
+                                                        onClick={() => {
+                                                            setShowRegionalPrice(true)
+                                                        }}
+                                                    >
+                                                        Xem giá cùng khu vực
+                                                    </Button>
+                                                )}
+                                            </div>
+
+                                            <Link to={`/detail_du_an/${duAnItem.id}`} className="popup-duan__link">
+                                                Xem chi tiết
+                                            </Link>
+                                        </div>
+                                    </Popup>
+                                )}
                             </Marker>
                         );
                     })}
@@ -2012,10 +2045,10 @@ const Map = forwardRef(
                             <Polygon key={id} positions={coordinates} color="red" />
                         ))}
 
-                    {regionPolygon && regionPolygon.map((polygon, index) => (
+                    {searchParams.get("regionPolygon") === "on" && regionPolygon && regionPolygon.map((polygon, index) => (
                         <Polygon key={index} positions={polygon} pathOptions={{
-                            color: 'blue',
-                            fillColor: 'rgba(0, 0, 255, 0.2)',
+                            color: '#E57373',
+                            fillColor: 'transparent',
                             weight: 2,
                         }} />
                     ))}

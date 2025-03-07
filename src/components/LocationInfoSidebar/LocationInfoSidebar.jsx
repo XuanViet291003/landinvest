@@ -242,7 +242,7 @@ const LocationInfoSidebar = ({
                             {heatMapLoading ? 'Đang tải bản đồ nhiệt...' : 'Xem bản đồ nhiệt tại đây'}
                         </button>
                         <button style={{ width: 'calc(50% - 32px)'}} onClick={handleInfraMutationClick}>
-                            Xem đột biến hạ tầng
+                            {searchParams.get("regionPolygon") === "on" ? "Tắt đột biến hạ tầng" : "Xem đột biến hạ tầng"}
                         </button>
                         <button 
                           style={{ width: 'calc(50% - 32px)'}} 
