@@ -22,8 +22,6 @@ const LocationUpdateModal = ({ show, handleClose, duAnId }) => {
                 body: formData
             });
 
-            // 21.002056589747855%2C105.75636863708496
-
             const data = await response.json();
             if (response.ok) {
                 alert("Cập nhật vị trí thành công!");
