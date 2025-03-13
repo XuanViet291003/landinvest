@@ -739,7 +739,7 @@ const Map = forwardRef(
                         res = await fetchProvinceName(vitri[0], vitri[1]);
                     }
 
-                    if (!(res?.provinceId == item?.idProvince && 
+                    if (!(res?.provinceId == item?.idProvince &&
                         (searchParams.get("type") === "QUYHOACH_TINH" || searchParams.get("type") === "QUYHOACH_DIACHINH"))) {
                         if (ref.current?.flyTo && !sharing) {
                             ref.current.flyTo([centerLat, centerLon], 16);
@@ -1805,9 +1805,28 @@ const Map = forwardRef(
                 );
 
                 const jsonData = await Promise.all(fetchPromises);
-                const allPolygons = jsonData.map(item => convertToPolygonArray(item[0].geom));
-                // console.log(allPolygons.flat(2))
-                setRegionPolygon(allPolygons.flat(1));
+
+                console.log(jsonData)
+
+                const allPolygons = jsonData
+                    .flatMap(item => convertToPolygonArray(item[0].geom))
+                    // .flat(1);
+
+                // Ngưỡng diện tích nhỏ nhất 
+                const MIN_AREA = 50000; 
+
+                // Lọc polygon có diện tích nhỏ hơn ngưỡng
+                console.log(allPolygons)
+                const filteredPolygons = allPolygons
+                    .filter(polygon => {
+                        const turfPolygon = turf.polygon([polygon]);
+                        const area = turf.area(turfPolygon);
+                        return area <= MIN_AREA; 
+                    });
+
+                    console.log(JSON.stringify(filteredPolygons))
+
+                setRegionPolygon(filteredPolygons);
             } catch (error) {
                 console.error("Lỗi khi tải JSON:", error);
             }
@@ -1965,7 +1984,7 @@ const Map = forwardRef(
                 >
                     {duAn.map((duAnItem) => {
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
-                        
+
                         return (
                             <Marker
                                 key={duAnItem.id}
@@ -1994,18 +2013,18 @@ const Map = forwardRef(
                                                 <b>Vị trí:</b> {duAnItem.viTri}
                                             </p>
                                             <div style={{ display: "flex", gap: "8px" }}>
-                                            <Button
-                                                style={{
-                                                    fontSize: "11px",
-                                                    padding: "6px 10px",
-                                                    backgroundColor: polygonDuAnArea?.polygon?.length ? "" : "red",
-                                                }}
-                                                onClick={() => {
-                                                    handleDrawPolygon(duAnItem.id);
-                                                }}
-                                            >
-                                                Update polygon
-                                            </Button>
+                                                <Button
+                                                    style={{
+                                                        fontSize: "11px",
+                                                        padding: "6px 10px",
+                                                        backgroundColor: polygonDuAnArea?.polygon?.length ? "" : "red",
+                                                    }}
+                                                    onClick={() => {
+                                                        handleDrawPolygon(duAnItem.id);
+                                                    }}
+                                                >
+                                                    Update polygon
+                                                </Button>
 
                                                 {regionalPrice && (
                                                     <Button
@@ -2052,8 +2071,8 @@ const Map = forwardRef(
 
                     {searchParams.get("regionPolygon") === "on" && regionPolygon && regionPolygon.map((polygon, index) => (
                         <Polygon key={index} positions={polygon} pathOptions={{
-                            color: '#D32F2F', 
-                            fillColor: '#FFCDD2', 
+                            color: '#D32F2F',
+                            fillColor: '#FFCDD2',
                             weight: 2,
                         }} />
                     ))}
