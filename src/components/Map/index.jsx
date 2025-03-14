@@ -2204,7 +2204,7 @@ const Map = forwardRef(
                                 );
                             })}
 
-                        {renderTileLayers()}
+                        {/* {renderTileLayers()} */}
                         {RegulationImages &&
                             !(
                                 (searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&

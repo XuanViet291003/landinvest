@@ -40,6 +40,8 @@ const CustomTileLayer = ({ item, opacity }) => {
         }
     }, [item.type_load_anh, item.link_server]);
 
+    console.log(item.link_server)
+
     return (
         <>
             {item.type_link === "1_link" ? (
@@ -47,9 +49,9 @@ const CustomTileLayer = ({ item, opacity }) => {
                     ref={tileLayerRef}
                     url={`${item.link_server}/{z}/{x}/{y}.png`}
                     pane="overlayPane"
-                    minNativeZoom={item.min_zoom || 12}
+                    minNativeZoom={9}
                     maxNativeZoom={item.zoom || 18}
-                    minZoom={(item.min_zoom || 12) - 3}
+                    minZoom={9}
                     maxZoom={25}
                     opacity={opacity}
                 />
@@ -62,9 +64,9 @@ const CustomTileLayer = ({ item, opacity }) => {
                             ref={(el) => (tileLayerRefs.current[index] = el)}
                             url={`${link}/{z}/{x}/{y}.png`}
                             pane="overlayPane"
-                            minNativeZoom={item.min_zoom || 12}
+                            minNativeZoom={9}
                             maxNativeZoom={item.zoom || 18}
-                            minZoom={(item.min_zoom || 12) - 3}
+                            minZoom={9}
                             maxZoom={25}
                             opacity={opacity}
                         />

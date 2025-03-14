@@ -60,13 +60,13 @@
 
 const fetchProvinceName = async (lat, lon) => {
     try {
-        // Bước 1: Fetch danh sách tỉnh từ file tinh.json
+        // Fetch danh sách tỉnh từ file tinh.json
         const response = await fetch('/tinh.json');
         const provincesList = await response.json();
 
         if (!lat || !lon) return 'Unknown';
 
-        // Bước 2: Tìm tỉnh chứa tọa độ trong bbox
+        // Tìm tỉnh chứa tọa độ trong bbox
         let matchedProvince = provincesList.find(province => {
             let bbox = JSON.parse(province.bbox.replace(/'/g, '"')); // Fix định dạng JSON lỗi
             return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east;
@@ -76,13 +76,13 @@ const fetchProvinceName = async (lat, lon) => {
 
         let provinceName = matchedProvince.name_province;
 
-        // Bước 3: Fetch danh sách quận/huyện từ file trong polygon
+        // Fetch danh sách quận/huyện từ file trong polygon
         const districtResponse = await fetch(`/polygon/${matchedProvince.file}`);
         const districtData = await districtResponse.json();
 
         const districtsList = districtData.list_tinh; // Đây là danh sách quận/huyện
 
-        // Bước 4: Tìm quận/huyện chứa tọa độ trong bbox của nó
+        // Tìm quận/huyện chứa tọa độ trong bbox của nó
         let matchedDistrict = districtsList.find(district => {
             let bbox = JSON.parse(district.bbox.replace(/'/g, '"')); // Fix định dạng JSON lỗi
             return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east        });
