@@ -31,9 +31,20 @@ const ListItem = (props) => {
 
                                     <div className="col-md-9">
                                         <div className="card-body card-body-container">
-                                            <span className={`badge ${badgeName} ms-auto bd-highlight fw-500 mb-2`}>
-                                                {item.trangThai}
-                                            </span>
+                                            <div className="d-flex align-items-center w-fit">
+                                                {/* Badge trạng thái */}
+                                                <span className={`badge ${badgeName} bd-highlight mb-2`}>
+                                                    {item.trangThai}
+                                                </span>
+
+                                                {/* Badge polygon */}
+                                                <span
+                                                    className={`badge mb-2 ms-2 ${item.polygon === "co_polygon" ? "bg-success text-white" : "bg-danger text-white"
+                                                        }`}
+                                                >
+                                                    {item.polygon === "co_polygon" ? "Có Polygon" : "Chưa Polygon"}
+                                                </span>
+                                            </div>
                                             <Link
                                                 to={`/detail_du_an/${item.id}`}
                                                 style={{ textDecoration: 'none', color: '#000' }}
