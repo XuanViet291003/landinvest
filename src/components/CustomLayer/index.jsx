@@ -40,7 +40,7 @@ const CustomTileLayer = ({ item, opacity }) => {
         }
     }, [item.type_load_anh, item.link_server]);
 
-    console.log(item.link_server)
+    console.log(item)
 
     return (
         <>
@@ -49,10 +49,11 @@ const CustomTileLayer = ({ item, opacity }) => {
                     ref={tileLayerRef}
                     url={`${item.link_server}/{z}/{x}/{y}.png`}
                     pane="overlayPane"
-                    minNativeZoom={9}
-                    maxNativeZoom={item.zoom || 18}
-                    minZoom={9}
-                    maxZoom={25}
+                    minNativeZoom={12}  
+                    maxNativeZoom={item.zoom || 18} 
+                    minZoom={9}         
+                    maxZoom={25}        
+                    tileSize={256}      
                     opacity={opacity}
                 />
             ) : (
