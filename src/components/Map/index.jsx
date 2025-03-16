@@ -524,31 +524,23 @@ const Map = forwardRef(
                     setSearchParams(searchUrlParams);
 
                     let dataProvinceCurrent = ''
+                    let vitri = '';
                     if (searchParams.get('vitri')) {
-                        const vitri = searchParams.get('vitri').split(',');
+                        vitri = searchParams.get('vitri').split(',');
 
                         // Gọi API lấy thông tin tỉnh/thành phố
-                        // dataProvinceCurrent = await getLocationInBoudingBox(vitri[0], vitri[1]);
+                        dataProvinceCurrent = await fetchProvinceName(vitri[0], vitri[1]);
                     }
 
-                    // if (
-                    //     zoom >= 19 &&
-                    //     (!RegulationImages ||
-                    //         (RegulationImages[0].idProvince != dataProvinceCurrent?.provinces &&
-                    //             searchParams.get('type') === 'QUYHOACH_DIACHINH'))
-                    // ) {
-                    //     // Gọi API lấy thông tin quy hoạch
-                    //     const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${vitri[0]}/${vitri[1]}`;
-                    //     const resQuyHoach = await fetch(apiUrl);
-                    //     if (!resQuyHoach.ok) throw new Error('Không thể lấy dữ liệu quy hoạch');
-
-                    //     const dataQuyHoach = await resQuyHoach.json();
-
-                    //     searchParams.set('type', 'QUYHOACH_DIACHINH');
-                    //     searchParams.set('id', tinh.id);
-                    //     searchParams.set('draw', 'auto');
-                    //     setSearchParams(searchParams);
-                    // }
+                    if (
+                        zoom >= 19 &&
+                        (!RegulationImages || RegulationImages[0].idProvince != dataProvinceCurrent?.provinceId)
+                    ) {
+                        // Gọi API lấy thông tin quy hoạch
+                        console.log(dataByType["QUYHOACH_DIACHINH"])
+                        const tile = [dataByType["QUYHOACH_DIACHINH"][dataByType["QUYHOACH_DIACHINH"].length - 1]];
+                        setRegulationImages(tile);
+                    }
 
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
