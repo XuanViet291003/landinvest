@@ -1802,10 +1802,10 @@ const Map = forwardRef(
 
                 const allPolygons = jsonData
                     .flatMap(item => convertToPolygonArray(item[0].geom))
-                    // .flat(1);
+                // .flat(1);
 
                 // Ngưỡng diện tích nhỏ nhất 
-                const MIN_AREA = 50000; 
+                const MIN_AREA = 50000;
 
                 // Lọc polygon có diện tích nhỏ hơn ngưỡng
                 console.log(allPolygons)
@@ -1813,10 +1813,10 @@ const Map = forwardRef(
                     .filter(polygon => {
                         const turfPolygon = turf.polygon([polygon]);
                         const area = turf.area(turfPolygon);
-                        return area <= MIN_AREA; 
+                        return area <= MIN_AREA;
                     });
 
-                    console.log(JSON.stringify(filteredPolygons))
+                console.log(JSON.stringify(filteredPolygons))
 
                 setRegionPolygon(filteredPolygons);
             } catch (error) {
@@ -1886,6 +1886,21 @@ const Map = forwardRef(
             setSearchParams(searchParams);
             setEstateLoading(false);
         }
+
+        const renderedLayers = useMemo(() => {
+            if (
+                !RegulationImages ||
+                RegulationImages.length === 0 ||
+                ((searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&
+                    searchParams.get('draw') === 'auto')
+            ) {
+                return null;
+            }
+
+            return RegulationImages.map((item, index) => (
+                <CustomTileLayer key={index} item={item} opacity={opacity} />
+            ));
+        }, [RegulationImages, opacity]);
 
         return (
             <>
@@ -2197,16 +2212,7 @@ const Map = forwardRef(
                             })}
 
                         {/* {renderTileLayers()} */}
-                        {RegulationImages &&
-                            !(
-                                (searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&
-                                searchParams.get('draw') === 'auto' &&
-                                RegulationImages
-                            ) &&
-                            RegulationImages.length > 0 &&
-                            RegulationImages.map((item, index) => (
-                                <CustomTileLayer key={index} item={item} opacity={opacity} />
-                            ))}
+                        {renderedLayers}
                     </Pane>
                     {/* {currentLocation && currentLocation.lat && currentLocation.lon && (
                     <Marker position={[currentLocation.lat, currentLocation.lon]} icon={customIcon}>
