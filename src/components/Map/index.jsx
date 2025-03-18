@@ -747,9 +747,9 @@ const Map = forwardRef(
             if (id && type && dataByType) {
                 // Gọi API khi có id và type và chưa có itemQuyHoach
                 const data = dataByType[type];
-
-                if (data) {
-                    handleItemClick(data);
+                const record = data.find(item => item.id == id);
+                if (record) {
+                    handleItemClick(record);
                     // handleItemClick(
                     //     data.boundingbox,
                     //     data.type,
@@ -778,7 +778,7 @@ const Map = forwardRef(
                 //         console.error('Error fetching data from API:', error);
                 //     });
             }
-        }, [id, type]);
+        }, [id, type, dataByType]);
 
         useEffect(() => {
             if (itemQuyHoach) {
