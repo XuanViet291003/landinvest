@@ -58,13 +58,37 @@
 
 // export default fetchProvinceName;
 
+let provincesCache = null; // Lưu danh sách tỉnh để chỉ fetch một lần
+let districtsCache = {}; // Cache danh sách quận/huyện theo provinceFile
+
+// Fetch danh sách tỉnh chỉ một lần
+const loadProvinces = async () => {
+    if (!provincesCache) {
+        const response = await fetch('/tinh.json');
+        provincesCache = await response.json();
+    }
+    return provincesCache;
+};
+
+// Fetch danh sách quận/huyện theo provinceFile và cache lại
+const loadDistricts = async (provinceFile) => {
+    if (!provinceFile) return null;
+    
+    if (!districtsCache[provinceFile]) {
+        const response = await fetch(`/polygon/${provinceFile}`);
+        const districtData = await response.json();
+        districtsCache[provinceFile] = districtData.list_tinh || null;
+    }
+    
+    return districtsCache[provinceFile];
+};
+
+// Hàm chính để lấy tên tỉnh và quận/huyện theo tọa độ
 const fetchProvinceName = async (lat, lon) => {
     try {
-        // Fetch danh sách tỉnh từ file tinh.json
-        const response = await fetch('/tinh.json');
-        const provincesList = await response.json();
+        if (!lat || !lon) return { provinceName: 'Unknown', districtName: 'Unknown', provinceId: 0 };
 
-        if (!lat || !lon) return 'Unknown';
+        const provincesList = await loadProvinces();
 
         // Tìm tỉnh chứa tọa độ trong bbox
         let matchedProvince = provincesList.find(province => {
@@ -72,42 +96,39 @@ const fetchProvinceName = async (lat, lon) => {
             return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east;
         });
 
-        if (!matchedProvince) return 'Unknown';
+        if (!matchedProvince) return { provinceName: 'Unknown', districtName: 'Unknown', provinceId: 0 };
 
         let provinceName = matchedProvince.name_province;
+        let provinceId = matchedProvince.province__id;
+        let provinceFile = matchedProvince.file;
 
-        // Fetch danh sách quận/huyện từ file trong polygon
-        const districtResponse = await fetch(`/polygon/${matchedProvince.file}`);
-        const districtData = await districtResponse.json();
-
-        const districtsList = districtData.list_tinh; // Đây là danh sách quận/huyện
+        // Fetch danh sách quận/huyện khi provinceFile thay đổi
+        const districtsList = await loadDistricts(provinceFile);
 
         // Tìm quận/huyện chứa tọa độ trong bbox của nó
-        let matchedDistrict = districtsList.find(district => {
-            let bbox = JSON.parse(district.bbox.replace(/'/g, '"')); // Fix định dạng JSON lỗi
-            return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east        });
+        let matchedDistrict = districtsList?.find(district => {
+            let bbox = JSON.parse(district.bbox.replace(/'/g, '"'));
+            return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east;
+        });
 
         let districtName = matchedDistrict ? matchedDistrict.name_District : 'Unknown';
-
-        const provinceId = matchedProvince ? matchedProvince.province__id : 0;
 
         return { provinceName, districtName, provinceId };
     } catch (error) {
         console.error('Error fetching province/district:', error);
-        return 'Unknown';
+        return { provinceName: 'Unknown', districtName: 'Unknown', provinceId: 0 };
     }
 };
 
+// Hàm lấy thông tin tỉnh theo tên (không fetch lại nếu đã có trong cache)
 export const getProvince = async (provinceName) => {
-    const response = await fetch('/tinh.json');
-    const provincesList = await response.json();
-    return provincesList.find(province => province.name_provice.toLowerCase() === provinceName.toLowerCase()) || null;
+    const provincesList = await loadProvinces();
+    return provincesList.find(province => province.name_province.toLowerCase() === provinceName.toLowerCase()) || null;
 };
 
+// Hàm lấy danh sách quận/huyện từ file provinceFile (sử dụng cache)
 export const getDistrict = async (provinceFile) => {
-    const response = await fetch(`/polygon/${provinceFile}`);
-    const districtData = await response.json();
-    return districtData.list_tinh || null;
+    return await loadDistricts(provinceFile);
 };
 
 export default fetchProvinceName;
