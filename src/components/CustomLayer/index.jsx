@@ -48,13 +48,11 @@ const CustomTileLayer = ({ item, opacity }) => {
                 <TileLayer
                     ref={tileLayerRef}
                     url={`${item.link_server}/{z}/{x}/{y}.png`}
-                    // pane="overlayPane"
-                    // minNativeZoom={12}  
-                    // maxNativeZoom={item.zoom || 18} 
-                    // minZoom={9}         
-                    // maxZoom={25}        
-                    // tileSize={256}      
-                    opacity={opacity}
+                    minNativeZoom={12}  
+                    maxNativeZoom={18} 
+                    minZoom={9}         
+                    maxZoom={25} 
+                    tileSize={256} 
                 />
             ) : (
                 item.link_server
@@ -64,11 +62,11 @@ const CustomTileLayer = ({ item, opacity }) => {
                             key={index}
                             ref={(el) => (tileLayerRefs.current[index] = el)}
                             url={`${link}/{z}/{x}/{y}.png`}
-                            // pane="overlayPane"
-                            // minNativeZoom={9}
-                            // maxNativeZoom={item.zoom || 18}
-                            // minZoom={9}
-                            // maxZoom={25}
+                            minNativeZoom={12}
+                            maxNativeZoom={18}
+                            minZoom={9}
+                            maxZoom={25}
+                            tileSize={256} 
                             opacity={opacity}
                         />
                     ))
