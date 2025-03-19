@@ -778,7 +778,7 @@ const Map = forwardRef(
                 //         console.error('Error fetching data from API:', error);
                 //     });
             }
-        }, [id, type, dataByType]);
+        }, [id, type]);
 
         useEffect(() => {
             if (itemQuyHoach) {

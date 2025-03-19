@@ -427,7 +427,7 @@ function Home() {
             try {
                 const response = await fetch("/quyhoach_toanbo.json");
                 if (!response.ok) throw new Error("Network response was not ok");
-    
+
                 const data = await response.json();
                 dataCache.current = data;
                 setRawQuyHoachData(data);
@@ -435,33 +435,33 @@ function Home() {
                 console.error("Error fetching data:", error);
             }
         };
-    
+
         if (!dataCache.current) {
             fetchData();
         } else {
             setRawQuyHoachData(dataCache.current);
         }
     }, []);
-    
+
     useEffect(() => {
         const vitriParam = searchParams.get("vitri");
         if (!vitriParam || !rawQuyHoachData) return;
-    
+
         const [lat, lon] = vitriParam.split(",").map(Number);
         if (!lat || !lon) return;
-    
+
         const filterByBoundingBox = (items) => {
             return items.filter((item) => {
                 if (!item.boundingbox) return false;
-    
+
                 const bbox = item.boundingbox.split(",").map(num => parseFloat(num.trim()));
                 if (bbox.length !== 4) return false;
-    
+
                 const [minLon, minLat, maxLon, maxLat] = bbox;
                 return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
             });
         };
-    
+
         const categorizedData = {
             QUAN_HUYEN: filterByBoundingBox(rawQuyHoachData.quanhuyen).map(item => ({
                 ...item,
@@ -484,7 +484,7 @@ function Home() {
                 type_link: item.type_link ?? "1_link"
             }))
         };
-    
+
         setDataByType(categorizedData);
     }, [searchParams, rawQuyHoachData]);
 
@@ -657,6 +657,8 @@ function Home() {
         setTempPolygon(polygon);
         setIsModalPolygonVisible(false);
     };
+
+    console.log(dataByType)
 
     return (
         <>
@@ -999,25 +1001,27 @@ function Home() {
                     quyHoachList={quyHoachList}
                 />
                 {/* Map Container */}
-                {!isOpen && (
-                    <Map
-                        opacity={opacity}
-                        ref={mapRef}
-                        setSelectedPosition={setSelectedPosition}
-                        selectedPosition={selectedPosition}
-                        setIdDistrict={setIdDistrict}
-                        idDistrict={idDistrict}
-                        markers={markers}
-                        setMarkers={setMarkers}
-                        isSelectedMeasure={isSelectedMeasure}
-                        setIsSelectedMeasure={setIsSelectedMeasure}
-                        distances={distances}
-                        setDistances={setDistances}
-                        setIsShowModalUpload={setIsShowModalUpload}
-                        polygonCoords={polygon ? convertToPolygonArray(polygon) : ""}
-                        dataByType={dataByType}
-                    />
-                )}
+                {(!isOpen &&
+                    ((!searchParams.get("id") || !searchParams.get("type")) ||
+                        (dataByType[searchParams.get("type")] && dataByType[searchParams.get("type")].length > 0))) && (
+                        <Map
+                            opacity={opacity}
+                            ref={mapRef}
+                            setSelectedPosition={setSelectedPosition}
+                            selectedPosition={selectedPosition}
+                            setIdDistrict={setIdDistrict}
+                            idDistrict={idDistrict}
+                            markers={markers}
+                            setMarkers={setMarkers}
+                            isSelectedMeasure={isSelectedMeasure}
+                            setIsSelectedMeasure={setIsSelectedMeasure}
+                            distances={distances}
+                            setDistances={setDistances}
+                            setIsShowModalUpload={setIsShowModalUpload}
+                            polygonCoords={polygon ? convertToPolygonArray(polygon) : ""}
+                            dataByType={dataByType}
+                        />
+                    )}
 
                 <ModalDownMenu
                     show={isModalVisible}
