@@ -53,6 +53,7 @@ const CustomTileLayer = ({ item, opacity }) => {
                     minZoom={9}         
                     maxZoom={25} 
                     tileSize={256} 
+                    opacity={opacity}
                 />
             ) : (
                 item.link_server
