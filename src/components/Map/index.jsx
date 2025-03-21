@@ -1902,6 +1902,14 @@ const Map = forwardRef(
             ));
         }, [RegulationImages, opacity]);
 
+        useEffect(() => {
+            if(searchParams.get('ups') === 'history-cost'){
+                const vitri = searchParams.get("vitri").split(",");
+                setLatHistoryCost(vitri[0]);
+                setLonHistoryCost(vitri[1]);
+            }
+        }, [])
+
         return (
             <>
                 {contextHolder}

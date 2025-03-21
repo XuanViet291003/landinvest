@@ -5,32 +5,30 @@ const CustomTileLayer = ({ item, opacity }) => {
     const tileLayerRef = useRef(null);
     const tileLayerRefs = useRef([]);
 
-    console.log(item)
-
-    const updateTileLayer = (tileLayer, link) => {
-        if (!tileLayer) return;
-        if (item.type_load_anh && item.type_load_anh === "NGHICH") {
-            tileLayer.getTileUrl = ({ x, y, z }) => {
-                const newY = Math.pow(2, z) - 1 - y;
-                return `${link}/${z}/${x}/${newY}.png`;
-            };
-        } else {
-            tileLayer.getTileUrl = ({ x, y, z }) => {
-                return `${link}/${z}/${x}/${y}.png`;
-            };
-        }
-        tileLayer.redraw();
-    };
-
     useEffect(() => {
+        if (!item) return; 
+
+        const updateTileLayer = (tileLayer, link) => {
+            if (!tileLayer) return;
+            if (item?.type_load_anh === "NGHICH") {
+                tileLayer.getTileUrl = ({ x, y, z }) => {
+                    const newY = Math.pow(2, z) - 1 - y;
+                    return `${link}/${z}/${x}/${newY}.png`;
+                };
+            } else {
+                tileLayer.getTileUrl = ({ x, y, z }) => `${link}/${z}/${x}/${y}.png`;
+            }
+            tileLayer.redraw();
+        };
+
         if (item.type_link === "1_link") {
             if (tileLayerRef.current) {
                 updateTileLayer(tileLayerRef.current, item.link_server);
             }
         } else {
             const links = item.link_server
-                .split(",")
-                .map((link) => link.trim().replace(/[^a-zA-Z0-9:/._-]/g, ""));
+                ?.split(",")
+                .map((link) => link.trim().replace(/[^a-zA-Z0-9:/._-]/g, "")) || [];
 
             links.forEach((link, index) => {
                 if (tileLayerRefs.current[index]) {
@@ -38,9 +36,11 @@ const CustomTileLayer = ({ item, opacity }) => {
                 }
             });
         }
-    }, [item.type_load_anh, item.link_server]);
+    }, [item?.type_load_anh, item?.link_server, item?.type_link]);
 
-    console.log(item)
+    if (!item) {
+        return null;
+    }
 
     return (
         <>
@@ -56,21 +56,19 @@ const CustomTileLayer = ({ item, opacity }) => {
                     opacity={opacity}
                 />
             ) : (
-                item.link_server
-                    .split(",")
-                    .map((link, index) => (
-                        <TileLayer
-                            key={index}
-                            ref={(el) => (tileLayerRefs.current[index] = el)}
-                            url={`${link}/{z}/{x}/{y}.png`}
-                            minNativeZoom={12}
-                            maxNativeZoom={18}
-                            minZoom={9}
-                            maxZoom={25}
-                            tileSize={256} 
-                            opacity={opacity}
-                        />
-                    ))
+                item?.link_server?.split(",").map((link, index) => (
+                    <TileLayer
+                        key={index}
+                        ref={(el) => (tileLayerRefs.current[index] = el)}
+                        url={`${link}/{z}/{x}/{y}.png`}
+                        minNativeZoom={12}
+                        maxNativeZoom={18}
+                        minZoom={9}
+                        maxZoom={25}
+                        tileSize={256} 
+                        opacity={opacity}
+                    />
+                ))
             )}
         </>
     );
