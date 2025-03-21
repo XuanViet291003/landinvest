@@ -9,7 +9,7 @@ const CustomTileLayer = ({ item, opacity }) => {
 
     const updateTileLayer = (tileLayer, link) => {
         if (!tileLayer) return;
-        if (item.type_load_anh === "NGHICH") {
+        if (item.type_load_anh && item.type_load_anh === "NGHICH") {
             tileLayer.getTileUrl = ({ x, y, z }) => {
                 const newY = Math.pow(2, z) - 1 - y;
                 return `${link}/${z}/${x}/${newY}.png`;

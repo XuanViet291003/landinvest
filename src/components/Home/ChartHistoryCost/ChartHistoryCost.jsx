@@ -54,6 +54,7 @@ const ChartCostHistory = (props) => {
                 item.type.trim().toLowerCase()
             )
         );
+        console.log(uniqueData)
         setData(uniqueData);
 
         const res = await getLocationInBoudingBox(lat, lon);
