@@ -57,15 +57,21 @@ const getAllDistrictsInProvinceApi = createAsyncThunk(
 );
 const getAllLocalitiesInDistrictApi = createAsyncThunk(
     'api/getAllLocalitiesInDistrict',
-    async (args, { rejectWithValue }) => {
-        const id = args;
-
+    async (districtIds, { rejectWithValue }) => {
         try {
-            const data = await getAllLocalitiesInDistrict(id);
+            // If districtIds is an array, call the API for each ID and merge the results
+            const ids = Array.isArray(districtIds) ? districtIds : [districtIds];
+            const promises = ids.map((id) => getAllLocalitiesInDistrict(id));
+            const results = await Promise.all(promises);
+            
+            // Merge all ward/commune data from districts
+            const allLocalities = results.reduce((acc, result) => {
+                return acc.concat(result.dulieu);
+            }, []);
 
-            return data.dulieu;
+            return allLocalities;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     },
 );
@@ -84,7 +90,7 @@ const getDistrictIdApi = createAsyncThunk('api/getDistrictId', async (args, { re
     }
 });
 
-// districtId, provinceId,location nên được tách riêng ra để sử dụng
+
 const initialState = {
     allProvinces: [],
     allLandCost: [],
@@ -193,6 +199,7 @@ const landCostSlice = createSlice({
             })
             .addCase(getAllLocalitiesInDistrictApi.rejected, (state) => {
                 state.allLocalitiesStatus = THUNK_API_STATUS.REJECTED;
+                state.allLocalities =[];
             })
             .addCase(getDistrictIdApi.pending, (state) => {})
             .addCase(getDistrictIdApi.fulfilled, (state, action) => {

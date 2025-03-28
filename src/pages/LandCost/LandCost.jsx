@@ -1,10 +1,12 @@
 import { Button, Select } from 'antd';
-import React, { useEffect } from 'react';
-import { Carousel, Container } from 'react-bootstrap';
+import React, { useEffect, useCallback } from 'react';
+import { Container } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { arrayBannerImage } from '../../assets/banner/image';
+import Banner from '../../components/Banner';
 import LandCostTable from '../../components/LandCostTable/LandCostTable';
+import { useState } from "react";
+import axios from "axios";
 import { LAND_COST_KEY, MAP_TABLE_TYPE } from '../../constants/LandCostKey';
 import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
 import {
@@ -17,14 +19,15 @@ import {
     setCurrentPage,
     setFilterSeletecd,
 } from '../../redux/landCostSlice/landCostSlice';
-import Banner from '../../components/Banner';
+
 
 const LandCost = () => {
+    const [searchResults, setSearchResults] = useState([]);
     const dispatch = useDispatch();
     const allProvinces = useSelector((state) => state.landCost.allProvinces);
     const allDistricts = useSelector((state) => state.landCost.allDistricts);
     const allLocalities = useSelector((state) => state.landCost.allLocalities);
-    const allLandCost = useSelector((state) => state.landCost.allLandCost); 
+    const allLandCost = useSelector((state) => state.landCost.allLandCost);
     const provincesStatus = useSelector((state) => state.landCost.provincesStatus);
     const allDistrictsStatus = useSelector((state) => state.landCost.allDistrictsStatus);
     const allLocalitiesStatus = useSelector((state) => state.landCost.allLocalitiesStatus);
@@ -48,18 +51,43 @@ const LandCost = () => {
         setSearchParams(searchParams);
     };
 
-    const handleChangeDistricts = (id) => {
-        dispatch(getAllLocalitiesInDistrictApi(id));
-        dispatch(getAllLandCostApi({ id, type: LAND_COST_KEY.DISTRICT }));
-        dispatch(
-            setFilterSeletecd({
-                district: id,
-                locality: null,
-            }),
-        );
-        searchParams.set(LAND_COST_KEY.DISTRICT, id);
+    //find all district
+    const handleChangeDistricts = useCallback(async (districtIds) => {
+        const isAllSelected = districtIds.includes('all');
+        const selectedDistrictIds = isAllSelected ? 'all' : districtIds;
+        dispatch(setFilterSeletecd({
+            district: selectedDistrictIds,
+            locality: null,
+        }));
+
+        // Call API to get data if district is selected
+        if (selectedDistrictIds) {
+            try {
+                const idsToFetch = isAllSelected
+                    ? allDistricts?.map((item) => item.DistrictID) || []
+                    : districtIds;
+                if (idsToFetch.length > 0) {
+                    await dispatch(getAllLocalitiesInDistrictApi(idsToFetch)).unwrap();
+                    dispatch(getAllLandCostApi({ id: idsToFetch, type: LAND_COST_KEY.DISTRICT }));
+                }
+                if (isAllSelected) {
+                    searchParams.set(LAND_COST_KEY.DISTRICT, 'all');
+                } else {
+                    searchParams.set(LAND_COST_KEY.DISTRICT, districtIds.join(','));
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu:', error);
+            }
+        } else {
+            dispatch(resetData({ type: LAND_COST_KEY.DISTRICT }));
+            dispatch(getAllLandCostApi({ id: filterSelected.province, type: LAND_COST_KEY.PROVINCE }));
+            searchParams.delete(LAND_COST_KEY.DISTRICT);
+        }
+
+        dispatch(setCurrentPage(1));
         setSearchParams(searchParams);
-    };
+    }, [dispatch, searchParams, allDistricts, filterSelected.province, setSearchParams]);
+
     const handleChangeLocalites = (id) => {
         dispatch(getAllLandCostApi({ id, type: LAND_COST_KEY.LOCALITY }));
         dispatch(
@@ -68,6 +96,7 @@ const LandCost = () => {
             }),
         );
     };
+
     const handleResetLandCost = () => {
         dispatch(getAllLandCostApi({}));
         dispatch(resetData({}));
@@ -82,6 +111,54 @@ const LandCost = () => {
         searchParams.delete(LAND_COST_KEY.DISTRICT);
         setSearchParams(searchParams);
     };
+
+    const [showTable, setShowTable] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const handleSearch = async () => {
+        if (!searchTerm) {
+            alert("Vui lòng nhập từ khóa tìm kiếm!");
+            return;
+    }
+
+    try {
+        const response = await axios.get(
+            `https://api.quyhoach.xyz/search_bang_gia_dat/${encodeURIComponent(searchTerm)}`
+        );
+            console.log("Dữ liệu từ API:", response.data);
+            setSearchResults(response.data);
+            setShowTable(true);
+    }catch (error) {
+            console.error("Lỗi gọi API:", error);
+        }
+    };
+    {showTable && (
+        <div className="search-results-container">
+            <h2>Kết quả tìm kiếm</h2>
+            <LandCostTable tableType={MAP_TABLE_TYPE.ON_ROUTE} data={searchResults} />
+            <Button onClick={() => setShowTable(false)}>Đóng</Button>
+        </div>
+    )}
+
+    const removeVietnameseTones = (str) => {
+        if (!str) return '';
+        str = str.toLowerCase();
+        str = str.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a');
+        str = str.replace(/[èéẹẻẽêềếệểễ]/g, 'e');
+        str = str.replace(/[ìíịỉĩ]/g, 'i');
+        str = str.replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o');
+        str = str.replace(/[ùúụủũưừứựửữ]/g, 'u');
+        str = str.replace(/[ỳýỵỷỹ]/g, 'y');
+        str = str.replace(/đ/g, 'd');
+        return str;
+    };
+
+    const districtOptions = [
+        { label: 'Tất cả quận huyện', value: 'all' },
+        ...(allDistricts?.map((item) => ({
+            label: item.DistrictName,
+            value: item.DistrictID,
+        })) || []),
+    ];
 
     useEffect(() => {
         const provinceId = Number(searchParams.get(LAND_COST_KEY.PROVINCE));
@@ -115,6 +192,24 @@ const LandCost = () => {
         <Container>
             <Banner />
             <div className="land-cost__container">
+                <div  className='land-cost__container-search'>
+                    <input
+                        type="text"
+                        placeholder='Nhập từ khóa tìm kiếm'
+                        className='land-cost__container-search-items'
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}          
+                    />
+                    <Button
+                        htmlType="button"
+                        type="primary"
+                        size="large"
+                        className="land-cost__container-select-btn"
+                        onClick={handleSearch}
+                    >
+                        Tìm kiếm
+                    </Button>
+                </div>
                 <div className="land-cost__container-select">
                     <Select
                         onChange={handleChangeProvinces}
@@ -129,20 +224,30 @@ const LandCost = () => {
                             label: item.ProvinceName,
                             value: item.ProvinceID,
                         }))}
+                        showSearch
+                        filterOption={(input, option) => {
+                            const searchText = removeVietnameseTones(input);
+                            const optionText = removeVietnameseTones(option.label);
+                            return optionText.includes(searchText);
+                        }}
                     />
                     <Select
                         onChange={handleChangeDistricts}
                         loading={allDistrictsStatus === THUNK_API_STATUS.PENDING}
-                        disabled={allDistrictsStatus === THUNK_API_STATUS.PENDING}
+                        disabled={allDistrictsStatus === THUNK_API_STATUS.PENDING || !filterSelected.province}
                         placeholder="Quận huyện"
                         size="large"
                         value={allDistrictsStatus === THUNK_API_STATUS.PENDING ? null : filterSelected.district}
                         allowClear
+                        mode="multiple"
                         className="land-cost__container-select-item"
-                        options={allDistricts?.map((item) => ({
-                            label: item.DistrictName,
-                            value: item.DistrictID,
-                        }))}
+                        options={districtOptions}
+                        showSearch
+                        filterOption={(input, option) => {
+                            const searchText = removeVietnameseTones(input);
+                            const optionText = removeVietnameseTones(option.label);
+                            return optionText.includes(searchText);
+                        }}
                     />
                     <Select
                         placeholder="Thị trấn, phường, xã"
@@ -157,6 +262,12 @@ const LandCost = () => {
                             label: item.WandName,
                             value: item.WandID,
                         }))}
+                        showSearch
+                        filterOption={(input, option) => {
+                            const searchText = removeVietnameseTones(input);
+                            const optionText = removeVietnameseTones(option.label);
+                            return optionText.includes(searchText);
+                        }}
                     />
                     <Button
                         htmlType="button"
