@@ -85,6 +85,13 @@ const iconDuAn = new L.Icon({
     popupAnchor: [-3, -38],
 });
 
+const iconDuAnNoPlygon = new L.Icon({
+    iconUrl: require('../../assets/icons8-home-48.png'),
+    iconSize: [38, 38],
+    iconAnchor: [22, 38],
+    popupAnchor: [-3, -38],
+});
+
 const dotIcon = new L.DivIcon({
     className: 'custom-dot-icon',
     html: `<div></div>`,
@@ -1999,12 +2006,14 @@ const Map = forwardRef(
                 >
                     {duAn.map((duAnItem) => {
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
+                        const hasPolygon = duAnItem.polygon === "CO_POLYGON";
+                        const markerIcon = hasPolygon ? iconDuAn : iconDuAnNoPlygon;
 
                         return (
                             <Marker
                                 key={duAnItem.id}
                                 position={[lat, lng]}
-                                icon={iconDuAn}
+                                icon={markerIcon}
                                 eventHandlers={{
                                     click: () => handleClickDuAnIcon(duAnItem.id),
                                 }}
