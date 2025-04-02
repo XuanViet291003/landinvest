@@ -8,6 +8,7 @@ const LandCostDescription = ({ description, oneLine = false }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = () => {
+        console.log("Modal should open")
         setIsModalOpen(true);
     };
     const handleOk = () => {
@@ -51,6 +52,7 @@ const LandCostDescription = ({ description, oneLine = false }) => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 className="land-cost-description-modal"
+                bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }} // Đã có, giữ nguyên
             >
                 <div className="land-const-detail__wrapper">
                     <div className="lant-cost-detail__header">
@@ -63,6 +65,7 @@ const LandCostDescription = ({ description, oneLine = false }) => {
                             onClick={handleCancel}
                         />
                     </div>
+                    {console.log("Modal content:", description)}
                     <p className="land-cost-description--detail">{description}</p>
                 </div>
             </Modal>

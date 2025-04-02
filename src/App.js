@@ -39,6 +39,7 @@ import DetailBidding from './pages/Bidding/DetailBidding/DetailBidding.jsx';
 import DetailProcurement from './pages/Bidding/Procurement/DetailProcurement/DetailProcurement.jsx';
 import Procurement from './pages/Bidding/Procurement/Procurement.jsx';
 import LandCost from './pages/LandCost/LandCost.jsx';
+import BidPlans from './pages/BidPlans/BidPlans.jsx';
 import LandUsePlanDetail from './pages/LandPlan/LandPlanDetail/LandPlanDetail.jsx';
 import LandUsePlan from './pages/LandPlan/LandUsePlan.jsx';
 import Checkout from './pages/Payment/Checkout.jsx';
@@ -51,6 +52,7 @@ import './styles/checkout.scss';
 import './styles/coin.scss';
 import './styles/landAdministration.scss';
 import './styles/landCost.scss';
+import './styles/BidPlans.scss';
 import './styles/landTable.scss';
 import './styles/listRegulation.scss';
 import './styles/map.scss';
@@ -221,6 +223,10 @@ function App() {
                 {
                     path: '/land-cost',
                     element: <LandCost />,
+                },
+                {
+                    path: '/bid-plans',
+                    element:<BidPlans/>
                 },
                 {
                     path: '/administrative-maps',

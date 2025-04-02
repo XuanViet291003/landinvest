@@ -484,6 +484,9 @@ const Header = () => {
                                 <NavLink to="/about-us" className="nav-link">
                                     <InfoCircleOutlined style={{ fontSize: 20 }} />
                                 </NavLink>
+                                <NavLink to="/bid-plans" className="nav-link">
+                                    <img src={icons.bidPlansIcon} alt="" width={30} height={30} /> {/* Icon mới */}
+                                </NavLink>
                                 <NavLink className="header-notification" to="/login-user">
                                     <IoIosNotifications size={24} style={{color: "white"}} />
                                 </NavLink>
@@ -685,12 +688,15 @@ const Header = () => {
                             <ActionIcon />
                         </NavLink>
                         <NavLink to="/land-cost" className="nav-link">
-                          <img src={icons.landCostIcon} alt="" width={30} height={30} />
+                            <img src={icons.landCostIcon} alt="" width={30} height={30} />
                         </NavLink>
                         <NavLink to="/login-user" className="nav-link">
                             <IoIosNotifications 
                               style={{ color: 'white', width: '20px', height: '20px' }} 
                             />
+                        </NavLink>
+                        <NavLink to="/land-cost" className="nav-link">
+                            <img src={icons.landCostIcon} alt="" width={30} height={30} />
                         </NavLink>
 
                         {!isAuthenticated ? (
