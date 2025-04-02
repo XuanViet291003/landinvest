@@ -1,11 +1,10 @@
-import { Button, Select } from 'antd';
-import React, { useEffect, useCallback } from 'react';
+import { Button, Select, Table } from 'antd';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import Banner from '../../components/Banner';
 import LandCostTable from '../../components/LandCostTable/LandCostTable';
-import { useState } from "react";
 import axios from "axios";
 import { LAND_COST_KEY, MAP_TABLE_TYPE } from '../../constants/LandCostKey';
 import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
@@ -20,9 +19,10 @@ import {
     setFilterSeletecd,
 } from '../../redux/landCostSlice/landCostSlice';
 
-
 const LandCost = () => {
     const [searchResults, setSearchResults] = useState([]);
+    const [showTable, setShowTable] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const dispatch = useDispatch();
     const allProvinces = useSelector((state) => state.landCost.allProvinces);
     const allDistricts = useSelector((state) => state.landCost.allDistricts);
@@ -33,6 +33,43 @@ const LandCost = () => {
     const allLocalitiesStatus = useSelector((state) => state.landCost.allLocalitiesStatus);
     const filterSelected = useSelector((state) => state.landCost.filterSelected);
     const [searchParams, setSearchParams] = useSearchParams();
+
+    // Call API
+    const fetchData = async (term) => {
+        try {
+            const response = await axios.get(
+                `https://api.quyhoach.xyz/search_bang_gia_dat/${encodeURIComponent(term)}`
+            );
+            console.log("Dữ liệu từ API:", response.data);
+
+            if (response.data.dulieu && response.data.dulieu.length > 0) {
+                setSearchResults(response.data.dulieu);
+                setShowTable(true);
+            } else {
+                alert("Không tìm thấy kết quả phù hợp");
+                setShowTable(false);
+            }
+        } catch (error) {
+            console.error("Lỗi gọi API:", error);
+            alert("Đã xảy ra lỗi khi gọi API");
+            setShowTable(false);
+        }
+    };
+
+    // Search
+    const handleSearch = () => {
+        if (!searchTerm) {
+            alert("Vui lòng nhập từ khóa tìm kiếm!");
+            return;
+        }
+        fetchData(searchTerm); 
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
 
     const handleChangeProvinces = (id) => {
         dispatch(getAllDistrictsInProvinceApi(id));
@@ -60,6 +97,7 @@ const LandCost = () => {
             locality: null,
         }));
 
+
         // Call API to get data if district is selected
         if (selectedDistrictIds) {
             try {
@@ -86,12 +124,12 @@ const LandCost = () => {
 
         dispatch(setCurrentPage(1));
         setSearchParams(searchParams);
-    }, [dispatch, searchParams, allDistricts, filterSelected.province, setSearchParams]);
+        }, [dispatch, searchParams, allDistricts, filterSelected.province, setSearchParams]);
 
     const handleChangeLocalites = (id) => {
         dispatch(getAllLandCostApi({ id, type: LAND_COST_KEY.LOCALITY }));
         dispatch(
-            setFilterSeletecd({
+        setFilterSeletecd({
                 locality: id,
             }),
         );
@@ -101,55 +139,19 @@ const LandCost = () => {
         dispatch(getAllLandCostApi({}));
         dispatch(resetData({}));
         dispatch(
-            setFilterSeletecd({
-                province: null,
-                district: null,
-                locality: null,
+        setFilterSeletecd({
+            province: null,
+            district: null,
+            locality: null,
             }),
         );
         searchParams.delete(LAND_COST_KEY.PROVINCE);
         searchParams.delete(LAND_COST_KEY.DISTRICT);
         setSearchParams(searchParams);
-    };
-
-    const [showTable, setShowTable] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const handleSearch = async () => {
-        if (!searchTerm) {
-            alert("Vui lòng nhập từ khóa tìm kiếm!");
-            return;
-    }
-
-    try {
-        const response = await axios.get(
-            `https://api.quyhoach.xyz/search_bang_gia_dat/${encodeURIComponent(searchTerm)}`
-        );
-            console.log("Dữ liệu từ API:", response.data);
-            setSearchResults(response.data);
-            setShowTable(true);
-    }catch (error) {
-            console.error("Lỗi gọi API:", error);
-        }
-    };
-    {showTable && (
-        <div className="search-results-container">
-            <h2>Kết quả tìm kiếm</h2>
-            <LandCostTable tableType={MAP_TABLE_TYPE.ON_ROUTE} data={searchResults} />
-            <Button onClick={() => setShowTable(false)}>Đóng</Button>
-        </div>
-    )}
+        };
 
     const removeVietnameseTones = (str) => {
-        if (!str) return '';
-        str = str.toLowerCase();
-        str = str.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a');
-        str = str.replace(/[èéẹẻẽêềếệểễ]/g, 'e');
-        str = str.replace(/[ìíịỉĩ]/g, 'i');
-        str = str.replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o');
-        str = str.replace(/[ùúụủũưừứựửữ]/g, 'u');
-        str = str.replace(/[ỳýỵỷỹ]/g, 'y');
-        str = str.replace(/đ/g, 'd');
-        return str;
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
     };
 
     const districtOptions = [
@@ -186,19 +188,20 @@ const LandCost = () => {
         return () => {
             dispatch(setAllLandCost([]));
         };
-    }, []);
+    }, [dispatch, searchParams]);
 
     return (
         <Container>
             <Banner />
             <div className="land-cost__container">
-                <div  className='land-cost__container-search'>
+                <div className='land-cost__container-search'>
                     <input
                         type="text"
                         placeholder='Nhập từ khóa tìm kiếm'
                         className='land-cost__container-search-items'
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}          
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleKeyPress}
                     />
                     <Button
                         htmlType="button"
@@ -210,6 +213,18 @@ const LandCost = () => {
                         Tìm kiếm
                     </Button>
                 </div>
+                {showTable && (
+                    <div className="search-results-container">
+                        <h3 className='text-white'>Kết quả tìm kiếm</h3>
+                        <LandCostTable tableType={MAP_TABLE_TYPE.ON_ROUTE} data={searchResults} />
+                        <Button
+                            type='default'
+                            onClick={() => setShowTable(false)}
+                        >
+                            Đóng
+                        </Button>
+                    </div>
+                )}
                 <div className="land-cost__container-select">
                     <Select
                         onChange={handleChangeProvinces}
@@ -281,7 +296,7 @@ const LandCost = () => {
                 </div>
                 <h1 className="land-cost__container-title">Bảng giá đất 2024 do chính phủ ban hành</h1>
                 <p className="land-cost__container--notice">
-                    Chú thích: Vị trí 1 là mặt tiền đường; Ví trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m - 5m;
+                    Chú thích: Vị trí 1 là mặt tiền đường; Vị trí 2 là hẻm rộng trên 5m; Vị trí 3 là hẻm rộng 3m - 5m;
                     Vị trí 4 là hẻm rộng dưới 3m.
                 </p>
                 <p className="land-cost__container--notice">Giữ shift + lăn chuột để xem các cột tiếp theo</p>

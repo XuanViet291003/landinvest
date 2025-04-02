@@ -8,7 +8,8 @@ export const icons = {
     redMarker,
     mapIcon,
     vipIcon,
-    landCostIcon
+    landCostIcon,
+    bidPlansIcon: require('./images.png')
 };
 
 export const images = {

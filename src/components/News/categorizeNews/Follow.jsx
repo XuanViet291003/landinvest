@@ -1,7 +1,7 @@
 import { message, Radio, Spin } from 'antd';
 import '../News.scss';
 import { useEffect, useState } from 'react';
-import { getListAllUser, getListNewUser, getListOnlineUser } from '../../../services/api';
+import { getListNewUser, getListOnlineUser } from '../../../services/api';
 import img from '../../../assets/default-image-user.png';
 import { Col, Row } from 'antd';
 import ReactPaginate from 'react-paginate';
@@ -49,11 +49,11 @@ function Follow() {
             try {
                 const newUser = await getListNewUser();
                 const onlineUser = await getListOnlineUser();
-                const allUser = await getListAllUser();
+                // const allUser = await getListAllUser();
                 setListNewUser(newUser.data);
                 setTotalPage(Math.ceil(newUser.total_page));
                 setListOnlineUser(onlineUser.OnlineUsers);
-                setListAllUser(allUser);
+                // setListAllUser(allUser);
             } catch {
                 message.error('Đã có lỗi xảy ra !');
             }
