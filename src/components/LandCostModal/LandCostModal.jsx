@@ -23,6 +23,8 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
 
     const [debouncedInputSearch] = useDebounce(searchValue, 500);
 
+    const [isModalLarge, setIsModalLarge] = useState(true); // Quản lý trạng thái modal lớn hay nhỏ
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -123,7 +125,7 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                 open={isLandCostModalOpen}
                 onCancel={handleCancel}
                 footer={null}
-                width="20vw"
+                width="50vw"
                 centered // Căn giữa Modal
                 bodyStyle={{ backgroundColor: '#fffdfd', color: '#100e0e' }}
                 className="div#Bảng\ giá\ đất"
@@ -134,8 +136,10 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
             <ReactWindow
                 title="Bảng giá đất"
                 onClose={handleCancel}
-                width={isMobile ? '90vw' : 500}
-                height={isMobile ? '80vh' : 400}
+                // width={isMobile ? '90vw' : 500}
+                // height={isMobile ? '80vh' : 400}
+                width="90vw"
+                height="80vh"
                 style={{
                     backgroundColor: '#100f0f',
                     color: '#131313',
@@ -153,6 +157,21 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                 {modalContent}
             </ReactWindow>
         )
+        // <ReactWindow
+        //     title="Bảng giá đất"
+        //     onClose={handleCancel}
+        //     width={isMobile ? '90vw' : 800}
+        //     height={isMobile ? '80vh' : 600}
+        //     style={{
+        //         backgroundColor: '#100f0f',
+        //         color: '#eaeaea',
+        //         borderRadius: '8px',
+        //         padding: '20px',
+        //         overflow: 'hidden',
+        //     }}
+        // >
+        //     {modalContent}
+        // </ReactWindow>
     ) : null;
 };
 
