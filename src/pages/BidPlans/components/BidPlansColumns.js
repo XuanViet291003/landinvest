@@ -13,7 +13,7 @@ export const columns = [
   {
     title: 'Chi tiết dự án',
     key: 'action',
-    width: 200,
+    width: 170,
     render: (text, record) => (
       <Space size="middle">
         <a onClick={() => record.onViewDetail(record)}>Xem chi tiết</a>

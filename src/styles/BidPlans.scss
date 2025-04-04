@@ -2,95 +2,121 @@
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-}
-
-.bid-plans__content {
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.bid-plans__title {
-    text-align: center;
-    margin-bottom: 24px;
-    color: #1890ff;
-}
-
-.bid-plans__search {
-    margin-bottom: 24px;
-}
-
-.bid-plans__select {
-    margin-bottom: 16px;
-}
-
-.bid-plans__search-btn {
-    height: 40px;
-}
-
-.bid-plans__loading {
-    display: flex;
-    justify-content: center;
-    padding: 40px 0;
-}
-
-.bid-plans__error {
-    color: #ff4d4f;
-    text-align: center;
-    margin: 20px 0;
-    padding: 10px;
-    background: #fff2f0;
-    border-radius: 4px;
-}
-
-.bid-plans__results {
-    margin-top: 24px;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 16px;
-}
-
-.results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.close-btn {
-    margin-left: 16px;
-}
-
-
-@media (max-width: 768px) {
-    .bid-plans__search .ant-col {
-        margin-bottom: 16px;
+  
+    .bid-plans__content {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      margin-top: 20px;
+  
+      .bid-plans__title {
+        color: #1890ff;
+        text-align: center;
+        margin-bottom: 24px;
+        font-size: 24px;
+        font-weight: 500;
+      }
+  
+      .bid-plans__search {
+        margin-bottom: 24px;
+  
+        .ant-col {
+          margin-bottom: 16px;
+        }
+  
+        .bid-plans__select {
+          width: 100%;
+          
+          .ant-select-selector {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+            
+            &:hover {
+              border-color: #40a9ff;
+            }
+          }
+  
+          .ant-select-selection-item {
+            line-height: 38px;
+          }
+        }
+  
+        .ant-btn {
+          height: 40px;
+          font-weight: 500;
+          border-radius: 4px;
+          background-color: #1890ff;
+          border-color: #1890ff;
+          
+          &:hover {
+            background-color: #40a9ff;
+            border-color: #40a9ff;
+          }
+          
+          &:disabled {
+            background-color: #f5f5f5;
+            border-color: #d9d9d9;
+            color: rgba(0, 0, 0, 0.25);
+          }
+        }
+      }
+  
+      .bid-plans__results {
+        margin-top: 24px;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 16px;
+        background: #fafafa;
+  
+        .results-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+  
+          h3 {
+            color: #1890ff;
+            margin: 0;
+            font-size: 18px;
+          }
+  
+          .ant-btn {
+            background: #fff;
+            border-color: #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            
+            &:hover {
+              color: #1890ff;
+              border-color: #1890ff;
+            }
+          }
+        }
+      }
     }
-}
-
-.table-cell-truncate {
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 4.5em; /* 3 dòng x 1.5 line-height */
-    line-height: 1.5;
   }
   
-  /* Style cho nút xem thêm */
-  .see-more-btn {
-    color: #1890ff;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    margin-top: 4px;
-  }
+  // Responsive styles
+  @media (max-width: 768px) {
+    .bid-plans-container {
+      padding: 10px;
   
-  /* Modal hiển thị nội dung đầy đủ */
-  .full-content-modal .ant-modal-body {
-    white-space: pre-line;
-    max-height: 60vh;
-    overflow-y: auto;
+      .bid-plans__content {
+        padding: 16px;
+  
+        .bid-plans__title {
+          font-size: 20px;
+          margin-bottom: 16px;
+        }
+  
+        .bid-plans__search {
+          .ant-col {
+            margin-bottom: 12px;
+          }
+        }
+      }
+    }
   }
