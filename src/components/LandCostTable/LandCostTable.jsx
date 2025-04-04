@@ -12,7 +12,7 @@ export const LandCostTable = ({ tableType, searchValue, data, type }) => {
     const districtId = useSelector((state) => state.landCost.districtId);
     const [landCostData, setLandCostData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 10; // Số lượng dòng trên mỗi trang
+    const pageSize = 50; // Số lượng dòng trên mỗi trang
     const [totalRecords, setTotalRecords] = useState(0);
 
     useEffect(() => {

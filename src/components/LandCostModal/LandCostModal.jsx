@@ -9,6 +9,8 @@ import { ACTIONS } from '../../constants/commonKey';
 import { LAND_COST_KEY, MAP_TABLE_TYPE } from '../../constants/LandCostKey';
 import LandCostTable from '../LandCostTable/LandCostTable';
 import ReactWindow from 'reactjs-windows';
+import './LandCostModal.scss';
+
 
 const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
     const currentLocation = useSelector((state) => state.searchQuery.searchResult);
@@ -20,6 +22,7 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const [debouncedInputSearch] = useDebounce(searchValue, 500);
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -116,12 +119,14 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
         isMobile ? (
             <Modal
                 title={<span style={{ color: '#171616' }}>Bảng giá đất</span>}
-                visible={isLandCostModalOpen}
+                // visible={isLandCostModalOpen}
+                open={isLandCostModalOpen}
                 onCancel={handleCancel}
                 footer={null}
-                width="80vw"
+                width="20vw"
                 centered // Căn giữa Modal
                 bodyStyle={{ backgroundColor: '#fffdfd', color: '#100e0e' }}
+                className="div#Bảng\ giá\ đất"
             >
                 {modalContent}
             </Modal>
@@ -129,18 +134,21 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
             <ReactWindow
                 title="Bảng giá đất"
                 onClose={handleCancel}
-                width={500}
-                height={400}
+                width={isMobile ? '90vw' : 500}
+                height={isMobile ? '80vh' : 400}
                 style={{
                     backgroundColor: '#100f0f',
                     color: '#131313',
-                    position: 'absolute',
+                    position: 'fixed', // Sử dụng fixed position
                     top: '50%',
                     left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    transform: 'translate(-50%, -50%)', // Căn giữa màn hình
                     borderRadius: '8px',
                     padding: '20px',
+                    zIndex: 1000,
+                    overflow: 'hidden',
                 }}
+                className = {isLandCostModalOpen ? null : "_L7jnu"}
             >
                 {modalContent}
             </ReactWindow>
