@@ -1,14 +1,78 @@
-// /* div .23ix2{
-//     margin: 400px
-// } */
-
+/* Tùy chỉnh cửa sổ ReactWindow */
 div#Bảng\ giá\ đất {
     left: 5% !important;
     margin-right: 428px;
-    // width: 634px;
+    /* Có thể bỏ width nếu bạn muốn tự động điều chỉnh */
+    /* width: 634px; */
 }
 
-._L7jnu{
+/* Sửa lỗi thu phóng */
+._L7jnu {
     margin-left: 0px !important;
 }
-  
+
+/* Tùy chỉnh kích thước và vị trí cửa sổ */
+._2BySA {
+    transform: none !important;
+    height: 90vh !important;
+    width: 90vw !important;
+}
+
+// /* Ghi đè thứ tự nút điều khiển */
+// .react-window-header-buttons {
+//     display: flex;
+//     flex-direction: row-reverse !important; /* Đảo thứ tự các nút */
+// }
+
+// /* Hoặc chỉ đảo nút minimize và maximize */
+// .react-window-header-buttons>*:nth-child(1) {
+//     order: 2;
+//     /* Close */
+// }
+
+// .react-window-header-buttons>*:nth-child(2) {
+//     order: 0;
+//     /* Minimize */
+// }
+
+// .react-window-header-buttons>*:nth-child(3) {
+//     order: 1;
+//     /* Maximize */
+// }
+
+// /* Tùy chỉnh màu sắc và kiểu dáng của các nút */
+// .react-window-header-buttons button {
+//     background-color: #333;
+//     color: white;
+//     border: none;
+//     padding: 8px 12px;
+//     font-size: 14px;
+//     border-radius: 4px;
+//     cursor: pointer;
+//     transition: background-color 0.3s ease;
+// }
+
+// /* Hiệu ứng hover cho các nút */
+// .react-window-header-buttons button:hover {
+//     background-color: #555;
+// }
+
+// /* Tùy chỉnh thanh tiêu đề của cửa sổ */
+// .react-window-header {
+//     background-color: #222; /* Màu nền thanh tiêu đề */
+//     color: #fff; /* Màu chữ */
+//     padding: 10px;
+//     font-size: 16px;
+//     font-weight: bold;
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+// }
+
+// /* Tùy chỉnh nội dung cửa sổ */
+// .react-window-content {
+//     padding: 20px;
+//     background-color: #333; /* Màu nền nội dung */
+//     color: #ddd; /* Màu chữ */
+//     font-size: 14px;
+// }

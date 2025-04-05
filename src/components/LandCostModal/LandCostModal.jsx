@@ -23,8 +23,6 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
 
     const [debouncedInputSearch] = useDebounce(searchValue, 500);
 
-    const [isModalLarge, setIsModalLarge] = useState(true); // Quản lý trạng thái modal lớn hay nhỏ
-
 
     useEffect(() => {
         const handleResize = () => {
@@ -125,10 +123,10 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                 open={isLandCostModalOpen}
                 onCancel={handleCancel}
                 footer={null}
-                width="50vw"
+                width="20vw"
                 centered // Căn giữa Modal
                 bodyStyle={{ backgroundColor: '#fffdfd', color: '#100e0e' }}
-                className="div#Bảng\ giá\ đất"
+                className="_2BySA"
             >
                 {modalContent}
             </Modal>
@@ -136,10 +134,8 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
             <ReactWindow
                 title="Bảng giá đất"
                 onClose={handleCancel}
-                // width={isMobile ? '90vw' : 500}
-                // height={isMobile ? '80vh' : 400}
-                width="90vw"
-                height="80vh"
+                width='90vw'
+                height='80vh'
                 style={{
                     backgroundColor: '#100f0f',
                     color: '#131313',
@@ -152,26 +148,11 @@ const LandCostModal = ({ isLandCostModalOpen, handleOk, handleCancel }) => {
                     zIndex: 1000,
                     overflow: 'hidden',
                 }}
-                className = {isLandCostModalOpen ? null : "_L7jnu"}
+                className="react-window-header-buttons"
             >
                 {modalContent}
             </ReactWindow>
         )
-        // <ReactWindow
-        //     title="Bảng giá đất"
-        //     onClose={handleCancel}
-        //     width={isMobile ? '90vw' : 800}
-        //     height={isMobile ? '80vh' : 600}
-        //     style={{
-        //         backgroundColor: '#100f0f',
-        //         color: '#eaeaea',
-        //         borderRadius: '8px',
-        //         padding: '20px',
-        //         overflow: 'hidden',
-        //     }}
-        // >
-        //     {modalContent}
-        // </ReactWindow>
     ) : null;
 };
 
