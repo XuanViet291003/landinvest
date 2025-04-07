@@ -49,7 +49,7 @@ const CustomTileLayer = ({ item, opacity }) => {
                     ref={tileLayerRef}
                     url={`${item.link_server}/{z}/{x}/{y}.png`}
                     minNativeZoom={12}  
-                    maxNativeZoom={18} 
+                    maxNativeZoom={22}                      // fix item.zoom 18 -> 22
                     minZoom={9}         
                     maxZoom={25} 
                     tileSize={256} 
@@ -62,7 +62,7 @@ const CustomTileLayer = ({ item, opacity }) => {
                         ref={(el) => (tileLayerRefs.current[index] = el)}
                         url={`${link}/{z}/{x}/{y}.png`}
                         minNativeZoom={12}
-                        maxNativeZoom={18}
+                        maxNativeZoom={22}                  // fix item.zoom 18 -> 22
                         minZoom={9}
                         maxZoom={25}
                         tileSize={256} 
