@@ -364,8 +364,12 @@
   "phankhu": [
     {"id":"1","idProvince":"15","description":"Quy Hoạch Phân Khu Đà Nẵng","location":"","boundingbox":"107.8185394  ,  15.9179902  ,  108.6563747   ,   16.3340091","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/danang_qhpk","so_lan_view":"967","zoom":"17","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/danang_qhpk","link_goc":null},
     {"id":"2","idProvince":"24","description":"Quy Hoạch Phân Khu Hà Nội","location":"","boundingbox":"105.2889615  ,  20.5645154  ,  106.0200725   ,   21.3852777","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/tp_hanoi_qhpk","so_lan_view":"1328","zoom":"18","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/tp_hanoi_qhpk","link_goc":"https:\/\/s3-hn-2.cloud.cmctelecom.vn\/guland10\/qhpk\/ha-noi-2025"},
-    {"id":"3","idProvince":"29","description":"Quy Hoạch Phân Khu Hồ Chí Minh","location":"","boundingbox":"106.3567007  ,  10.1399458  ,  107.0276712   ,   11.1603083","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/hochiminh_qhpk","so_lan_view":"0","zoom":"18","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hochiminh_qhpk","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"}
-    {"id":"4","idProvince":"24","description":"Quy Hoạch Phân Khu Hà Nội 2","location":"","boundingbox":"105.2889615  ,  20.5645154  ,  106.0200725   ,   21.3852777","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/hochiminh_qhpk","so_lan_view":"0","zoom":"18","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hanoi_phankhu","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"}
+    {"id":"3","idProvince":"29","description":"Quy Hoạch Phân Khu Hồ Chí Minh","location":"","boundingbox":"106.3567007  ,  10.1399458  ,  107.0276712   ,   11.1603083","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/hochiminh_qhpk","so_lan_view":"0","zoom":"18","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hochiminh_qhpk","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"} ,
+    {"id":"4","idProvince":"24","description":"Quy Hoạch Phân Khu Hà Nội 2","location":"","boundingbox":"105.2889615  ,  20.5645154  ,  106.0200725   ,   21.3852777","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/tp_hanoi_qhpk","so_lan_view":"0","zoom":"18","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hanoi_phankhu","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"} ,
+    {"id":"5","idProvince":"24","description":"Quy Hoạch Phân Khu Hà Nội 3","location":"","boundingbox":"105.2889615  ,  20.5645154  ,  106.0200725   ,   21.3852777","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/tp_hanoi_qhpk","so_lan_view":"0","zoom":"17","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hanoi_phankhu2","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"} ,
+    {"id":"6","idProvince":"24","description":"Quy Hoạch Phân Khu Hà Nội 4","location":"","boundingbox":"105.2889615  ,  20.5645154  ,  106.0200725   ,   21.3852777","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/tp_hanoi_qhpk","so_lan_view":"0","zoom":"17","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hanoi_phankhu_dtvt","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"} ,
+    {"id":"7","idProvince":"24","description":"Quy Hoạch Phân Khu Hà Nội 5","location":"","boundingbox":"105.2889615  ,  20.5645154  ,  106.0200725   ,   21.3852777","coordation":"","createAt":"2024-08-22 06:53:12","tinh_image":"\/media\/son\/son2\/quyhoach_phankhu\/tp_hanoi_qhpk","so_lan_view":"0","zoom":"17","min_zoom":"12","type_load_anh":"NGHICH","link_server":"https:\/\/gachmen.org\/quyhoach\/quyhoach_phankhu\/hanoi_phankhu_vietpalm","link_goc":"https:\/\/sqhkt-qlqh.tphcm.gov.vn\/api\/tiles\/bandoso"} 
+
 
   ],
   "tinh": [
@@ -1673,7 +1677,7 @@
       "id": "12",
       "idDistrict": "10",
       "idProvince": "24",
-      "description": "Quy hoạch Huyện Sóc Sơn  2030",
+      "description": "Quy hoạch Huyện Sóc Sơn  2030",
       "image": "quan_huyen_1.jpg",
       "imageHttp": "quan_huyen_1.jpg",
       "location": "",
@@ -1694,7 +1698,7 @@
       "id": "13",
       "idDistrict": "15",
       "idProvince": "24",
-      "description": "Quy hoạch Quận Bắc Từ Liêm  2030",
+      "description": "Quy hoạch Quận Bắc Từ Liêm  2030",
       "image": "quan_huyen_1.jpg",
       "imageHttp": "quan_huyen_1.jpg",
       "location": "",
@@ -1715,7 +1719,7 @@
       "id": "14",
       "idDistrict": "6",
       "idProvince": "24",
-      "description": "Quy hoạch Quận Đống Đa 2030",
+      "description": "Quy hoạch Quận Đống Đa 2030",
       "image": "quan_huyen_1.jpg",
       "imageHttp": "quan_huyen_1.jpg",
       "location": "",
@@ -1778,7 +1782,7 @@
       "id": "17",
       "idDistrict": "16",
       "idProvince": "24",
-      "description": "Quy hoạch Huyện Mê Linh  2030",
+      "description": "Quy hoạch Huyện Mê Linh  2030",
       "image": "quan_huyen_1.jpg",
       "imageHttp": "quan_huyen_1.jpg",
       "location": "",
@@ -1799,7 +1803,7 @@
       "id": "18",
       "idDistrict": "20",
       "idProvince": "24",
-      "description": "Quy hoạch Huyện Phúc Thọ  2030",
+      "description": "Quy hoạch Huyện Phúc Thọ  2030",
       "image": "quan_huyen_1.jpg",
       "imageHttp": "quan_huyen_1.jpg",
       "location": "",
@@ -1820,7 +1824,7 @@
       "id": "19",
       "idDistrict": "3",
       "idProvince": "24",
-      "description": "Quy hoạch Quận Tây Hồ  2030",
+      "description": "Quy hoạch Quận Tây Hồ  2030",
       "image": "quan_huyen_1.jpg",
       "imageHttp": "quan_huyen_1.jpg",
       "location": "",
