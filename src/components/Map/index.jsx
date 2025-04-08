@@ -1517,7 +1517,7 @@ const Map = forwardRef(
                         url={getTileUrl(item.link_server, '{x}', '{y}', '{z}')} // Gọi hàm với x, y, z từ tileCoords
                         pane="overlayPane"
                         minNativeZoom={item.min_zoom ? item.min_zoom : 12}
-                        maxNativeZoom={item.zoom ? item.zoom : 22}              // fix item.zoom 18 -> 22
+                        maxNativeZoom={item.zoom ? item.zoom : 22}
                         minZoom={item.min_zoom ? item.min_zoom - 2 : 9}
                         maxZoom={25}
                         opacity={opacity}
@@ -2203,7 +2203,7 @@ const Map = forwardRef(
                                         // set min zoom = item.min_zoom is avoid leaflet map lag
                                         minZoom={item.min_zoom ? item.min_zoom - 2 : 9}
                                         minNativeZoom={item.min_zoom ? item.min_zoom - 1 : 12}
-                                        maxNativeZoom={item.zoom ? item.zoom : 22}            // fix item.zoom 18 -> 22
+                                        maxNativeZoom={item.zoom ? item.zoom : 22}
                                         maxZoom={25}
                                         opacity={opacity}
                                     />
@@ -2221,7 +2221,7 @@ const Map = forwardRef(
                                         // set min zoom = item.min_zoom is avoid leaflet map lag
                                         minZoom={item.min_zoom ? item.min_zoom - 2 : 9}
                                         minNativeZoom={item.min_zoom ? item.min_zoom - 1 : 12}
-                                        maxNativeZoom={item.zoom ? item.zoom : 22}            // fix item.zoom 18 -> 22
+                                        maxNativeZoom={item.zoom ? item.zoom : 22}
                                         maxZoom={25}
                                         opacity={opacity}
                                     />
