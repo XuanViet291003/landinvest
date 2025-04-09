@@ -9,6 +9,7 @@ const ListRegulations = ({ RegulationsImagesList, handleItemClick }) => {
     const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
     const [isShowLoginModal, setIsShowLoginModal] = useState(false);
     const isEmpty = !RegulationsImagesList || RegulationsImagesList.length === 0;
+    console.log('RegulationsImagesList:', RegulationsImagesList);
 
     const getTotalHeight = (items) => {
         const itemCount = items?.length;
@@ -67,6 +68,7 @@ const ListRegulations = ({ RegulationsImagesList, handleItemClick }) => {
                                                         setIsShowLoginModal(true);
                                                         return;
                                                     }
+                                                    
                                                     handleItemClick(item); // Xử lý khi click vào bounding box
                                                     handleItemClick(
                                                         item.boundingbox,

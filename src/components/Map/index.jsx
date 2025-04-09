@@ -582,11 +582,11 @@ const Map = forwardRef(
                         setMapZoom(zoom);
                     }
 
-                    // if (zoom >= 15) {
-                    //     handleGetListRegulation(_southWest, _northEast);
-                    // } else {
-                    //     setisShowListRegulation(false);
-                    // }
+                    if (zoom >= 15) {
+                        handleGetListRegulation(_southWest, _northEast);
+                    } else {
+                        setisShowListRegulation(false);
+                    }
                 },
                 zoomend: async () => {
                     const zoom = map.getZoom();

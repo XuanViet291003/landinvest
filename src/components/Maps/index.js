@@ -15,7 +15,6 @@ import {
     useMapEvents,
     ZoomControl,
 } from 'react-leaflet';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
@@ -126,7 +125,7 @@ const Map = forwardRef(
         const boundingboxStatus = useSelector((state) => state.boundingboxSlice.status);
         const currentBoundingBox = useSelector((state) => state.boundingboxSlice.currentBoundingBox);
         const listRegulations = useSelector((state) => state.listRegulationsSlice.listRegulations);
-        const RegulationsImagesList = listRegulations?.list_image;
+        const RegulationsImagesList = listRegulations?.list_image || [];
         const treeCheckedKeys = useSelector((state) => state.treePlans.treeCheckedKeys);
         const { initialCenter, initialZoom } = useMapParams();
         const windowSize = useWindowSize();
@@ -443,38 +442,31 @@ const Map = forwardRef(
         // call API to get list regulation
         const handleGetListRegulation = useCallback(
             async (_southWest, _northEast) => {
-                // Chuẩn hóa và tạo khóa cho vùng hiện tại
-                const regionKey = `${_southWest.lat.toFixed(6)},${_southWest.lng.toFixed(6)}-${_northEast.lat.toFixed(
-                    6,
-                )},${_northEast.lng.toFixed(6)}`;
-
-                // Kiểm tra nếu vùng đã được xử lý
-                // if (processedRegions.includes(regionKey)) {
-                //     return;
-                // }
-                try {
-                    // Gọi API với tọa độ hiện tại
-                    const response = await fetchListRegulations({
-                        southWest: _southWest,
-                        northEast: _northEast,
-                    });
-                    // Kiểm tra dữ liệu trả về từ API
-                    if (!response || response.length === 0) {
-                        // console.log('Không có vùng quy hoạch.');
-                        setisShowListRegulation(false);
-                        return;
-                    }
-                    // Cập nhật danh sách vùng đã xử lý
-                    setProcessedRegions((prev) => [...prev, regionKey]);
-                    // setisShowListRegulation(true);
-                    // Gửi thông tin vùng lên Redux store
-                    dispatch(fetchListRegulations({ southWest: _southWest, northEast: _northEast }));
-                } catch (error) {
-                    console.error('Lỗi khi gọi API:', error);
+              const regionKey = `${_southWest.lat.toFixed(6)},${_southWest.lng.toFixed(6)}-${_northEast.lat.toFixed(
+                6,
+              )},${_northEast.lng.toFixed(6)}`;
+          
+              try {
+                const response = await fetchListRegulations({
+                  southWest: _southWest,
+                  northEast: _northEast,
+                });
+                console.log('API response:', response);
+                if (!response || response.length === 0) {
+                  setisShowListRegulation(false);
+                  dispatch(fetchListRegulations({ list_image: [] })); // Dispatch mảng rỗng nếu không có dữ liệu
+                  return;
                 }
+                setProcessedRegions((prev) => [...prev, regionKey]);
+                setisShowListRegulation(true);
+                dispatch(fetchListRegulations(response)); // Dispatch dữ liệu thực tế từ API
+              } catch (error) {
+                console.error('Lỗi khi gọi API:', error);
+                dispatch(fetchListRegulations({ list_image: [] })); // Dispatch mảng rỗng nếu lỗi
+              }
             },
-            [processedRegions, dispatch],
-        );
+            [dispatch],
+          );
         const normalizeBoundingBox = (boundingbox) => {
             if (!boundingbox) return [];
             if (typeof boundingbox === 'string') {
