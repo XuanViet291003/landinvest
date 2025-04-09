@@ -21,6 +21,7 @@ import allPlannings from './AllPlansSlice/AllPlansSlice';
 import landAuctions from './LandAuctions/landAuctions';
 import landBidding from './landBiddingSlice/landBiddingSlice';
 import landCost from './landCostSlice/landCostSlice';
+import BidPlans from './BidPlansSlice/BidPlansSlice';
 import listRegulationReducer from './ListRegulations/ListRegulationsSlice';
 import mapLayer from './mapLayer/mapLayerSlice';
 import checkSearchReducer from './checkSearch/checkSearchSlice';

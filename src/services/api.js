@@ -550,7 +550,7 @@ export const getBidPlansByDistrictApi = async (districtId) => {
 
 export const searchBidPlansByTextApi = async (searchText) => {
     try {
-        const res = await instance.get(`dbht_search_text/${searchText}`);
+        const res = await instance.get(`/dbht_search_text/${searchText}`);
         console.log('Raw search bid plans response:', res);
         return res.data;
     } catch (error) {

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { LAND_COST_KEY } from '../../constants/LandCostKey';
+import { LAND_COST_KEY, MAP_TABLE_TYPE } from '../../constants/LandCostKey';
 import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
 import {
     getAllLandCost,

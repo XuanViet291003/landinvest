@@ -47,9 +47,11 @@ const landAuctionsSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(getLandAuctionsInfoApi.pending, (state) => {
+                
                 state.status = THUNK_API_STATUS.PENDING;
             })
             .addCase(getLandAuctionsInfoApi.fulfilled, (state, action) => {
+                console.log("🔥 Dữ liệu trả về từ searchLandAutions:", action.payload);
                 state.status = THUNK_API_STATUS.FULFILLED;
                 state.allLandAuctions = action.payload.data;
                 state.totalPage = Math.ceil(action.payload.total_page);
@@ -62,6 +64,7 @@ const landAuctionsSlice = createSlice({
                 state.status = THUNK_API_STATUS.PENDING;
             })
             .addCase(searchLandAuctionsInfoApi.fulfilled, (state, action) => {
+                console.log(" Dữ liệu trả về từ searchLandAutions:", action.payload);
                 state.status = THUNK_API_STATUS.FULFILLED;
                 state.allLandAuctions = action.payload?.data || [];
                 state.totalPage = Math.ceil(action.payload.total_page);

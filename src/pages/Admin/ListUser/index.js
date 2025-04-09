@@ -11,7 +11,7 @@ import {
 import { Button, Input, Pagination, Space, Row, Col, Table, Popconfirm, message, notification } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { current } from '@reduxjs/toolkit';
-import { BlockUserPost, ViewlistPost, callGetAllUsers } from '../../../services/api';
+import { BlockUserPost, ViewlistPost } from '../../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { doListBox, doListGroup, doListUser } from '../../../redux/listForum/lisForumSlice';
 
@@ -33,17 +33,17 @@ const TableUser = () => {
     const adGroupAdmin = useSelector((state) => state.getid.idPost);
     const idBox = useSelector((state) => state.getid.idGroup);
     const dispatch = useDispatch();
-    useEffect(() => {
-        getListViewUser();
-    }, [dataUpdate]);
+    // useEffect(() => {
+    //     getListViewUser();
+    // }, [dataUpdate]);
 
-    const getListViewUser = async () => {
-        let res = await callGetAllUsers();
-        if (res) {
-            setListUser(res.data);
-            dispatch(doListUser(res.data));
-        }
-    };
+    // const getListViewUser = async () => {
+    //     let res = await callGetAllUsers();
+    //     if (res) {
+    //         setListUser(res.data);
+    //         dispatch(doListUser(res.data));
+    //     }
+    // };
 
     const columns = [
         {

@@ -30,7 +30,7 @@ const convertTime = (string) => {
 function Follow() {
     const [ListNewUser, setListNewUser] = useState([]);
     const [listOnlineUser, setListOnlineUser] = useState([]);
-    const [listAllUser, setListAllUser] = useState([]);
+    // const [listAllUser, setListAllUser] = useState([]);
     const [option, setOption] = useState(1);
     const [totalPage, setTotalPage] = useState();
     const [loading, setLoading] = useState(false);
@@ -109,7 +109,7 @@ function Follow() {
                     </Spin>
                 </>
             )}
-            <Row className="list-user" gutter={[20, 20]}>
+            {/* <Row className="list-user" gutter={[20, 20]}>
                 {option == 3 &&
                     listAllUser.map((item) => (
                         <Col className="list-user-item" span={6} key={'user-new' + item.userid}>
@@ -118,7 +118,7 @@ function Follow() {
                         </Col>
                     ))}
                 {option == 2 && !listOnlineUser?.count_online && <p className="notify-user">Chưa có ai online !</p>}
-            </Row>
+            </Row> */}
         </div>
     );
 }

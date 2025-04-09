@@ -15,6 +15,7 @@ import {
     useMapEvents,
     ZoomControl,
 } from 'react-leaflet';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import fetchProvinceName from '../../function/findProvince';
@@ -448,9 +449,9 @@ const Map = forwardRef(
                 )},${_northEast.lng.toFixed(6)}`;
 
                 // Kiểm tra nếu vùng đã được xử lý
-                if (processedRegions.includes(regionKey)) {
-                    return;
-                }
+                // if (processedRegions.includes(regionKey)) {
+                //     return;
+                // }
                 try {
                     // Gọi API với tọa độ hiện tại
                     const response = await fetchListRegulations({

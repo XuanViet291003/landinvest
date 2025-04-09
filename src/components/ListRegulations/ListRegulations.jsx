@@ -23,6 +23,7 @@ const ListRegulations = ({ RegulationsImagesList, handleItemClick }) => {
 
     const toggleVisibility = () => {
         setIsVisible(!isVisible); // Toggle trạng thái hiển thị
+        console.log(isVisible)
     };
 
     return (
@@ -37,12 +38,13 @@ const ListRegulations = ({ RegulationsImagesList, handleItemClick }) => {
             >
                 <FaList style={{ fontSize: '30px', cursor: 'pointer' }} />
             </div>
+            
 
             {/* Danh sách quy hoạch */}
             {isVisible && (
                 <div
-                    className="list-wrapper-regulation"
-                    style={{ height: getTotalHeight(RegulationsImagesList) }}
+                    className="list-wrapper-regulation"                  
+                    style={{ height: getTotalHeight(RegulationsImagesList)}}
                 >
                     <div className="list-regulations">
                         <p>Bản đồ quy hoạch</p>
