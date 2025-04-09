@@ -5,7 +5,7 @@ const apiKeyName = 'x-api-key';
 
 // Create Axios instance
 const instance = axios.create({
-    baseURL: `https://api.quyhoach.xyz`,
+    baseURL: `https://landinvest.thinkdiff.us`,
     headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },

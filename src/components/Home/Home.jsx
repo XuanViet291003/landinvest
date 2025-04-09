@@ -393,7 +393,7 @@ function Home() {
     //         const [lat, lon] = vitriParam.split(',').map(Number);
 
     //         if (lat && lon) {
-    //             const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${lat}/${lon}`;
+    //             const apiUrl = `https://landinvest.thinkdiff.us/thongtin_district/${lat}/${lon}`;
 
     //             const fetchData = async () => {
     //                 try {

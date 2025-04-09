@@ -16,7 +16,7 @@ const AdministrativeMap = () => {
   const getDistrictByProvinceId = async (provinceId) => {
     try {
       // Gửi yêu cầu đến API lấy danh sách quận/huyện 
-      const response = await fetch(`https://api.quyhoach.xyz/list_districts_in_provinces/${provinceId}`);
+      const response = await fetch(`https://landinvest.thinkdiff.us/list_districts_in_provinces/${provinceId}`);
       const data = await response.json();
 
       // Nếu có dữ liệu thì trả về, ngược lại trả về null
@@ -32,7 +32,7 @@ const AdministrativeMap = () => {
   const getDistrictDetail = async (districtId) => {
     try {
       // Gửi yêu cầu đến API lấy thông tin bản đồ hành chính quận/huyện 
-      const response = await fetch(`https://api.quyhoach.xyz/thongtin_wiki_district/${districtId}`);
+      const response = await fetch(`https://landinvest.thinkdiff.us/thongtin_wiki_district/${districtId}`);
       const data = await response.json();
 
       // Nếu có dữ liệu thì trả về, ngược lại trả về null

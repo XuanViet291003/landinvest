@@ -293,7 +293,7 @@ const Map = forwardRef(
                     formData.append('he_dieu_hanh', detectOs(userAgent));
 
                     // Gửi dữ liệu data User bằng fetch API
-                    const responseUser = await fetch('https://api.quyhoach.xyz/add_active_user_activity', {
+                    const responseUser = await fetch('https://landinvest.thinkdiff.us/add_active_user_activity', {
                         method: 'POST',
                         body: formData,
                     });
@@ -301,7 +301,7 @@ const Map = forwardRef(
                     // console.log('Response:', dataUser);
 
                     // Gọi API lấy thông tin quy hoạch
-                    // const apiUrl = `https://api.quyhoach.xyz/thongtin_district/${latitude}/${longitude}`;
+                    // const apiUrl = `https://landinvest.thinkdiff.us/thongtin_district/${latitude}/${longitude}`;
                     // const resQuyHoach = await fetch(apiUrl);
                     // if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
 
@@ -556,7 +556,7 @@ const Map = forwardRef(
                         debouncedHandleBoundingBox(_southWest, _northEast);
 
                         const fetchDuan = await fetch(
-                            `https://api.quyhoach.xyz/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`,
+                            `https://landinvest.thinkdiff.us/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`,
                         );
                         const resDuan = await fetchDuan.json();
 
@@ -766,7 +766,7 @@ const Map = forwardRef(
                     console.error('No valid data received from API');
                 }
                 // axios
-                //     .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
+                //     .get(`https://landinvest.thinkdiff.us/thongtin_quyhoach/${type}/${id}`)
                 //     .then((response) => {
                 //         const data = response.data;
 
@@ -1596,7 +1596,7 @@ const Map = forwardRef(
                 const year = now.getFullYear();
 
                 const responseHeat = await fetch(
-                    `https://api.quyhoach.xyz/ban_do_nhiet_district/${id}/${month}/${year}`
+                    `https://landinvest.thinkdiff.us/ban_do_nhiet_district/${id}/${month}/${year}`
                 );
 
                 if (!responseHeat.ok) {
@@ -1715,7 +1715,7 @@ const Map = forwardRef(
                 const id = searchParams.get('id-duan');
 
                 if (id) {
-                    const response = await fetch(`https://api.quyhoach.xyz/detail_du_an/${id}`);
+                    const response = await fetch(`https://landinvest.thinkdiff.us/detail_du_an/${id}`);
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1871,7 +1871,7 @@ const Map = forwardRef(
         const fetchRealEstatePrice = async (lat, lng) => {
             try {
                 const response = await fetch(
-                    `https://api.quyhoach.xyz/lay_gia_bat_dong_san_location/${lat}/${lng}`
+                    `https://landinvest.thinkdiff.us/lay_gia_bat_dong_san_location/${lat}/${lng}`
                 );
 
                 if (!response.ok) {

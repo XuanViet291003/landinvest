@@ -48,7 +48,7 @@ const ChartCostHistory = (props) => {
             try {
                 console.log(1)
                 const response = await fetch(
-                    `https://api.quyhoach.xyz/lay_ls_gia_bat_dong_san_location/${lat}/${lon}`
+                    `https://landinvest.thinkdiff.us/lay_ls_gia_bat_dong_san_location/${lat}/${lon}`
                 );
                 if (!response.ok) {
                     throw new Error("Network response was not ok");

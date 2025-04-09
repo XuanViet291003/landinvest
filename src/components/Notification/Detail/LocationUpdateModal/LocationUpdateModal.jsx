@@ -17,7 +17,7 @@ const LocationUpdateModal = ({ show, handleClose, duAnId }) => {
 
         try {
             setIsLoading(true);
-            const response = await fetch(`https://api.quyhoach.xyz/edit_location_du_an_bds/${duAnId}`, {
+            const response = await fetch(`https://landinvest.thinkdiff.us/edit_location_du_an_bds/${duAnId}`, {
                 method: "POST",
                 body: formData
             });

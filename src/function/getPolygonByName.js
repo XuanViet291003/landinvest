@@ -21,7 +21,7 @@ export const getPolygonsByNames = async (names) => {
 
 export const getPolygonsQuanHuyen = async (id) => {
     try {
-        const response = await axios.get(`https://api.quyhoach.xyz/get_polygon_district/${id}`);
+        const response = await axios.get(`https://landinvest.thinkdiff.us/get_polygon_district/${id}`);
 
         return response.data.duongdan[0];
     } catch (error) {
@@ -32,7 +32,7 @@ export const getPolygonsQuanHuyen = async (id) => {
 
 export const getPolygonsTinh = async (id) => {
     try {
-        const response = await axios.get(`https://api.quyhoach.xyz/get_polygon_provinces/${id}`);
+        const response = await axios.get(`https://landinvest.thinkdiff.us/get_polygon_provinces/${id}`);
 
         return response.data.duongdan[0];
     } catch (error) {

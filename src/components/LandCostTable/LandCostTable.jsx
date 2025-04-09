@@ -23,7 +23,7 @@ export const LandCostTable = ({ tableType, searchValue, data, type }) => {
     // Hàm gọi API lấy dữ liệu theo trang
     const fetchLandCostData = async (page) => {
         try {
-            const response = await fetch(`https://api.quyhoach.xyz/bang_gia_dat_district/${districtId}?page=${page}`);
+            const response = await fetch(`https://landinvest.thinkdiff.us/bang_gia_dat_district/${districtId}?page=${page}`);
             const data = await response.json();
             console.log("Dữ liệu từ API:", data);// kiem tra
 

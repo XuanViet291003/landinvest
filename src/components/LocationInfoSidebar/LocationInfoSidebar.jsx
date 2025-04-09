@@ -55,7 +55,7 @@ const LocationInfoSidebar = ({
     const historyCost = useSelector((state) => state.historyCost.value);
     const dispatch = useDispatch();
 
-    const tileLayer = `https://api.quyhoach.xyz/get_quyhoach_theo_tinh/${provincePlansId}/${mapZoom}/${coordinates.x}/${coordinates.y}`;
+    const tileLayer = `https://landinvest.thinkdiff.us/get_quyhoach_theo_tinh/${provincePlansId}/${mapZoom}/${coordinates.x}/${coordinates.y}`;
 
     // Lấy tọa độ tile x, y từ bản đồ
     useEffect(() => {

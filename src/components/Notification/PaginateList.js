@@ -35,7 +35,7 @@ const PaginateList = () => {
 
     const getSearchResults = useCallback(async (query) => {
         try {
-            const res = await axios.get(`https://api.quyhoach.xyz/search_du_an?search=${encodeURIComponent(query)}`);
+            const res = await axios.get(`https://landinvest.thinkdiff.us/search_du_an?search=${encodeURIComponent(query)}`);
             setSearchResults(res.data.data || []); // Cập nhật kết quả tìm kiếm
         } catch (error) {
             console.error('Error fetching search results:', error);

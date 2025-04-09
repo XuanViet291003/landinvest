@@ -38,7 +38,7 @@ const LandCost = () => {
     const fetchData = async (term) => {
         try {
             const response = await axios.get(
-                `https://api.quyhoach.xyz/search_bang_gia_dat/${encodeURIComponent(term)}`
+                `https://landinvest.thinkdiff.us/search_bang_gia_dat/${encodeURIComponent(term)}`
             );
             console.log("Dữ liệu từ API:", response.data);
 

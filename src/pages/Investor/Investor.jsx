@@ -22,7 +22,7 @@ const Investor = () => {
         setLoading(true);
         try {
             if (e.trim() == '') {
-                const response = await fetch(`https://api.quyhoach.xyz/list_nhadautu?page=${1}`);
+                const response = await fetch(`https://landinvest.thinkdiff.us/list_nhadautu?page=${1}`);
                 const result = await response.json();
                 setData(result.data);
                 setTotalPages(Math.ceil(result.page_numer));
@@ -45,7 +45,7 @@ const Investor = () => {
             try {
                 let result;
                 if (!isSearch) {
-                    const response = await fetch(`https://api.quyhoach.xyz/list_nhadautu?page=${currentPage}`);
+                    const response = await fetch(`https://landinvest.thinkdiff.us/list_nhadautu?page=${currentPage}`);
                     result = await response.json();
                     setData(result.data);
                 } else {

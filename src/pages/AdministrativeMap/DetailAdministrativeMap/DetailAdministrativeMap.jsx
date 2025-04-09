@@ -14,7 +14,7 @@ const DetailAdministrativeMap = () => {
   // Hàm lấy dữ liệu từ API
   const getDistrictDetail = async (districtId) => {
     try {
-      const response = await fetch(`https://api.quyhoach.xyz/thongtin_wiki_district/${districtId}`);
+      const response = await fetch(`https://landinvest.thinkdiff.us/thongtin_wiki_district/${districtId}`);
       const data = await response.json();
       return data.dulieu || null;
     } catch (error) {

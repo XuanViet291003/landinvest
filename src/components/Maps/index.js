@@ -533,7 +533,7 @@ const Map = forwardRef(
             if (id && type) {
                 // Gọi API khi có id và type và chưa có itemQuyHoach
                 axios
-                    .get(`https://api.quyhoach.xyz/thongtin_quyhoach/${type}/${id}`)
+                    .get(`https://landinvest.thinkdiff.us/thongtin_quyhoach/${type}/${id}`)
                     .then((response) => {
                         const data = response.data;
 
