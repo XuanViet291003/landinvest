@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TileLayer } from "react-leaflet";
 
 // const CustomTileLayer = ({ item, opacity }) => {
@@ -76,9 +76,20 @@ import { TileLayer } from "react-leaflet";
 
 const CustomTileLayer = ({ item, opacity }) => {
     const tileLayerRefs = useRef([]);
+    const diachinhRefs = useRef([]);
+    const [quyhoachData, setQuyhoachData] = useState(null);
 
+    // Fetch dữ liệu quy hoạch từ public
     useEffect(() => {
-        if (!item || !item.link_server) return;
+        fetch("/quyhoach_toanbo.json")
+            .then(res => res.json())
+            .then(data => setQuyhoachData(data))
+            .catch(err => console.error("Lỗi tải file quyhoach_toanbo.json: ", err));
+    }, []);
+
+    // Khi item thay đổi, cập nhật createTile cho các layer
+    useEffect(() => {
+        if (!item || !item.link_server || !quyhoachData) return;
 
         const links = item.type_link === "1_link"
             ? [item.link_server]
@@ -111,9 +122,29 @@ const CustomTileLayer = ({ item, opacity }) => {
             // Bắt buộc redraw lại sau khi gán createTile
             layer.redraw();
         });
-    }, [item]);
 
-    if (!item) return null;
+        // === Tải địa chính tương ứng ===
+        const dcList = quyhoachData.diachinh.filter(dc => dc.idProvince === item.idProvince);
+        dcList.forEach((dc, index) => {
+            const layer = diachinhRefs.current[index];
+            if (!layer) return;
+
+            layer.createTile = function (coords, done) {
+                const { x, y, z } = coords;
+                const tile = document.createElement("img");
+                const tileY = dc.type_load_anh === "NGHICH" ? Math.pow(2, z) - 1 - y : y;
+                tile.src = `${dc.link_server}/${z}/${x}/${tileY}.png`;
+                tile.onload = () => done(null, tile);
+                tile.onerror = () => done(null, tile);
+                return tile;
+            };
+
+            layer.redraw();
+        })
+
+    }, [item, quyhoachData]);
+
+    if (!item || !quyhoachData) return null;
 
     const tileOptions = {
         minZoom: item.min_zoom ? Number(item.min_zoom) - 2 : 9,
@@ -131,6 +162,9 @@ const CustomTileLayer = ({ item, opacity }) => {
             ?.split(",")
             .map((link) => link.trim().replace(/[^a-zA-Z0-9:/._-]/g, "")) || [];
 
+    // Test
+    const diachinhForProvince = quyhoachData.diachinh.filter(dc => dc.idProvince === item.idProvince);
+
     return (
         <>
             {links.map((link, index) => (
@@ -139,6 +173,23 @@ const CustomTileLayer = ({ item, opacity }) => {
                     ref={(ref) => (tileLayerRefs.current[index] = ref)}
                     url="" // bắt buộc để ngăn Leaflet auto load
                     {...tileOptions}
+                />
+            ))}
+
+            {/* Lớp địa chính */}
+            {diachinhForProvince.map((dc, index) => (
+                <TileLayer 
+                    key={`dc-${dc.id}-${index}`}
+                    ref={(ref) => diachinhRefs.current[index] = ref}
+                    url=""
+                    minZoom={Number(dc.min_zoom) - 1}
+                    minNativeZoom={Number(dc.min_zoom)}
+                    maxNativeZoom={Number(dc.zoom)}
+                    maxZoom={25}
+                    tileSize={256}
+                    opacity={0.7}
+                    zIndex={400}
+                    noWrap={true}
                 />
             ))}
         </>
