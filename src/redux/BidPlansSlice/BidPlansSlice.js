@@ -10,6 +10,7 @@ import {
 export const getAllProvincesApi = createAsyncThunk('api/getAllProvinces', async (_, { rejectWithValue }) => {
     try {
         const data = await getAllProvinces();
+        console.log('API provinces:', data);
         if (!data.dulieu || !Array.isArray(data.dulieu)) {
             throw new Error('Dữ liệu tỉnh/thành phố không hợp lệ');
         }
@@ -38,25 +39,9 @@ export const getAllDistrictsInProvinceApi = createAsyncThunk(
 export const getBidPlansByDistrictApi = createAsyncThunk(
     'api/getBidPlansByDistrict',
     async (districtId, { rejectWithValue }) => {
-      try {
-        const response = await fetchBidPlansByDistrict(districtId);
-        if (!response || !response.data || !Array.isArray(response.data)) {
-          throw new Error('Dữ liệu đấu thầu không hợp lệ');
-        }
-        return response.data; 
-      } catch (error) {
-        return rejectWithValue(error.message || 'Failed to fetch bid plans');
-      }
-    }
-  );
-
-export const fetchBidPlansByTextApi = createAsyncThunk(
-    'api/searchBidPlansByText',
-    async (searchText, { rejectWithValue }) => {
         try {
-            console.log('Search Text:', searchText);
-            const response = await searchBidPlansByTextApi(searchText);
-            console.log('Search API response:', response);
+            console.log('District ID:', districtId);
+            const response = await fetchBidPlansByDistrict(districtId);
             if (!response) {
                 throw new Error('Không nhận được phản hồi từ API');
             }
@@ -65,7 +50,22 @@ export const fetchBidPlansByTextApi = createAsyncThunk(
             }
             return response.data;
         } catch (error) {
-            console.log('Error searching bid plans:', error.message);
+            console.log('Error fetching bid plans:', error.message);
+            return rejectWithValue(error.message || 'Failed to fetch bid plans');
+        }
+    }
+);
+
+export const fetchBidPlansByTextApi = createAsyncThunk(
+    'api/searchBidPlansByTextApi',
+    async (searchText, { rejectWithValue }) => {
+        try {
+            const response = await searchBidPlansByTextApi(searchText);
+            if (!response || !Array.isArray(response.data)) {
+                throw new Error('Dữ liệu đấu thầu không hợp lệ');
+            }
+            return response.data;
+        } catch (error) {
             return rejectWithValue(error.message || 'Failed to search bid plans');
         }
     }

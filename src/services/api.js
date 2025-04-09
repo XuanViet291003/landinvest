@@ -537,6 +537,30 @@ export const getCommentsByIdPost = async (id, page) => {
     return res.data;
 };
 
+export const getBidPlansByDistrictApi = async (districtId) => {
+    try {
+        const res = await instance.get(`dbht_theo_huyen/${districtId}`);
+        console.log('Raw bid plans response:', res);
+        return res.data;
+    } catch (error) {
+        console.error('Error fetching bid plans:', error);
+        throw error;
+    }
+};
+
+export const searchBidPlansByTextApi = async (searchText) => {
+    try {
+        const res = await instance.get(`dbht_search_text/${searchText}`);
+        console.log('Raw search bid plans response:', res);
+        return res.data;
+    } catch (error) {
+        console.error('Error searching bid plans:', error);
+        throw error;
+    }
+};
+
+
+
 // land autions
 
 export const getAllLandAutions = async (page) => {

@@ -26,6 +26,7 @@ import mapLayer from './mapLayer/mapLayerSlice';
 import checkSearchReducer from './checkSearch/checkSearchSlice';
 import landUsePlan from './landUsePlanSlice/lanUsePlanSlice';
 import historyCostReducer from './historyCost/historyCostSlice';
+import bidPlansReducer from './BidPlansSlice/BidPlansSlice'; 
 
 const persistConfig = {
     key: 'root',
@@ -69,6 +70,7 @@ const rootReducer = combineReducers({
     landAuctions,
     checkSearch: checkSearchReducer,
     historyCost: historyCostReducer,
+    bidPlans: bidPlansReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

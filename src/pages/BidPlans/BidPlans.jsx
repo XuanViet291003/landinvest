@@ -142,7 +142,7 @@ const BidPlans = () => {
                         <Col>
                         <Search
                             className="search-input"
-                            placeholder="Nhập từ khóa tìm kiếm (ví dụ: abc)"
+                            placeholder="Nhập từ khóa tìm kiếm (ví dụ: Hà Nội)"
                             allowClear
                             enterButton="Tìm kiếm"
                             onSearch={handleSearchByText}

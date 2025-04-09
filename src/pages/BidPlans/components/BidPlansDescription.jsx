@@ -1,87 +1,70 @@
-import { Modal, Typography } from 'antd';
+// src/components/BidPlans/BidPlansDescription.jsx
+import { Modal } from 'antd';
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { FaCircleMinus } from 'react-icons/fa6';
 
-const { Text } = Typography;
-
-const BidPlansDescription = ({ description, maxLines = 3 }) => {
+const BidPlansDescription = ({ description, oneLine = false }) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
     const descriptionRef = useRef(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const showModal = () => setIsModalOpen(true);
-    const handleCancel = () => setIsModalOpen(false);
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
     useEffect(() => {
-        const checkOverflow = () => {
-            if (descriptionRef.current) {
-                const element = descriptionRef.current;
-                // Calculate if content exceeds maxLines
-                const lineHeight = parseInt(getComputedStyle(element).lineHeight);
-                const maxHeight = lineHeight * maxLines;
-                setIsOverflowing(element.scrollHeight > maxHeight);
+        const checkIsOverFlow = () => {
+            const element = descriptionRef?.current;
+            if (element) {
+                setTimeout(() => {
+                    if (element.scrollHeight > element.clientHeight) {
+                        setIsOverflowing(true);
+                    }
+                }, 0);
             }
         };
-
-        checkOverflow();
-        window.addEventListener('resize', checkOverflow);
-        return () => window.removeEventListener('resize', checkOverflow);
-    }, [description, maxLines]);
-
-    if (!description) return 'N/A';
+        checkIsOverFlow();
+        window.addEventListener('resize', checkIsOverFlow);
+        return () => window.removeEventListener('resize', checkIsOverFlow);
+    }, []);
 
     return (
-        <div className="bid-plans-description-container">
-            <Text
-                ref={descriptionRef}
-                ellipsis={{
-                    rows: maxLines,
-                    expandable: false,
-                    tooltip: isOverflowing ? description : null
-                }}
-                style={{
-                    whiteSpace: 'pre-line',
-                    marginBottom: isOverflowing ? '8px' : 0
-                }}
-            >
+        <div className="land-cost-description-container">
+            <p className={`land-cost-description ${oneLine ? 'one-line' : ''}`} ref={descriptionRef}>
                 {description}
-            </Text>
-            
+            </p>
             {isOverflowing && (
-                <Text 
-                    type="link" 
-                    onClick={showModal}
-                    style={{ 
-                        display: 'block',
-                        marginTop: '4px'
-                    }}
-                >
+                <span className="land-cost-detail" onClick={showModal}>
                     Xem chi tiết
-                </Text>
+                </span>
             )}
-
             <Modal
                 closable={false}
-                footer={null}
-                centered
+                footer={<></>}
+                center
                 open={isModalOpen}
+                onOk={handleOk}
                 onCancel={handleCancel}
-                className="bid-plans-description-modal"
-                width={800}
+                className="land-cost-description-modal"
             >
-                <div className="modal-content-wrapper">
-                    <div className="modal-header">
-                        <span className="modal-title">Mô tả chi tiết</span>
+                <div className="land-const-detail__wrapper">
+                    <div className="lant-cost-detail__header">
+                        <span></span>
+                        <span className="lant-cost-detail__header--title">Mô tả chi tiết</span>
                         <FaCircleMinus
-                            className="close-icon"
+                            color="#fff"
+                            fontSize={24}
+                            className="lant-cost-detail__header--icon"
                             onClick={handleCancel}
                         />
                     </div>
-                    <div className="modal-body">
-                        <Text style={{ whiteSpace: 'pre-line' }}>
-                            {description}
-                        </Text>
-                    </div>
+                    <p className="land-cost-description--detail">{description}</p>
                 </div>
             </Modal>
         </div>
