@@ -1,12 +1,11 @@
+// src/components/BidPlans/BidPlansDetail.jsx
 import React from 'react';
 import { Descriptions } from 'antd';
 
-const LandCostDetail = ({ record, onClose }) => {
+const BidPlansDetail = ({ record, onClose }) => {
   if (!record) {
     return <div>Không có dữ liệu để hiển thị</div>;
   }
-
-
 
   const bidNames = Array.isArray(record.bidNamePlanNew)
     ? record.bidNamePlanNew.map((bid) => bid.name).join('; ')
@@ -41,4 +40,4 @@ const LandCostDetail = ({ record, onClose }) => {
   );
 };
 
-export default LandCostDetail;
+export default BidPlansDetail;

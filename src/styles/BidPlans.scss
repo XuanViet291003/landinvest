@@ -2,121 +2,103 @@
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-  
-    .bid-plans__content {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      padding: 24px;
-      margin-top: 20px;
-  
-      .bid-plans__title {
-        color: #1890ff;
-        text-align: center;
-        margin-bottom: 24px;
-        font-size: 24px;
-        font-weight: 500;
-      }
-  
-      .bid-plans__search {
-        margin-bottom: 24px;
-  
-        .ant-col {
-          margin-bottom: 16px;
-        }
-  
-        .bid-plans__select {
-          width: 100%;
-          
-          .ant-select-selector {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            border-radius: 4px;
-            border: 1px solid #d9d9d9;
-            
-            &:hover {
-              border-color: #40a9ff;
-            }
-          }
-  
-          .ant-select-selection-item {
-            line-height: 38px;
-          }
-        }
-  
-        .ant-btn {
-          height: 40px;
-          font-weight: 500;
-          border-radius: 4px;
-          background-color: #1890ff;
-          border-color: #1890ff;
-          
-          &:hover {
-            background-color: #40a9ff;
-            border-color: #40a9ff;
-          }
-          
-          &:disabled {
-            background-color: #f5f5f5;
-            border-color: #d9d9d9;
-            color: rgba(0, 0, 0, 0.25);
-          }
-        }
-      }
-  
-      .bid-plans__results {
-        margin-top: 24px;
-        border: 1px solid #f0f0f0;
+    
+    .bid-plans-content {
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 24px;
         border-radius: 8px;
-        padding: 16px;
-        background: #fafafa;
-  
-        .results-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-  
-          h3 {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        
+        .bid-plans-title {
+            text-align: center;
             color: #1890ff;
-            margin: 0;
-            font-size: 18px;
-          }
-  
-          .ant-btn {
-            background: #fff;
-            border-color: #d9d9d9;
-            color: rgba(0, 0, 0, 0.85);
+            margin-bottom: 24px;
+        }
+        
+        .search-section {
+            margin-bottom: 32px;
             
-            &:hover {
-              color: #1890ff;
-              border-color: #1890ff;
+            .search-row {
+                margin-bottom: 16px;
+                
+                .search-input {
+                    width: 500px;
+                    max-width: 100%;
+                }
             }
-          }
+            
+            .filter-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+                
+                .province-select, 
+                .district-select {
+                    width: 300px;
+                }
+                
+                .reset-btn {
+                    background: #f5222d;
+                    color: white;
+                    border: none;
+                    
+                    &:hover {
+                        background: #ff4d4f;
+                    }
+                }
+            }
         }
-      }
+        
+        .results-section {
+            margin-top: 32px;
+            
+            .loading-spinner {
+                display: flex;
+                justify-content: center;
+                padding: 40px 0;
+            }
+            
+            .empty-state {
+                padding: 40px 0;
+                color: rgba(0, 0, 0, 0.45);
+            }
+            
+            .bid-plans-table {
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
     }
-  }
-  
-  // Responsive styles
-  @media (max-width: 768px) {
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
     .bid-plans-container {
-      padding: 10px;
-  
-      .bid-plans__content {
-        padding: 16px;
-  
-        .bid-plans__title {
-          font-size: 20px;
-          margin-bottom: 16px;
+        padding: 10px;
+        
+        .bid-plans-content {
+            padding: 16px;
+            
+            .search-section {
+                .search-row {
+                    .search-input {
+                        width: 100%;
+                    }
+                }
+                
+                .filter-row {
+                    flex-direction: column;
+                    align-items: stretch;
+                    
+                    .province-select,
+                    .district-select {
+                        width: 100%;
+                    }
+                }
+            }
         }
-  
-        .bid-plans__search {
-          .ant-col {
-            margin-bottom: 12px;
-          }
-        }
-      }
     }
-  }
+}

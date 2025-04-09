@@ -1,284 +1,224 @@
-import { Button, Select, Spin, Row, Col, Input, message, Form } from "antd";
-import React, { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
-import Banner from "../../components/Banner";
-import BidPlansTable from "../../components/BidPlansTable/BidPlansTable";
+import React, { useEffect, useState } from 'react';
+import Banner from '../../components/Banner';
+import { useDispatch, useSelector } from 'react-redux';
+import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
+import {
+    getAllProvincesApi,
+    getAllDistrictsInProvinceApi,
+    getBidPlansByDistrictApi,
+    fetchBidPlansByTextApi,
+    resetBidPlansState,
+} from '../../redux/BidPlansSlice/BidPlansSlice';
+import { Select, Row, Col, Spin, Empty, Button, message, Input } from 'antd';
+import BidPlansTable from '../../components/BidPlansTable/BidPlansTable.jsx';
+import { Container } from 'react-bootstrap';
+import { Margin } from '@mui/icons-material';
 
 const { Option } = Select;
 const { Search } = Input;
 
+const removeVietnameseAccents = (str) => {
+    return str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D');
+};
+
 const BidPlans = () => {
-    const [provinces, setProvinces] = useState([]);
+    const dispatch = useDispatch();
     const [selectedProvince, setSelectedProvince] = useState(null);
-    const [districts, setDistricts] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState(null);
-    const [searchResults, setSearchResults] = useState([]);
-    const [showTable, setShowTable] = useState(false);
-    const [loading, setLoading] = useState({ provinces: false, districts: false, data: false });
-    const [error, setError] = useState(null);
-    const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState('');
+
+    const bidPlansState = useSelector((state) => state.bidPlans) || {};
+    const {
+        provinces = [],
+        districts = [],
+        bidPlans = [],
+        status = { provinces: 'DEFAULT', districts: 'DEFAULT', bidPlans: 'DEFAULT' },
+    } = bidPlansState;
+    const { provinces: provincesStatus, districts: districtsStatus, bidPlans: bidPlansStatus } = status;
 
     useEffect(() => {
-        fetchProvinces();
-    }, []);
-
-    const fetchProvinces = async () => {
-        setLoading(prev => ({ ...prev, provinces: true }));
-        try {
-            const response = await fetch("https://api.quyhoach.xyz/all_provinces");
-            const data = await response.json();
-            const provincesList = data.dulieu.map(province => ({
-                name: province.ProvinceName,
-                code: province.ProvinceCode
-            }));
-            setProvinces(provincesList);
-        } catch (error) {
-            console.error("Lỗi khi tải danh sách tỉnh/thành phố:", error);
-            message.error("Không thể tải danh sách tỉnh/thành phố");
-        } finally {
-            setLoading(prev => ({ ...prev, provinces: false }));
-        }
-    };
-
-    const fetchDistricts = async (provinceName) => {
-        if (!provinceName) return;
-        setLoading(prev => ({ ...prev, districts: true }));
-        setError(null);
-        setDistricts([]);
-        setSelectedDistrict(null);
-        setShowTable(false);
-
-        try {
-            let allDistricts = [];
-            let page = 1;
-            let totalPages = 1;
-
-            while (page <= totalPages) {
-                const response = await fetch(`https://api.quyhoach.xyz/dbht_search_text/${encodeURIComponent(provinceName)}?page=${page}`);
-                const data = await response.json();
-
-                if (!data.data || data.data.length === 0) break;
-
-                allDistricts = [...allDistricts, ...data.data.flatMap(item => item.DistrictID)];
-                totalPages = data.totalPages || 1;
-                page++;
+        dispatch(getAllProvincesApi()).then((result) => {
+            if (result.error) {
+                message.error('Không thể tải danh sách tỉnh/thành phố');
+            } else {
+                console.log('Provinces from API:', result.payload);
+                const hoaBinh = result.payload.find(p => p.ProvinceName === 'Hòa Bình');
+                console.log('Tìm Hòa Bình:', hoaBinh);
             }
+        });
+    }, [dispatch]);
 
-            const uniqueDistricts = Array.from(new Map(allDistricts.map(d => [d.districtCode, d])).values());
-            setDistricts(uniqueDistricts);
-            message.success(`Tìm thấy ${uniqueDistricts.length} huyện/quận`);
-        } catch (error) {
-            console.error("Lỗi khi tải danh sách huyện/quận:", error);
-            setError("Không thể tải danh sách huyện/quận");
-            message.error("Lỗi khi tải danh sách huyện/quận");
-        } finally {
-            setLoading(prev => ({ ...prev, districts: false }));
-        }
-    };
-
-    const fetchDataByDistrict = async () => {
-        if (!selectedDistrict || !selectedProvince) return;
-        setLoading(prev => ({ ...prev, data: true }));
-        setShowTable(false);
-        setError(null);
-
-        try {
-            let allResults = [];
-            let page = 1;
-            let hasMore = true;
-
-            while (hasMore) {
-                const response = await fetch(`https://api.quyhoach.xyz/dbht_search_text/${encodeURIComponent(selectedProvince)}?page=${page}`);
-                const data = await response.json();
-
-                if (!data.data || data.data.length === 0) {
-                    hasMore = false;
-                } else {
-                    const filtered = data.data.filter(item => 
-                        item.DistrictID.some(d => d.districtCode === selectedDistrict)
-                    );
-                    allResults = [...allResults, ...filtered];
-                    page++;
+    useEffect(() => {
+        if (selectedDistrict) {
+            if (!Number.isInteger(Number(selectedDistrict))) {
+                message.error('Mã quận/huyện không hợp lệ');
+                return;
+            }
+            dispatch(getBidPlansByDistrictApi(selectedDistrict)).then((result) => {
+                if (result.error) {
+                    message.error(result.payload || 'Không thể tải dữ liệu đấu thầu');
+                } else if (result.payload.length === 0) {
+                    message.info('Không có dữ liệu đấu thầu cho quận/huyện này');
                 }
-            }
-
-            if (allResults.length > 0) {
-                setSearchResults(allResults);
-                setShowTable(true);
-                message.success(`Tìm thấy ${allResults.length} kết quả`);
-            } else {
-                message.warning("Không tìm thấy kết quả phù hợp");
-            }
-        } catch (error) {
-            console.error("Lỗi khi tải dữ liệu đấu thầu:", error);
-            setError("Không thể tải dữ liệu đấu thầu");
-            message.error("Lỗi khi tải dữ liệu đấu thầu");
-        } finally {
-            setLoading(prev => ({ ...prev, data: false }));
+            });
         }
-    };
-
-    const fetchDataByText = async () => {
-        if (!searchText.trim()) {
-            message.warning("Vui lòng nhập từ khóa tìm kiếm");
-            return;
-        }
-        
-        setLoading(prev => ({ ...prev, data: true }));
-        setShowTable(false);
-        setError(null);
-
-        try {
-            const response = await fetch(`https://api.quyhoach.xyz/dbht_search_text/${encodeURIComponent(searchText)}`);
-            const data = await response.json();
-
-            if (data.data && data.data.length > 0) {
-                setSearchResults(data.data);
-                setShowTable(true);
-                message.success(`Tìm thấy ${data.data.length} kết quả`);
-            } else {
-                message.warning("Không tìm thấy kết quả phù hợp");
-                setSearchResults([]);
-                setShowTable(false);
-            }
-        } catch (error) {
-            console.error("Lỗi khi tìm kiếm:", error);
-            setError("Không thể thực hiện tìm kiếm");
-            message.error("Lỗi khi tìm kiếm");
-        } finally {
-            setLoading(prev => ({ ...prev, data: false }));
-        }
-    };
+    }, [selectedDistrict, dispatch]);
 
     const handleProvinceChange = (value) => {
+        // Reset ô search khi chọn tỉnh/thành phố
+        setSearchText('');
+    
         setSelectedProvince(value);
         setSelectedDistrict(null);
-        setDistricts([]);
-        setSearchResults([]);
-        setShowTable(false);
-        fetchDistricts(value);
+        
+        if (value) {
+            dispatch(getAllDistrictsInProvinceApi(value)).then((result) => {
+                if (result.error) message.error('Không thể tải danh sách quận/huyện');
+                else if (result.payload.length === 0) message.warning('Không có quận/huyện nào trong tỉnh này');
+            });
+        }
     };
 
-    const resetSearch = () => {
+    const handleDistrictChange = (value) => {
+        // Reset ô search khi chọn quận/huyện
+        setSearchText('');
+        
+        setSelectedDistrict(value);
+        dispatch(resetBidPlansState()); // Chỉ reset dữ liệu khi chọn quận/huyện
+        
+        if (value) {
+            if (!Number.isInteger(Number(value))) {
+                message.error('Mã quận/huyện không hợp lệ');
+                return;
+            }
+            dispatch(getBidPlansByDistrictApi(value)).then((result) => {
+                if (result.error) {
+                    message.error(result.payload || 'Không thể tải dữ liệu đấu thầu');
+                } else if (result.payload.length === 0) {
+                    message.info('Không có dữ liệu đấu thầu cho quận/huyện này');
+                }
+            });
+        }
+    };
+
+    const handleSearchByText = (value) => {
+        if (!value || value.trim() === '') {
+            message.warning('Vui lòng nhập từ khóa tìm kiếm hợp lệ!');
+            return;
+        }
+        // Reset các select box
         setSelectedProvince(null);
         setSelectedDistrict(null);
-        setDistricts([]);
-        setSearchResults([]);
-        setShowTable(false);
-        setSearchText("");
+
+        dispatch(resetBidPlansState());
+        dispatch(fetchBidPlansByTextApi(value.trim())).then((result) => {
+            if (result.error) {
+                message.error(result.payload || 'Không thể tìm kiếm dữ liệu đấu thầu');
+            } else if (result.payload.length === 0) {
+                message.info('Không tìm thấy dữ liệu đấu thầu với từ khóa này');
+            }
+        });
+    };
+
+    const handleReset = () => {
+        setSelectedProvince(null);
+        setSelectedDistrict(null);
+        setSearchText('');
+        dispatch(resetBidPlansState());
     };
 
     return (
         <Container className="bid-plans-container">
             <Banner />
-            <div className="bid-plans__content">
-                <h1 className="bid-plans__title">Kế hoạch đấu thầu</h1>
+            <div className="bid-plans-content">
+                <h2 className="bid-plans-title">Tìm kiếm Kế hoạch đấu thầu</h2>
 
-                <Form layout="vertical">
-                    {/* Ô tìm kiếm theo text */}
-                    <Row gutter={16} className="bid-plans__search">
-                        <Col xs={24} md={18}>
-                            <Search
-                                placeholder="Nhập từ khóa tìm kiếm (tên dự án, số hiệu kế hoạch...)"
-                                enterButton="Tìm kiếm"
-                                size="large"
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                                onSearch={fetchDataByText}
-                                loading={loading.data}
-                            />
+                <div className="search-section">
+                    <Row gutter={16} justify="center" className="search-row">
+                        <Col>
+                        <Search
+                            className="search-input"
+                            placeholder="Nhập từ khóa tìm kiếm (ví dụ: abc)"
+                            allowClear
+                            enterButton="Tìm kiếm"
+                            onSearch={handleSearchByText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            value={searchText}
+                        />
                         </Col>
-                        <Col xs={24} md={6}>
-                            <Button 
-                                type="default" 
-                                size="large" 
-                                onClick={resetSearch}
-                                style={{ width: '100%', height: '40px' }}
+                    </Row>
+
+                    <Row gutter={16} justify="center" className="filter-row">
+                        <Col>
+                            <Select
+                                    className="province-select"
+                                    placeholder="Chọn Tỉnh/Thành phố"
+                                    loading={provincesStatus === 'PENDING'}
+                                    onChange={handleProvinceChange}
+                                    value={selectedProvince} // Sẽ tự động clear khi search
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        removeVietnameseAccents(option.children.toLowerCase()).includes(
+                                            removeVietnameseAccents(input.toLowerCase())
+                                        )
+                                    }
+                                >
+                                {provinces.map((province) => (
+                                    <Option key={province.ProvinceID} value={province.ProvinceID}>
+                                        {province.ProvinceName}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Col>
+                        <Col>
+                            <Select
+                                className="district-select"
+                                placeholder={
+                                    districtsStatus === 'PENDING'
+                                        ? 'Đang tải...'
+                                        : districts.length === 0
+                                        ? 'Không có quận/huyện'
+                                        : 'Chọn Quận/Huyện'
+                                    }
+                                    disabled={!selectedProvince || districtsStatus === 'PENDING'}
+                                    loading={districtsStatus === 'PENDING'}
+                                    onChange={handleDistrictChange}
+                                    value={selectedDistrict} // Sẽ tự động clear khi search
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        removeVietnameseAccents(option.children.toLowerCase()).includes(
+                                            removeVietnameseAccents(input.toLowerCase())
+                                        )
+                                    }
                             >
+                                {districts.map((district) => (
+                                <Option   Option key={district.DistrictID} value={district.DistrictID}>
+                                        {district.DistrictName}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Col>
+                        <Col>
+                            <Button className="reset-btn" onClick={handleReset}>
                                 Đặt lại
                             </Button>
                         </Col>
                     </Row>
+                </div>
 
-                    <div className="search-divider">
-                        <span>HOẶC</span>
-                    </div>
-
-                    {/* Tìm kiếm theo tỉnh/huyện */}
-                    <Row gutter={16} className="bid-plans__search">
-                        <Col xs={24} sm={12} md={8}>
-                            <Select
-                                className="bid-plans__select"
-                                placeholder="Chọn tỉnh/thành phố"
-                                value={selectedProvince}
-                                onChange={handleProvinceChange}
-                                loading={loading.provinces}
-                                showSearch
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    option.children.toLowerCase().includes(input.toLowerCase())
-                                }
-                                size="large"
-                            >
-                                {provinces.map(province => (
-                                    <Option key={province.code} value={province.name}>
-                                        {province.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Col>
-
-                        <Col xs={24} sm={12} md={8}>
-                            <Select
-                                className="bid-plans__select"
-                                placeholder={selectedProvince ? "Chọn huyện/quận" : "Vui lòng chọn tỉnh trước"}
-                                value={selectedDistrict}
-                                onChange={setSelectedDistrict}
-                                disabled={!selectedProvince || districts.length === 0 || loading.districts}
-                                loading={loading.districts}
-                                showSearch
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    option.children.toLowerCase().includes(input.toLowerCase())
-                                }
-                                size="large"
-                            >
-                                {districts.map(d => (
-                                    <Option key={d.districtCode} value={d.districtCode}>
-                                        {d.districtName}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Col>
-
-                        <Col xs={24} sm={12} md={8}>
-                            <Button
-                                type="primary"
-                                onClick={fetchDataByDistrict}
-                                disabled={!selectedDistrict || loading.data}
-                                loading={loading.data}
-                                size="large"
-                                block
-                            >
-                                Tìm theo huyện
-                            </Button>
-                        </Col>
-                    </Row>
-                </Form>
-
-                {showTable && (
-                    <div className="bid-plans__results">
-                        <div className="results-header">
-                            <h3>
-                                {searchText 
-                                    ? `Kết quả tìm kiếm: "${searchText}"`
-                                    : `Kết quả tìm kiếm: ${districts.find(d => d.districtCode === selectedDistrict)?.districtName}`}
-                            </h3>
-                            <Button onClick={resetSearch}>Đóng kết quả</Button>
-                        </div>
-                        <BidPlansTable data={searchResults} />
-                    </div>
-                )}
+                <div className="results-section">
+                    {bidPlansStatus === 'PENDING' ? (
+                        <Spin size="large" className="loading-spinner" />
+                    ) : bidPlans.length === 0 ? (
+                        <Empty description="Không có kế hoạch nào" className="empty-state" />
+                    ) : (
+                        <BidPlansTable data={bidPlans} className="bid-plans-table" />
+                    )}
+                </div>
             </div>
         </Container>
     );

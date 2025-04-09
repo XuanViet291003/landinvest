@@ -1,57 +1,46 @@
-// src/pages/BidPlans/BidPlansTable.jsx
-import { ConfigProvider, Table, Modal } from 'antd';  
-import React, { memo, useEffect, useState } from 'react';
+import { Table, Modal } from 'antd';
+import React, { memo, useState } from 'react';
 import { columns } from '../../pages/BidPlans/components/BidPlansColumns';
 import BidPlansDetail from '../../pages/BidPlans/components/BidPlansDetail'; 
+import { Empty } from 'antd';
 
 const BidPlansTable = ({ data }) => {
     const [selectedRecord, setSelectedRecord] = useState(null);
-  
+
+    console.log('BidPlansTable data:', data);
+
     const handleViewDetail = (record) => {
-      setSelectedRecord(record);
+        setSelectedRecord(record);
     };
-  
+
     const handleCloseDetail = () => {
-      setSelectedRecord(null);
+        setSelectedRecord(null);
     };
-  
-    const dataSource = Array.isArray(data)
-      ? data.map((item, index) => ({
-          key: item.id,
-          STT: index + 1,
-          onViewDetail: handleViewDetail,
-          projectName: item.projectName,
-          chudautu: item.chudautu,
-          dotbien_hatang: item.dotbien_hatang,
-          tongmuc_dautu: item.tongmuc_dautu,
-          publicDate: item.publicDate,
-          bidCloseDate: item.bidCloseDate,
-          bidNamePlanNew: item.bidNamePlanNew,
-          ProvinceID: item.ProvinceID.rovinceName,
-          DistrictID: item.DistrictID.districtName,
-          link_muasamcong: item.link_muasamcong,
-        }))
-      : [];
-  
+
+    if (!Array.isArray(data) || data.length === 0) {
+        return <Empty description="Không có dữ liệu để hiển thị" />;
+    }
+
     return (
-      <div>
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          scroll={{ x: 1500 }}
-          pagination={{ pageSize: 10 }}
-        />
-        <Modal
-          title="Chi tiết dự án"
-          open={!!selectedRecord}
-          onCancel={handleCloseDetail}
-          footer={null}
-          width={800}
-        >
-          <BidPlansDetail record={selectedRecord} onClose={handleCloseDetail} />
-        </Modal>
-      </div>
+        <div>
+            <Table
+                columns={columns(handleViewDetail)}
+                dataSource={data}
+                rowKey={(record) => record.ProjectID || record.id}
+                scroll={{ x: 1500 }}
+                pagination={{ pageSize: 10 }}
+            />
+            <Modal
+                title="Chi tiết dự án"
+                open={!!selectedRecord}
+                onCancel={handleCloseDetail}
+                footer={null}
+                width={800}
+            >
+                <BidPlansDetail record={selectedRecord} onClose={handleCloseDetail} />
+            </Modal>
+        </div>
     );
-  };
-  
-  export default BidPlansTable;
+};
+
+export default memo(BidPlansTable);
