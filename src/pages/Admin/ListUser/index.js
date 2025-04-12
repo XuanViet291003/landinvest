@@ -125,7 +125,7 @@ const TableUser = () => {
         const res = await BlockUserPost(id);
         if (res) {
             message.success('Block thành công user!');
-            getListViewUser();
+            // getListViewUser();
         } else {
             notification.error({
                 message: 'Có lỗi xảy ra',
