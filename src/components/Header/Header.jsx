@@ -488,7 +488,11 @@ const Header = () => {
                                     <img src={icons.bidPlansIcon} alt="" width={30} height={30} /> {/* Icon mới */}
                                 </NavLink>
                                 <NavLink className="header-notification" to="/login-user">
-                                    <IoIosNotifications size={24} style={{color: "white"}} />
+                                    <IoIosNotifications size={24} style={{ color: "white" }} />
+                                </NavLink>
+                                {/* Upadte */}    
+                                <NavLink to="/thinkdiff" className="nav-link" style={{ marginLeft: "14px" }}>
+                                    <img src={icons.bookMarkIcon} alt="" width={24} height={24} style={{ alignItems: "center", marginLeft: "1px"}} /> {/* Icon bổ sung */}
                                 </NavLink>
                             </Nav>
                             <form
@@ -691,8 +695,8 @@ const Header = () => {
                             <img src={icons.landCostIcon} alt="" width={30} height={30} />
                         </NavLink>
                         <NavLink to="/login-user" className="nav-link">
-                            <IoIosNotifications 
-                              style={{ color: 'white', width: '20px', height: '20px' }} 
+                            <IoIosNotifications
+                                style={{ color: 'white', width: '20px', height: '20px' }}
                             />
                         </NavLink>
                         <NavLink to="/land-cost" className="nav-link">
