@@ -1,5 +1,6 @@
 import { message, notification, Radio } from 'antd';
 import L, { icon } from 'leaflet';
+import instance from '../../utils/axios-customize';
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaMapMarkedAlt } from 'react-icons/fa';
 import {
@@ -267,62 +268,64 @@ const Map = forwardRef(
                 return device;
             };
 
-            const fetchLocation = async () => {
-                try {
-                    // Lấy vị trí từ Cloudflare API
-                    const responseVitri = await fetch('https://ipv4-check-perf.radar.cloudflare.com/api/info');
-                    if (!responseVitri.ok) throw new Error('Không thể lấy dữ liệu vị trí');
 
-                    const vitriData = await responseVitri.json();
-                    const { longitude, latitude, ip_address, city } = vitriData;
+const fetchLocation = async () => {
+    try {
+        // Lấy vị trí từ Cloudflare API
+        const responseVitri = await fetch('https://ipv4-check-perf.radar.cloudflare.com/api/info');
+        if (!responseVitri.ok) throw new Error('Không thể lấy dữ liệu vị trí');
 
-                    if (!longitude || !latitude) throw new Error('Dữ liệu vị trí không hợp lệ');
+        const vitriData = await responseVitri.json();
+        const { longitude, latitude, ip_address, city } = vitriData;
 
-                    // Gọi API lấy thông tin tỉnh/thành phố
-                    // const dataProvinceCurrent = await getLocationInBoudingBox(latitude, longitude);
+        if (!longitude || !latitude) throw new Error('Dữ liệu vị trí không hợp lệ');
 
-                    const userAgent = navigator.userAgent;
+        const userAgent = navigator.userAgent;
 
-                    // Tạo đối tượng FormData
-                    const formData = new FormData();
-                    formData.append('iplocation', ip_address);
-                    formData.append('city', city);
-                    formData.append('lat', latitude);
-                    formData.append('lon', longitude);
-                    formData.append('device_active', detectDevice(userAgent));
-                    formData.append('he_dieu_hanh', detectOs(userAgent));
+        // Tạo đối tượng FormData
+        const formData = new FormData();
+        formData.append('iplocation', ip_address);
+        formData.append('city', city);
+        formData.append('lat', latitude);
+        formData.append('lon', longitude);
+        formData.append('device_active', detectDevice(userAgent));
+        formData.append('he_dieu_hanh', detectOs(userAgent));
 
-                    // Gửi dữ liệu data User bằng fetch API
-                    const responseUser = await fetch('https://landinvest.thinkdiff.us/add_active_user_activity', {
-                        method: 'POST',
-                        body: formData,
-                    });
-                    const dataUser = await responseUser.json();
-                    // console.log('Response:', dataUser);
-
-                    // Gọi API lấy thông tin quy hoạch
-                    // const apiUrl = `https://landinvest.thinkdiff.us/thongtin_district/${latitude}/${longitude}`;
-                    // const resQuyHoach = await fetch(apiUrl);
-                    // if (!resQuyHoach.ok) throw new Error("Không thể lấy dữ liệu quy hoạch");
-
-                    // const dataQuyHoach = await resQuyHoach.json();
-
-                    // Lọc danh sách quy hoạch tỉnh
-                    // const dataTinh = dataQuyHoach.dulieu.filter((item) => item.type === "QUYHOACH_TINH");
-
-                    // Tìm tỉnh phù hợp với vị trí hiện tại
-                    // const tinh = dataTinh.find((item) => item.idProvince === dataProvinceCurrent.provinces);
-
-                    // Set ID nếu tìm thấy tỉnh
-                    // if (tinh?.id) setId(tinh.id);
-
-                    // Kích hoạt button Quy Hoạch Tỉnh
-                    // document.querySelectorAll(".button-item[button-type]").forEach(btn => btn.classList.remove("active"));
-                    // document.querySelector('[button-type="3"]')?.classList.add("active");
-                } catch (error) {
-                    console.error('Lỗi khi lấy vị trí:', error);
+        try {
+            const responseUser = await instance.post(
+                '/add_active_user_activity', // Sử dụng tiền tố proxy
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 }
-            };
+            );
+            const dataUser = responseUser.data;
+            // console.log('Response:', dataUser);
+        } catch (error) {
+            console.error('Lỗi khi gửi dữ liệu người dùng:', error);
+            // Xử lý lỗi khi gửi dữ liệu người dùng
+        }
+
+        // Gọi API lấy thông tin quy hoạch bằng instance.get
+        // Lưu ý: Bạn cần xác định endpoint chính xác cho API này
+        // Ví dụ (có thể cần điều chỉnh):
+        // try {
+        //     const resQuyHoach = await instance.get(`/api/landinvest/thongtin_district/${latitude}/${longitude}`);
+        //     const dataQuyHoach = resQuyHoach.data;
+        //     // Xử lý dữ liệu quy hoạch
+        //     console.log('Dữ liệu quy hoạch:', dataQuyHoach);
+        // } catch (error) {
+        //     console.error('Lỗi khi lấy dữ liệu quy hoạch:', error);
+        //     // Xử lý lỗi khi lấy dữ liệu quy hoạch
+        // }
+
+    } catch (error) {
+        console.error('Lỗi trong quá trình fetchLocation:', error);
+        // Xử lý lỗi chung cho toàn bộ quá trình fetchLocation
+    }
+};
 
             fetchLocation();
         }, []);
@@ -554,19 +557,22 @@ const Map = forwardRef(
                     }
                     if (zoom >= 16) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
-
-                        const fetchDuan = await fetch(
-                            `https://landinvest.thinkdiff.us/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`,
-                        );
-                        const resDuan = await fetchDuan.json();
-
-                        // console.log(resDuan?.du_an)
-                        setDuAn(resDuan?.du_an);
-
-                        if (!isShowBtnOpen && isShowImagesList) {
-                            setIsShowImagesList(true);
-                        } else if (!isShowBtnOpen) {
-                            setIsShowBtnOpen(true);
+                    
+                        try {
+                            const responseDuan = await instance.get(
+                                `/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`
+                            );
+                            setDuAn(responseDuan.data?.du_an); // Dữ liệu thường nằm trong `response.data` của Axios
+                    
+                            if (!isShowBtnOpen && isShowImagesList) {
+                                setIsShowImagesList(true);
+                            } else if (!isShowBtnOpen) {
+                                setIsShowBtnOpen(true);
+                            }
+                        } catch (error) {
+                            console.error('Lỗi khi lấy dữ liệu dự án:', error);
+                            // Xử lý lỗi tại đây, ví dụ: setDuAn([]) để đảm bảo không có lỗi hiển thị
+                            setDuAn([]);
                         }
                     } else {
                         if (isShowBtnOpen) {
@@ -575,7 +581,6 @@ const Map = forwardRef(
                         if (isShowImagesList) {
                             setIsShowImagesList(false);
                         }
-
                         setDuAn([]);
                     }
                     if (zoom !== mapZoom) {
@@ -1590,55 +1595,52 @@ const Map = forwardRef(
         };
 
         const fetchHeatMapData = async (id, heatType) => {
+            setHeatMapLoading(true);
             try {
                 const now = new Date();
                 const month = now.getMonth() + 1;
                 const year = now.getFullYear();
-
-                const responseHeat = await fetch(
-                    `https://landinvest.thinkdiff.us/ban_do_nhiet_district/${id}/${month}/${year}`
+        
+                const responseHeat = await instance.get(
+                    `/ban_do_nhiet_district/${id}/${month}/${year}`
                 );
-
-                if (!responseHeat.ok) {
-                    throw new Error(`Lỗi API: ${responseHeat.status} ${responseHeat.statusText}`);
-                }
-
-                const data = await responseHeat.json();
-
+        
+                const data = responseHeat.data;
+        
                 // Lọc và chuyển đổi danh sách polygons
                 const priceHeatMap = [];
-
-                const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
+        
+                const polygonsByColor = data[heatType]?.map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
                     const obj = {
                         name: name_xaphuong,
                         value: avg,
                         color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#8884d8"
                     };
-
+        
                     priceHeatMap.push(obj);
-
-                    const relatedPolygon = data.list_polygon.find(({ WandID }) => WandID === xaphuong_id);
-
+        
+                    const relatedPolygon = data.list_polygon?.find(({ WandID }) => WandID === xaphuong_id);
+        
                     if (!relatedPolygon) return null;
-
+        
                     const errors = [];
-
-                    const polygons = relatedPolygon.polygon[0].map((coords) => {
+        
+                    const polygons = relatedPolygon.polygon?.[0]?.map((coords) => {
                         if (!Array.isArray(coords) || coords.length !== 2) {
                             errors.push({ name: name_xaphuong });
                             return null;
                         }
-
+        
                         const [lng, lat] = coords;
-
+        
                         if (typeof lng !== "number" || typeof lat !== "number") {
                             errors.push({ name: name_xaphuong });
                             return null;
                         }
-
+        
                         return { lat, lng };
                     }).filter(Boolean);
-
+        
                     return {
                         color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#ccc",
                         polygons: polygons,
@@ -1648,23 +1650,24 @@ const Map = forwardRef(
                         min,
                         name_xaphuong,
                     };
-                }).filter(Boolean);
-
-                if (!polygonsByColor || polygonsByColor.length == 0 || priceHeatMap.length == 0) {
+                }).filter(Boolean) || []; // Đảm bảo là một mảng nếu data[heatType] không tồn tại
+        
+                if (!polygonsByColor || polygonsByColor.length === 0 || priceHeatMap.length === 0) {
                     messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
                 }
-
+        
                 if (priceHeatMap.length > 0) {
                     setHeatRegionalPrice(priceHeatMap);
                 } else {
                     setHeatRegionalPrice(null);
                 }
-
+        
                 setPolygonHeatMap(polygonsByColor);
-
+        
                 searchParams.set("id-district", id);
                 searchParams.set("heat-type", heatType);
                 setSearchParams(searchParams);
+        
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
                 messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
@@ -1713,36 +1716,35 @@ const Map = forwardRef(
         useEffect(() => {
             const fetchData = async () => {
                 const id = searchParams.get('id-duan');
-
+        
                 if (id) {
-                    const response = await fetch(`https://landinvest.thinkdiff.us/detail_du_an/${id}`);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-
-                    const res = await response.json();
-
-                    setRegionalPrice(res?.data?.gia_cung_khu_vuc);
-
-                    if (res.data?.polygon) {
-                        const dataPolygon = JSON.parse(res.data?.polygon);
-
-                        const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
-
-                        // Lưu dữ liệu vào state
-                        setPolygonDuAnArea({
-                            polygon,
-                            address: res.data.diachi || 'Không có địa chỉ',
-                        });
-                    } else {
-                        setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
+                    try {
+                        const response = await instance.get(`/detail_du_an/${id}`);
+        
+                        setRegionalPrice(response.data?.data?.gia_cung_khu_vuc);
+        
+                        if (response.data?.data?.polygon) {
+                            const dataPolygon = JSON.parse(response.data.data.polygon);
+                            const polygon = dataPolygon.map(([lat, lng]) => ({ lat, lng }));
+        
+                            setPolygonDuAnArea({
+                                polygon,
+                                address: response.data.diachi || 'Không có địa chỉ',
+                            });
+                        } else {
+                            setPolygonDuAnArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
+                        }
+                    } catch (error) {
+                        console.error("Error fetching project details:", error);
+                        setRegionalPrice(null);
+                        setPolygonDuAnArea({ polygon: [], address: 'Lỗi khi tải dữ liệu ...' });
                     }
                 }
             };
+        
             fetchData();
             setShowPopup(true);
-        }, [searchParams]);
+        }, [searchParams, polygonArea]); // Lưu ý: Thêm polygonArea vào dependency array nếu bạn sử dụng nó trong state cập nhật
 
         const textIcon = (text) =>
             L.divIcon({
@@ -1869,19 +1871,18 @@ const Map = forwardRef(
         }
 
         const fetchRealEstatePrice = async (lat, lng) => {
+            setEstateLoading(true); // Thêm trạng thái loading khi bắt đầu fetch
             try {
-                const response = await fetch(
-                    `https://landinvest.thinkdiff.us/lay_gia_bat_dong_san_location/${lat}/${lng}`
+                const response = await instance.get(
+                    `/lay_gia_bat_dong_san_location/${lat}/${lng}`
                 );
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setEstatePrice(data);
+        
+                setEstatePrice(response.data); // Dữ liệu trả về từ Axios nằm trong `response.data`
             } catch (error) {
                 console.error("Error fetching real estate price:", error);
+                setEstatePrice(null); // Đặt lại state trong trường hợp lỗi
+            } finally {
+                setEstateLoading(false); // Đảm bảo trạng thái loading được cập nhật sau khi fetch xong
             }
         };
 

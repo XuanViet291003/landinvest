@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import './Investor.scss';
+import instance from '../../utils/axios-customize';
 import InvestorCard from './components/InvestorCard';
 import { Input, Spin } from 'antd';
 import { getListSearchInvestor } from '../../services/api';
 const { Search } = Input;
+
 const Investor = () => {
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -12,58 +14,67 @@ const Investor = () => {
     const [loading, setLoading] = useState(false);
     const [isSearch, setIsSearch] = useState(false);
     const [keySearch, setKeySearch] = useState('');
-    const onSearch = async (e) => {
-        setIsSearch(true);
-        if (currentPage !== 1) {
-            setCurrentPage(1);
-            return;
-        }
-        setCurrentPage(1);
+    const [error, setError] = useState(null);
+
+    // Cache để lưu trữ dữ liệu API
+    const cache = new Map();
+
+    const fetchInvestors = async (page, searchTerm = '') => {
         setLoading(true);
+        setError(null);
         try {
-            if (e.trim() == '') {
-                const response = await fetch(`https://landinvest.thinkdiff.us/list_nhadautu?page=${1}`);
-                const result = await response.json();
-                setData(result.data);
-                setTotalPages(Math.ceil(result.page_numer));
-                setLoading(false);
-                return;
+            let result;
+            const cacheKey = searchTerm ? `search_${searchTerm}_page_${page}` : `list_page_${page}`;
+
+            // Kiểm tra cache
+            if (cache.has(cacheKey)) {
+                console.log(`Returning cached data for ${cacheKey}`);
+                result = cache.get(cacheKey);
+            } else {
+                if (searchTerm.trim()) {
+                    // Gọi API tìm kiếm
+                    const res = await getListSearchInvestor(searchTerm, page);
+                    result = res;
+                } else {
+                    // Gọi API danh sách nhà đầu tư
+                    const response = await instance.get(`/list_nhadautu?page=${page}`);
+                    result = response.data;
+                }
+                cache.set(cacheKey, result);
             }
-            const res = await getListSearchInvestor(e);
-            setData(res.data);
-            if (res) {
-                setTotalPages(Math.ceil(res.page_numer));
+
+            if (!result || !result.data) {
+                throw new Error("Không tìm thấy dữ liệu nhà đầu tư");
+            }
+
+            setData(result.data);
+            if (result.page_numer) {
+                setTotalPages(Math.ceil(result.page_numer));
+            } else {
+                setTotalPages(1);
             }
         } catch (e) {
-            console.log(e);
-        }
-        setLoading(false);
-    };
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                let result;
-                if (!isSearch) {
-                    const response = await fetch(`https://landinvest.thinkdiff.us/list_nhadautu?page=${currentPage}`);
-                    result = await response.json();
-                    setData(result.data);
-                } else {
-                    const res = await getListSearchInvestor(keySearch, currentPage);
-                    // console.log(res);
-                    result = res.data;
-                    setData(result);
-                }
-                if (result.page_numer) {
-                    setTotalPages(Math.ceil(result.page_numer));
-                }
-            } catch (err) {
-                console.log(err.message);
-            }
+            setError("Không thể tải danh sách nhà đầu tư");
+            console.log(e.message);
+            setData([]);
+            setTotalPages(1);
+        } finally {
             setLoading(false);
-        };
-        fetchData();
-    }, [currentPage]);
+        }
+    };
+
+    // Xử lý tìm kiếm
+    const onSearch = (value) => {
+        setIsSearch(!!value.trim());
+        setKeySearch(value);
+        setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+        fetchInvestors(1, value);
+    };
+
+    // Fetch dữ liệu khi thay đổi trang hoặc tìm kiếm
+    useEffect(() => {
+        fetchInvestors(currentPage, keySearch);
+    }, [currentPage, keySearch]);
 
     // Hàm bắt sự kiện click vào trang
     const handlePageChange = (page) => {
@@ -103,66 +114,73 @@ const Investor = () => {
                         placeholder="Tìm kiếm"
                         size="large"
                         onSearch={onSearch}
-                        onChange={(e) => {
-                            setKeySearch(e.target.value);
-                        }}
+                        onChange={(e) => setKeySearch(e.target.value)}
                         enterButton
                         style={{ width: '300px' }}
                     />
 
-                    {data.map((item, index) => (
-                        <InvestorCard key={index} data={item} />
-                    ))}
-                    <ul className="pagination">
-                        <li>
-                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                                «
-                            </button>
-                        </li>
+                    {error && <div style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
 
-                        <li>
-                            <button className={currentPage === 1 ? 'active' : ''} onClick={() => handlePageChange(1)}>
-                                1
-                            </button>
-                        </li>
+                    {data.length > 0 ? (
+                        data.map((item, index) => (
+                            <InvestorCard key={index} data={item} />
+                        ))
+                    ) : (
+                        !loading && <div>Không có dữ liệu nhà đầu tư</div>
+                    )}
 
-                        {renderPagination().map((page, index) =>
-                            page === '...' ? (
-                                <li key={index} className="dots">
-                                    ...
-                                </li>
-                            ) : (
-                                <li key={index}>
-                                    <button
-                                        className={currentPage === page ? 'active' : ''}
-                                        onClick={() => handlePageChange(page)}
-                                    >
-                                        {page}
-                                    </button>
-                                </li>
-                            ),
-                        )}
-
-                        {totalPages > 1 && (
+                    {totalPages > 1 && (
+                        <ul className="pagination">
                             <li>
-                                <button
-                                    className={currentPage === totalPages ? 'active' : ''}
-                                    onClick={() => handlePageChange(totalPages)}
-                                >
-                                    {totalPages}
+                                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                    «
                                 </button>
                             </li>
-                        )}
 
-                        <li>
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            >
-                                »
-                            </button>
-                        </li>
-                    </ul>
+                            <li>
+                                <button className={currentPage === 1 ? 'active' : ''} onClick={() => handlePageChange(1)}>
+                                    1
+                                </button>
+                            </li>
+
+                            {renderPagination().map((page, index) =>
+                                page === '...' ? (
+                                    <li key={index} className="dots">
+                                        ...
+                                    </li>
+                                ) : (
+                                    <li key={index}>
+                                        <button
+                                            className={currentPage === page ? 'active' : ''}
+                                            onClick={() => handlePageChange(page)}
+                                        >
+                                            {page}
+                                        </button>
+                                    </li>
+                                ),
+                            )}
+
+                            {totalPages > 1 && (
+                                <li>
+                                    <button
+                                        className={currentPage === totalPages ? 'active' : ''}
+                                        onClick={() => handlePageChange(totalPages)}
+                                    >
+                                        {totalPages}
+                                    </button>
+                                </li>
+                            )}
+
+                            <li>
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    »
+                                </button>
+                            </li>
+                        </ul>
+                    )}
                 </div>
             </Spin>
         </Container>

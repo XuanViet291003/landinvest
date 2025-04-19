@@ -2,6 +2,7 @@ import { message, notification, Radio } from 'antd';
 import L from 'leaflet';
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaMapMarkedAlt } from 'react-icons/fa';
+import instance from '../../utils/axios-customize';
 import {
     LayersControl,
     MapContainer,
@@ -531,18 +532,19 @@ const Map = forwardRef(
 
         useEffect(() => {
             if (id && type) {
-                // Gọi API khi có id và type và chưa có itemQuyHoach
-                axios
-                    .get(`https://landinvest.thinkdiff.us/thongtin_quyhoach/${type}/${id}`)
+                // Gọi API khi có id và type
+                instance
+                    .get(`/thongtin_quyhoach/${type}/${id}`)
                     .then((response) => {
                         const data = response.data;
-
-                        if (data && data.dulieu) {
-                            handleItemClick(data.dulieu[0]);
+    
+                        if (data && data.dulieu && data.dulieu.length > 0) {
+                            const firstItem = data.dulieu[0];
+                            handleItemClick(firstItem);
                             handleItemClick(
-                                data.dulieu[0].boundingbox,
-                                data.dulieu[0].type,
-                                data.dulieu[0].nam_het_han,
+                                firstItem.boundingbox,
+                                firstItem.type,
+                                firstItem.nam_het_han,
                             );
                         } else {
                             console.error('No valid data received from API');
@@ -552,7 +554,7 @@ const Map = forwardRef(
                         console.error('Error fetching data from API:', error);
                     });
             }
-        }, [id, type]);
+        }, [id, type, handleItemClick]); // Thêm handleItemClick vào dependency array
 
         useEffect(() => {
             if (itemQuyHoach) {

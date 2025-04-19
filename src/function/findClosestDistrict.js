@@ -1,29 +1,31 @@
 import axios from 'axios';
+import instance from '../utils/axios-customize'; // Import the configured instance
 
 export const findClosestDistrict = async (provinceId, districtName) => {
     try {
-        const response = await axios.get(`https://api.quyhoach.xyz/api/districts/Byprovince/${provinceId}`);
+        // Sử dụng instance thay vì axios.get để tận dụng cấu hình proxy và interceptors
+        const response = await instance.get(`/api/districts/Byprovince/${provinceId}`);
         const districts = response.data;
 
-        const normalizedSearchName = districtName.toLowerCase()?.replace(/[^\w\s]/gi, '');
+        const normalizedSearchName = districtName?.toLowerCase()?.replace(/[^\w\s]/gi, '') || '';
 
         const calculateSimilarity = (name1, name2) => {
             const words1 = name1.split(' ');
-            const words2 = name2.split(' ');
+            const words2 = name2?.split(' ') || [];
             let matchCount = 0;
 
             words1.forEach((word) => {
-                if (words2?.includes(word)) matchCount++;
+                if (words2.includes(word)) matchCount++;
             });
 
-            return matchCount / Math.max(words1.length, words2.length);
+            return words1.length === 0 && words2.length === 0 ? 1 : Math.max(words1.length, words2.length) === 0 ? 0 : matchCount / Math.max(words1.length, words2.length);
         };
 
         let closestDistrict = null;
         let highestSimilarity = 0;
 
-        districts.forEach((district) => {
-            const normalizedDistrictName = district.DistrictName?.toLowerCase()?.replace(/[^\w\s]/gi, '');
+        districts?.forEach((district) => {
+            const normalizedDistrictName = district?.DistrictName?.toLowerCase()?.replace(/[^\w\s]/gi, '') || '';
             const similarity = calculateSimilarity(normalizedSearchName, normalizedDistrictName);
 
             if (similarity > highestSimilarity) {
