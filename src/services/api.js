@@ -1,6 +1,7 @@
 import removeAccents from 'remove-accents';
-import instance, { payOsInstance } from '../utils/axios-customize';
+import instance, { payOsInstance,thinkDiffInstance  } from '../utils/axios-customize';
 import { Await } from 'react-router-dom';
+import axios from 'axios';
 // api login, logout
 export const callLogin = (Username, Password, LastLoginIP) => {
     const params = {
@@ -8,14 +9,14 @@ export const callLogin = (Username, Password, LastLoginIP) => {
         Password: Password,
         LastLoginIP,
     };
-    return instance.post('/api/login', params);
+    return instance.post('/login', params);
 };
 export const callLogout = (Username, Password) => {
     const params = {
         Username: Username,
         Password: Password,
     };
-    return instance.post('/api/logout', params);
+    return instance.post('/logout', params);
 };
 
 // api register
@@ -43,7 +44,7 @@ export const callRegister = (
     };
 
     return instance
-        .post('/api/register', payload)
+        .post('/register', payload)
         .then((response) => response.data)
         .catch((error) => {
             if (error.response) {
@@ -59,7 +60,7 @@ export const callRefeshToken = () => {
 };
 
 export const callforgotPassword = (email) => {
-    return instance.post('/api/forgotPassword', {
+    return instance.post('/forgotPassword', {
         Email: email,
     });
 };
@@ -67,19 +68,19 @@ export const callforgotPassword = (email) => {
 //api search quy hoạch
 
 export const searchQueryAPI = (query) => {
-    return instance.get(`/api/zonings/view?name=${encodeURIComponent(query)}`);
+    return instance.get(`/zonings/view?name=${encodeURIComponent(query)}`);
 };
 
 // api box
 export const ViewlistBox = () => {
-    return instance.get('/api/box/viewlist_box');
+    return instance.get('/box/viewlist_box');
 };
 export const CreateBox = (BoxName, Description, avatarLink) => {
-    return instance.post('/api/box/add_box', { BoxName, Description, avatarLink });
+    return instance.post('/box/add_box', { BoxName, Description, avatarLink });
 };
 
 export const UpdateBox = (BoxID, BoxName, Description, avatarLink) => {
-    return instance.patch(`/api/box/update_box/${BoxID}`, { BoxName, Description, avatarLink });
+    return instance.patch(`/box/update_box/${BoxID}`, { BoxName, Description, avatarLink });
 };
 
 // API Map
@@ -156,7 +157,7 @@ export const fetchQuyHoach1500 = async () => {
 
 export const fetchProvinces = async () => {
     try {
-        const response = await instance.get('/api/provinces/view/');
+        const response = await instance.get('/provinces/view/');
         return response.data;
     } catch (error) {
         console.error('Error fetching provinces: ', error);
@@ -166,7 +167,7 @@ export const fetchProvinces = async () => {
 
 export const fetchListInfo = async (idDistrict) => {
     try {
-        const { data } = await instance.get(`/api/location/list_info_by_district/${idDistrict}`);
+        const { data } = await instance.get(`/location/list_info_by_district/${idDistrict}`);
         return data;
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -175,7 +176,7 @@ export const fetchListInfo = async (idDistrict) => {
 
 export const fetchAllProvince = async () => {
     try {
-        const { data } = await instance.get('/api/provinces/view/');
+        const { data } = await instance.get('/provinces/view/');
         return data;
     } catch (error) {
         console.error('Error fetching provinces: ', error);
@@ -185,7 +186,7 @@ export const fetchAllProvince = async () => {
 
 export const fetchDistrictsByProvinces = async (ProvinceID) => {
     try {
-        const { data } = await instance.get(`/api/districts/Byprovince/${ProvinceID}`);
+        const { data } = await instance.get(`/districts/Byprovince/${ProvinceID}`);
         return data;
     } catch (error) {
         console.error('Error fetching districts', error);
@@ -224,7 +225,7 @@ export const searchLocation = async (districtName) => {
 
 export const fetchListHighestLocation = async (districtId) => {
     try {
-        const response = await instance.get(`/api/location/list_info_highest/${districtId}`);
+        const response = await instance.get(`location/list_info_highest/${districtId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching districts', error);
@@ -241,17 +242,17 @@ export const fetchFilteredAuctions = async (startTime, endTime, startPrice, endP
         StartPrice: startPrice,
         EndPrice: endPrice,
     };
-    const response = await instance.post('/api/landauctions/filter_auction', params);
+    const response = await instance.post('/landauctions/filter_auction', params);
     return response.data;
 };
 
 export const fetchAuctionInfor = async (LandAuctionID) => {
-    const response = await instance.get(`/api/landauctions/view/${LandAuctionID}`);
+    const response = await instance.get(`/landauctions/view/${LandAuctionID}`);
     return response.data;
 };
 
 export const fetchOrganization = async () => {
-    const response = await instance.get('/api/list_organizers');
+    const response = await instance.get('/list_organizers');
     return response.data;
 };
 
@@ -260,13 +261,13 @@ export const fetchCreateComment = async (IDAuction, comment, userId) => {
         idUser: userId,
         content: comment,
     };
-    const response = await instance.post(`/api/landauctions/create_comment/${IDAuction}`, params);
+    const response = await instance.post(`/landauctions/create_comment/${IDAuction}`, params);
     return response.data;
 };
 
 //api list comment
 export const fetchListComment = async (IDAuction) => {
-    const response = await instance.get(`/api/landauctions/list_comment/${IDAuction}`);
+    const response = await instance.get(`/landauctions/list_comment/${IDAuction}`);
     return response.data;
 };
 
@@ -275,19 +276,19 @@ export const EditCommentAuction = async (IDComment, EditComment) => {
     const params = {
         content: EditComment,
     };
-    const response = await instance.patch(`/api/landauctions/edit_comment/${IDComment}`, params);
+    const response = await instance.patch(`/landauctions/edit_comment/${IDComment}`, params);
     return response.data;
 };
 //api delete comment
 export const DeleteCommentAuction = async (IDComment) => {
-    const response = await instance.delete(`/api/landauctions/delete_comment/${IDComment}`);
+    const response = await instance.delete(`/landauctions/delete_comment/${IDComment}`);
     return response.data;
 };
 
 //forums post
 
 export const ViewlistPost = () => {
-    return instance.get('/api/forum/view_allpost');
+    return instance.get('/forum/view_allpost');
 };
 
 export const CreatePost = (GroupID, Title, Content, PostLatitude, PostLongitude, base64Images, isHastags) => {
@@ -300,84 +301,84 @@ export const CreatePost = (GroupID, Title, Content, PostLatitude, PostLongitude,
         Images: base64Images,
         Hastags: isHastags,
     };
-    return instance.post('/api/forum/add_post', params);
+    return instance.post('/forum/add_post', params);
 };
 export const UpdatePost = (PostID, Title, Content) => {
-    return instance.patch(`/api/forum/update_post/${PostID}`, { Title, Content });
+    return instance.patch(`/forum/update_post/${PostID}`, { Title, Content });
 };
 
 // export const callFetchPostById = (PostID) => {
 //     return instance.get(`/api/forum/view_post/${PostID}`);
 // };
 export const DeletePost = (PostID) => {
-    return instance.delete(`/api/forum/delete_post/${PostID}`);
+    return instance.delete(`/forum/delete_post/${PostID}`);
 };
 
 // api like, comment, share
 
 export const LikePost = (idUser, idPost) => {
-    return instance.post(`/api/forum/like_post/${idUser}/${idPost}`);
+    return instance.post(`/forum/like_post/${idUser}/${idPost}`);
 };
 
 export const ListUserLike = (idPost) => {
-    return instance.get(`/api/forum/list_user_like_post/${idPost}`);
+    return instance.get(`/forum/list_user_like_post/${idPost}`);
 };
 export const numberInteractions = (idPost) => {
-    return instance.get(`/api/forum/number_info_post/${idPost}`);
+    return instance.get(`/forum/number_info_post/${idPost}`);
 };
 export const AllPostInfor = () => {
-    return instance.get('/api/forum/all_post_info');
+    return instance.get('/forum/all_post_info');
 };
 
 // api comment post
 export const ViewlistComment = (PostID) => {
-    return instance.get(`/api/post/comments/${PostID}`);
+    return instance.get(`/post/comments/${PostID}`);
 };
 export const CreateComment = (PostID, Content, Images) => {
-    return instance.post(`/api/post/add_comment/${PostID}`, { Content, Images });
+    return instance.post(`/post/add_comment/${PostID}`, { Content, Images });
 };
 export const UpdateComment = (CommentID, Content, PhotoURL) => {
-    return instance.patch(`/api/post/comment/update/${CommentID}`, { Content, PhotoURL });
+    return instance.patch(`/post/comment/update/${CommentID}`, { Content, PhotoURL });
 };
 export const DeleteComment = (CommentID) => {
-    return instance.delete(`/api/post/comment/remove/${CommentID}`);
+    return instance.delete(`/post/comment/remove/${CommentID}`);
 };
 
 // api group
 export const CreateGroup = (BoxID, GroupName, avatarLink) => {
-    return instance.post('/api/group/add_group', { BoxID, GroupName, avatarLink });
+    return instance.post('/group/add_group', { BoxID, GroupName, avatarLink });
 };
 
 export const UpdateGroup = (GroupID, GroupName) => {
-    return instance.patch(`/api/group/update_group/${GroupID}`, { GroupName });
+    return instance.patch(`/group/update_group/${GroupID}`, { GroupName });
 };
 export const DeleteGroup = (GroupID) => {
-    return instance.delete(`/api/group/remove_group/${GroupID}`);
+    return instance.delete(`/group/remove_group/${GroupID}`);
 };
 export const ViewlistGroup = (BoxID) => {
-    return instance.get(`/api/group/all_group/${BoxID}`);
+    return instance.get(`/group/all_group/${BoxID}`);
 };
 
 // api user, checkonline
 export const callGetAllUsers = () => {
-    return instance.get(`/api/listalluser`);
+    return instance.get(`/listalluser`);
 };
 export const ViewProfileUser = (USERID) => {
-    return instance.get(`/api/private/profile/${USERID}`);
+    return instance.get(`/private/profile/${USERID}`);
 };
 export const CheckUserOnline = (USERID) => {
-    return instance.get(`/api/checkOnline/${USERID}`);
+    return instance.get(`/checkOnline/${USERID}`);
 };
 export const BlockUserPost = (USERID) => {
-    return instance.patch(`/api/forum/block_user/${USERID}`);
+    return instance.patch(`/forum/block_user/${USERID}`);
 };
 export const UpdateProfileUser = (updatedUserData) => {
-    return instance.patch('/api/profile/updateprofile', updatedUserData);
+    return instance.patch('/profile/updateprofile', updatedUserData);
 };
 
 //api account
 export const fetchAccount = async () => {
-    const response = await instance.get('/api/listalluser');
+    const response = await instance.get('/listalluser');
     return response.data;
 };
 
@@ -425,11 +426,11 @@ export const getListRegulations = async (southwest, northeast) => {
     return res.data;
 };
 export const postImageLocation = async (image) => {
-    const res = await instance.patch('https://api.quyhoach.xyz/add_image_get_link_nginx/10', image);
+    const res = await instance.patch('/add_image_get_link_nginx/10', image);
     return res.data;
 };
 export const postUploadImage = async (lat, lng, image) => {
-    const res = await instance.post(`https://api.quyhoach.xyz/add_image_location/${lat}/${lng}`, image);
+    const res = await instance.post(`/add_image_location/${lat}/${lng}`, image);
     return res.data;
 };
 
@@ -442,7 +443,7 @@ export const getAreaLocation = async (lat, lng) => {
     return response.data;
 };
 export const listAuctionsInfor = async (page = 1, limit = 5) => {
-    const res = await instance.get(`https://api.quyhoach.xyz/api/daugia/thongtin?page=${page}&limit=${limit}`);
+    const res = await instance.get(`/daugia/thongtin?page=${page}&limit=${limit}`);
     return res.data;
 };
 export const createCheckoutInfo = async (data) => {
@@ -537,13 +538,46 @@ export const getCommentsByIdPost = async (id, page) => {
     return res.data;
 };
 
+export const searchLandCostByTextApi = async (searchText) => {
+    try {
+        const res = await instance.get(`/search_bang_gia_dat/${searchText}`);
+        return res.data.dulieu;
+    } catch (error) {
+        console.error('Error searching bid plans:', error);
+        throw error;
+    }
+};
+
+
 export const getBidPlansByDistrictApi = async (districtId) => {
     try {
-        const res = await instance.get(`dbht_theo_huyen/${districtId}`);
-        console.log('Raw bid plans response:', res);
-        return res.data;
+        const id = parseInt(districtId);
+        if (isNaN(id) || id <= 0) {
+            throw new Error('Mã quận/huyện không hợp lệ');
+        }
+
+        const res = await thinkDiffInstance.get(`/dotbien-hatang/${id}.json`);
+        console.log(`Raw bid plans response for district ${id}:`, res.data.projects);
+
+        if (!res.data.projects) {
+            throw new Error(`Không có dữ liệu trả về cho quận/huyện ${id}`);
+        }
+
+        if (!Array.isArray(res.data.projects)) {
+            throw new Error(`Dữ liệu trả về không chứa danh sách kế hoạch hợp lệ cho quận/huyện ${id}`);
+        }
+
+        if (res.data.DistrictID !== id) {
+            throw new Error(`Dữ liệu trả về không khớp với mã quận/huyện ${id}`);
+        }
+
+        return res.data.projects; // Trả về mảng projects thay vì object
     } catch (error) {
-        console.error('Error fetching bid plans:', error);
+        console.error(`Error fetching bid plans for district ${districtId}:`, {
+            message: error.message,
+            response: error.response ? error.response.data : null,
+            status: error.response ? error.response.status : null,
+        });
         throw error;
     }
 };
@@ -655,7 +689,6 @@ export const getDistrictAndProvinceByLocation = async (lat, lng) => {
     const res = await instance.get(`get_districts_provinces_by_location/${lat}/${lng}`);
     return res.data;
 };
-
 export const getAllWandInDistrict = async (id) => {
     const res = await instance.get(`get_tat_ca_xa_1_huyen/${id}`);
     return res.data;
@@ -673,10 +706,10 @@ export const postPolyGonForDuAn = async (id, value) => {
     return res.data;
 };
 export const getListNewsByIdUser = async (id, page = 1) => {
-    const res = await instance.get(`/api/forum/list_all_post_by_user/${id}/${page}`);
+    const res = await instance.get(`/forum/list_all_post_by_user/${id}/${page}`);
     return res.data;
 };
 export const getDataUserById = async (id) => {
-    const res = await instance.get(`/api/profile/other_user/${id}`);
+    const res = await instance.get(`/profile/other_user/${id}`);
     return res.data;
 };

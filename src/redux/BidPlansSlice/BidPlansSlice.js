@@ -42,13 +42,14 @@ export const getBidPlansByDistrictApi = createAsyncThunk(
         try {
             console.log('District ID:', districtId);
             const response = await fetchBidPlansByDistrict(districtId);
+            console.log('response :', response);
             if (!response) {
                 throw new Error('Không nhận được phản hồi từ API');
             }
-            if (!Array.isArray(response.data)) {
+            if (!Array.isArray(response)) {
                 throw new Error('Dữ liệu đấu thầu không hợp lệ');
             }
-            return response.data;
+            return response;
         } catch (error) {
             console.log('Error fetching bid plans:', error.message);
             return rejectWithValue(error.message || 'Failed to fetch bid plans');

@@ -8,6 +8,7 @@ import LandCostTable from '../../components/LandCostTable/LandCostTable';
 import axios from "axios";
 import { LAND_COST_KEY, MAP_TABLE_TYPE } from '../../constants/LandCostKey';
 import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
+import instance from '../../utils/axios-customize';
 import {
     getAllDistrictsInProvinceApi,
     getAllLandCostApi,
@@ -38,10 +39,8 @@ const LandCost = () => {
     const fetchData = async (term) => {
         try {
             const response = await axios.get(
-                `https://landinvest.thinkdiff.us/search_bang_gia_dat/${encodeURIComponent(term)}`
+                `/api/landinvest/search_bang_gia_dat/${encodeURIComponent(term)}`
             );
-            console.log("Dữ liệu từ API:", response.data);
-
             if (response.data.dulieu && response.data.dulieu.length > 0) {
                 setSearchResults(response.data.dulieu);
                 setShowTable(true);

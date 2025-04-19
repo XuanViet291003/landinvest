@@ -12,7 +12,7 @@ export const LandCostTable = ({ tableType, searchValue, data, type }) => {
     const districtId = useSelector((state) => state.landCost.districtId);
     const [landCostData, setLandCostData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 50; // Số lượng dòng trên mỗi trang
+    const pageSize = 10; // Số lượng dòng trên mỗi trang
     const [totalRecords, setTotalRecords] = useState(0);
 
     useEffect(() => {
@@ -23,7 +23,7 @@ export const LandCostTable = ({ tableType, searchValue, data, type }) => {
     // Hàm gọi API lấy dữ liệu theo trang
     const fetchLandCostData = async (page) => {
         try {
-            const response = await fetch(`https://landinvest.thinkdiff.us/bang_gia_dat_district/${districtId}?page=${page}`);
+            const response = await fetch(`/api/landinvest/bang_gia_dat_district/${districtId}?page=${page}`);
             const data = await response.json();
             console.log("Dữ liệu từ API:", data);// kiem tra
 

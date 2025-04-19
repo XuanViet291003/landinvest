@@ -1,212 +1,220 @@
 // BidPlans.scss
 
 .bid-plans-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f7fa;
-    min-height: 100vh;
-  
-    .bid-plans-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+
+  .bid-plans-content {
       background: #ffffff;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       padding: 30px;
       margin-top: 20px;
-  
+
       .bid-plans-title {
-        text-align: center;
-        color: #2c3e50;
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 30px;
-        position: relative;
-        padding-bottom: 15px;
-  
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 80px;
-          height: 3px;
-          background: #1890ff;
-        }
+          text-align: center;
+          color: #38761d; // Màu xanh lá cây đậm hơn
+          font-size: 2.5em; // To hơn
+          font-weight: bold; // In đậm
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; // Font chữ khác
+          margin-bottom: 30px;
+          position: relative;
+          padding-bottom: 15px;
+
+          &::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 80px;
+              height: 3px;
+              background: #8fce00; // Màu xanh lá cây tươi hơn cho gạch chân
+          }
       }
-  
+
       .search-section {
-        margin-bottom: 30px;
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  
-        .search-row {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 20px;
-  
-          .search-input {
-            width: 600px;
-            max-width: 100%;
-            border-radius: 4px;
-            
-            .ant-input-group-addon button {
-              background-color: #1890ff;
-              border-color: #1890ff;
-              color: white;
-            }
-          }
-        }
-  
-        .filter-row {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 15px;
-          flex-wrap: wrap;
-  
-          .ant-select {
-            width: 280px;
-            
-            &.province-select, 
-            &.district-select {
-              .ant-select-selector {
-                border-radius: 4px;
-                height: 40px;
-                display: flex;
-                align-items: center;
+          margin-bottom: 30px;
+          background: #f8f9fa;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+          .search-row {
+              display: flex;
+              justify-content: center;
+              margin-bottom: 20px;
+
+              .search-input {
+                  width: 600px;
+                  max-width: 100%;
+                  border-radius: 4px;
+
+                  .ant-input-group-addon button {
+                      background-color: #8fce00; // Màu xanh lá cây tươi hơn cho nút tìm kiếm
+                      border-color: #8fce00;
+                      color: white;
+                  }
               }
-            }
           }
-  
-          .reset-btn {
-            background-color: #ff4d4f;
-            color: white;
-            border: none;
-            height: 40px;
-            padding: 0 20px;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.3s;
-  
-            &:hover {
-              background-color: #ff7875;
-              transform: translateY(-1px);
-            }
+
+          .filter-row {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 15px;
+              flex-wrap: wrap;
+
+              .ant-select {
+                  width: 280px;
+
+                  &.province-select,
+                  &.district-select {
+                      .ant-select-selector {
+                          border-radius: 4px;
+                          height: 40px;
+                          display: flex;
+                          align-items: center;
+                      }
+                  }
+              }
+
+              .reset-btn {
+                  background-color: #d9534f; // Màu đỏ đậm hơn cho nút reset
+                  color: white;
+                  border: none;
+                  height: 40px;
+                  padding: 0 20px;
+                  border-radius: 4px;
+                  font-weight: 500;
+                  transition: all 0.3s;
+
+                  &:hover {
+                      background-color: #c9302c; // Màu đỏ đậm hơn khi hover
+                      transform: translateY(-1px);
+                  }
+              }
           }
-        }
       }
-  
+
       .results-section {
-        margin-top: 30px;
-        background: #ffffff;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  
-        .loading-spinner {
-          display: flex;
-          justify-content: center;
-          padding: 50px 0;
-          
-          .ant-spin-dot {
-            font-size: 40px;
+          margin-top: 30px;
+          background: #ffffff;
+          border-radius: 8px;
+          padding: 20px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+          .search-result-text {
+              color: #228B22; // Màu xanh lá cây forest
+              font-style: italic;
+              margin-bottom: 15px;
+              font-family: 'Georgia', serif; // Font chữ serif
           }
-        }
-  
-        .empty-state {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 40px 0;
-          color: #8c8c8c;
-          
-          .ant-empty-image {
-            height: 100px;
+
+          .loading-spinner {
+              display: flex;
+              justify-content: center;
+              padding: 50px 0;
+
+              .ant-spin-dot {
+                  font-size: 40px;
+              }
           }
-          
-          .ant-empty-description {
-            font-size: 16px;
-            margin-top: 10px;
+
+          .empty-state {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              padding: 40px 0;
+              color: #8c8c8c;
+
+              .ant-empty-image {
+                  height: 100px;
+              }
+
+              .ant-empty-description {
+                  font-size: 16px;
+                  margin-top: 10px;
+              }
           }
-        }
-  
-        .bid-plans-table {
-          width: 100%;
-          overflow-x: auto;
-          border-radius: 6px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          
-          .ant-table {
-            border-radius: 6px;
-            
-            .ant-table-thead > tr > th {
-              background-color: #f0f2f5;
-              font-weight: 600;
-              color: #2c3e50;
-            }
-            
-            .ant-table-tbody > tr:hover > td {
-              background-color: #e6f7ff !important;
-            }
+
+          .bid-plans-table {
+              width: 100%;
+              overflow-x: auto;
+              border-radius: 6px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+              .ant-table {
+                  border-radius: 6px;
+
+                  .ant-table-thead > tr > th {
+                      background-color: #f0f2f5;
+                      font-weight: 600;
+                      color: #2c3e50;
+                  }
+
+                  .ant-table-tbody > tr:hover > td {
+                      background-color: #e6f7ff !important;
+                  }
+              }
           }
-        }
       }
-    }
   }
-  
-  // Responsive styles
-  @media (max-width: 992px) {
-    .bid-plans-container {
+}
+
+// Responsive styles
+@media (max-width: 992px) {
+  .bid-plans-container {
       padding: 15px;
-      
+
       .bid-plans-content {
-        padding: 20px;
-        
-        .search-section {
-          padding: 15px;
-          
-          .search-row .search-input {
-            width: 100%;
+          padding: 20px;
+
+          .search-section {
+              padding: 15px;
+
+              .search-row .search-input {
+                  width: 100%;
+              }
+
+              .filter-row {
+                  gap: 10px;
+
+                  .ant-select {
+                      width: 100%;
+                  }
+              }
           }
-          
-          .filter-row {
-            gap: 10px;
-            
-            .ant-select {
-              width: 100%;
-            }
-          }
-        }
       }
-    }
   }
-  
-  @media (max-width: 576px) {
-    .bid-plans-container {
+}
+
+@media (max-width: 576px) {
+  .bid-plans-container {
       padding: 10px;
-      
+
       .bid-plans-content {
-        padding: 15px;
-        
-        .bid-plans-title {
-          font-size: 20px;
-          margin-bottom: 20px;
-        }
-        
-        .search-section {
-          padding: 10px;
-          
-          .filter-row {
-            flex-direction: column;
-            
-            .reset-btn {
-              width: 100%;
-            }
+          padding: 15px;
+
+          .bid-plans-title {
+              font-size: 20px;
+              margin-bottom: 20px;
           }
-        }
+
+          .search-section {
+              padding: 10px;
+
+              .filter-row {
+                  flex-direction: column;
+
+                  .reset-btn {
+                      width: 100%;
+                  }
+              }
+          }
       }
-    }
   }
+}

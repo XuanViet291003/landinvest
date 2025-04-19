@@ -1,4 +1,5 @@
 import axios from 'axios';
+import instance from '../utils/axios-customize'; // Import the configured instance
 
 export const getPolygonsByNames = async (names) => {
     const promises = names.map((name, i) => {
@@ -21,23 +22,22 @@ export const getPolygonsByNames = async (names) => {
 
 export const getPolygonsQuanHuyen = async (id) => {
     try {
-        const response = await axios.get(`https://landinvest.thinkdiff.us/get_polygon_district/${id}`);
-
-        return response.data.duongdan[0];
+        // Sử dụng instance thay vì axios.get để tận dụng cấu hình proxy và interceptors
+        const response = await instance.get(`/get_polygon_district/${id}`);
+        return response.data?.duongdan?.[0]; // Sử dụng optional chaining để tránh lỗi nếu không có dữ liệu
     } catch (error) {
-        console.error('Error fetching polygon data:', error);
+        console.error('Lỗi khi lấy dữ liệu polygon quận/huyện:', error);
         throw error;
     }
 };
 
 export const getPolygonsTinh = async (id) => {
     try {
-        const response = await axios.get(`https://landinvest.thinkdiff.us/get_polygon_provinces/${id}`);
-
-        return response.data.duongdan[0];
+        // Sử dụng instance thay vì axios.get
+        const response = await instance.get(`/get_polygon_provinces/${id}`);
+        return response.data?.duongdan?.[0]; // Sử dụng optional chaining
     } catch (error) {
-        console.error('Error fetching polygon data:', error);
+        console.error('Lỗi khi lấy dữ liệu polygon tỉnh:', error);
         throw error;
     }
 };
-
