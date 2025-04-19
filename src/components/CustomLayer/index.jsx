@@ -113,6 +113,8 @@ const CustomTileLayer = ({ item, opacity }) => {
                 tile.onload = () => done(null, tile);
                 tile.onerror = () => {
                     console.warn(`Tile load error: ${tile.src}`);
+                    // update test
+                    tile.style.opacity = "0.2";
                     done(null, tile);
                 };
 
@@ -124,18 +126,22 @@ const CustomTileLayer = ({ item, opacity }) => {
         });
 
         // === Tải địa chính tương ứng ===
-        const dcList = quyhoachData.diachinh.filter(dc => dc.idProvince === item.idProvince);
+        const dcList = quyhoachData.diachinh?.filter(dc => dc.idProvince === item.idProvince) || [];
         dcList.forEach((dc, index) => {
             const layer = diachinhRefs.current[index];
             if (!layer) return;
 
             layer.createTile = function (coords, done) {
-                const { x, y, z } = coords;
                 const tile = document.createElement("img");
+                const { x, y, z } = coords;
                 const tileY = dc.type_load_anh === "NGHICH" ? Math.pow(2, z) - 1 - y : y;
                 tile.src = `${dc.link_server}/${z}/${x}/${tileY}.png`;
                 tile.onload = () => done(null, tile);
-                tile.onerror = () => done(null, tile);
+                tile.onerror = () => {                    
+                    console.warn(`DC tile lỗi: zoom=${z}, x=${x}, y=${tileY} - ${tile.src}`);
+                    tile.style.opacity = "0.2";
+                    done(null, tile);
+                }
                 return tile;
             };
 
@@ -145,7 +151,7 @@ const CustomTileLayer = ({ item, opacity }) => {
     }, [item, quyhoachData]);
 
     if (!item || !quyhoachData) return null;
-
+    
     const tileOptions = {
         minZoom: item.min_zoom ? Number(item.min_zoom) - 2 : 9,
         minNativeZoom: item.min_zoom ? Number(item.min_zoom) : 12,
@@ -163,13 +169,13 @@ const CustomTileLayer = ({ item, opacity }) => {
             .map((link) => link.trim().replace(/[^a-zA-Z0-9:/._-]/g, "")) || [];
 
     // Test
-    const diachinhForProvince = quyhoachData.diachinh.filter(dc => dc.idProvince === item.idProvince);
+    const diachinhForProvince = quyhoachData.diachinh?.filter(dc => dc.idProvince === item.idProvince) || [];
 
     return (
         <>
             {links.map((link, index) => (
                 <TileLayer
-                    key={index}
+                    key={`map-${index}`}
                     ref={(ref) => (tileLayerRefs.current[index] = ref)}
                     url="" // bắt buộc để ngăn Leaflet auto load
                     {...tileOptions}
@@ -182,14 +188,15 @@ const CustomTileLayer = ({ item, opacity }) => {
                     key={`dc-${dc.id}-${index}`}
                     ref={(ref) => diachinhRefs.current[index] = ref}
                     url=""
-                    minZoom={Number(dc.min_zoom) - 1}
-                    minNativeZoom={Number(dc.min_zoom)}
+                    minZoom={Number(dc.min_zoom || 10) - 1}
+                    minNativeZoom={Number(dc.min_zoom || 10)}
                     maxNativeZoom={Number(dc.zoom)}
                     maxZoom={25}
                     tileSize={256}
                     opacity={0.7}
-                    zIndex={400}
+                    zIndex={800}
                     noWrap={true}
+                    bounds={undefined} // đảm bảo không bị cắt ngoài vùngs
                 />
             ))}
         </>
