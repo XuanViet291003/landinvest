@@ -27,7 +27,7 @@ import VipUpgrade from './components/VipUpgrade/VipUpgrade.jsx';
 import './index.css';
 import AboutUs from './pages/AboutUs/AboutUs.jsx';
 // Test update
-import ThinkDiff from './pages/ThinkDiff/ThinkDiff.jsx';
+// import ThinkDiff from './pages/ThinkDiff/ThinkDiff.jsx';
 import AdminPage from './pages/Admin/Dashboard';
 import LayoutAdmin from './pages/Admin/LayoutAdmin';
 import TableBox from './pages/Admin/ListBox';
@@ -265,10 +265,10 @@ function App() {
             path: '/forgotPassword',
             element: <ForgotPassword />,
         },
-        {
-            path: '/thinkdiff',
-            element: <ThinkDiff />,
-        },
+        // {
+        //     path: '/thinkdiff',
+        //     element: <ThinkDiff />,
+        // },
     ];
 
     if (datauser?.role === true) {
