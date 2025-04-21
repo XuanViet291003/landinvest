@@ -361,7 +361,7 @@ export const ViewlistGroup = (BoxID) => {
 
 // api user, checkonline
 export const callGetAllUsers = () => {
-    return instance.get(`/listalluser`);
+    return instance.get(`/api/listalluser`);
 };
 export const ViewProfileUser = (USERID) => {
     return instance.get(`/private/profile/${USERID}`);
@@ -378,7 +378,7 @@ export const UpdateProfileUser = (updatedUserData) => {
 
 //api account
 export const fetchAccount = async () => {
-    const response = await instance.get('/listalluser');
+    const response = await instance.get('/api/listalluser');
     return response.data;
 };
 
@@ -537,6 +537,9 @@ export const getCommentsByIdPost = async (id, page) => {
     const res = await instance.get(`api/forum/list_comment_post/${id}?page=${page}`);
     return res.data;
 };
+//Dữ liệu đột biến hạ tầng
+
+
 
 export const searchLandCostByTextApi = async (searchText) => {
     try {
@@ -587,15 +590,22 @@ export const searchBidPlansByTextApi = async (searchText) => {
         const res = await instance.get(`/dbht_search_text/${searchText}`);
         console.log('Raw search bid plans response:', res);
         return res.data;
+// =======
+// //text search dot bien ha tang
+// export const searchBidPlansByTextApi = async (searchText) => {
+//     try {
+//         const res = await instance.get(`https://api.quyhoach.xyz/dbht_search_text/${searchText}`);
+//         console.log('Raw search bid plans response:', res);
+//         if (!Array.isArray(res.data)) {
+//             throw new Error('Dữ liệu trả về không phải là mảng');
+//         }
+//         return res.data; 
+// >>>>>>> Stashed changes
     } catch (error) {
         console.error('Error searching bid plans:', error);
         throw error;
     }
 };
-
-
-
-// land autions
 
 export const getAllLandAutions = async (page) => {
     const res = await instance.get(`api/daugia/thongtin`, {
