@@ -60,7 +60,7 @@ const ProjectCarousel = ({ items }) => {
 
             <div className="w-full px-4">
                 <Slider ref={sliderRef} {...settings}>
-                    {items.map((item, idx) => (
+                    {(items || []).map((item, idx) => (
                         <div className="px-2" key={idx}>
                             <img src={item.img} alt={item.title} style={{ height: item.heightStyle, width: "100%" }} />
                             <div className="down-content">
