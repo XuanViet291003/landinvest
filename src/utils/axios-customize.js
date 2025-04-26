@@ -11,7 +11,7 @@ export const instance = axios.create({
 
 export const thinkDiffus= axios.create({
     // baseURL: '/', // Cách cũ: Phải gọi thinkDiffInstance.get('/api/thinkdiff/...')
-    baseURL: 'https://thinkdiff.us', // Cách mới: Gọi thinkDiffInstance.get('/...') là đủ
+    baseURL: 'https://landinvest.com.vn', // Cách mới: Gọi thinkDiffInstance.get('/...') là đủ
 });
 // --- Instance cho thinkdiff.us (qua proxy) ---
 // Export nếu cần dùng ở nơi khác

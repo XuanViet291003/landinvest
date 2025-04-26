@@ -9,14 +9,14 @@ export const callLogin = (Username, Password, LastLoginIP) => {
         Password: Password,
         LastLoginIP,
     };
-    return thinkDiffInstance.post('/login', params);
+    return instance.post('/api/login', params);
 };
 export const callLogout = (Username, Password) => {
     const params = {
         Username: Username,
         Password: Password,
     };
-    return thinkDiffInstance.post('/logout', params);
+    return instance.post('/api/logout', params);
 };
 
 // api register

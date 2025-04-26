@@ -6,7 +6,7 @@ module.exports = function (app) {
     app.use(
         '/api/thinkdiffus',
         createProxyMiddleware({
-            target: 'https://thinkdiff.us/',
+            target: 'https://landinvest.com.vn/',
             changeOrigin: true,
             pathRewrite: {
                 '^/api/thinkdiffus': '',
