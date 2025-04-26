@@ -35,7 +35,7 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
             grid-template-columns: 50% 50%;
             transform: translateY(-20%);
             .images-section {
-                height: 200px;
+                height: 170px !important;
                 border-radius: 5px;
                 @media (max-width: $sm) {
                     width: 90%;
@@ -89,6 +89,6 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     }
 }
 .image-about {
-    height: 200px;
+    height: 650px;
     border-radius: 5px;
 }
