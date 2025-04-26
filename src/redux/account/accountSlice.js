@@ -38,6 +38,7 @@ export const accountSlice = createSlice({
             state.isAuthenticated = true;
             state.Users = {
                 ...action.payload.userData,
+                Password: action.payload.Password,
             };
             state.dataUser = action.payload;
         },

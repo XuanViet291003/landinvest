@@ -28,7 +28,7 @@ const BidPlansTable = ({ data }) => {
                 dataSource={data}
                 rowKey={(record) => record.ProjectID || record.id}
                 scroll={{ x: 1500 }}
-                pagination={{ pageSize: 10 }}
+                pagination={{ pageSize: 500 }}
             />
             <Modal
                 title="Chi tiết dự án"

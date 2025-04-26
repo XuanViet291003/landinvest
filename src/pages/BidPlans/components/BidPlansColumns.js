@@ -70,7 +70,7 @@ export const columns = (onViewDetail) => [
     title: 'Tên gói thầu',
     dataIndex: 'bidNamePlanNew',
     key: 'bidNamePlanNew',
-    width: 300,
+    width: 100,
     render: (bidNames) => {
       if (!Array.isArray(bidNames) || bidNames.length === 0) return 'N/A';
       return bidNames.map((bid, index) => <div key={index}>{bid.name}</div>);

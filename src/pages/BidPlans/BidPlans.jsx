@@ -147,7 +147,7 @@ const BidPlans = () => {
     };
 
     return (
-        <Container className="bid-plans-container">
+        <div  className="bid-plans-container">
             <Banner />
             <div className="bid-plans-content">
                 <h2 className="bid-plans-title">Tìm kiếm Kế hoạch đấu thầu</h2>
@@ -236,7 +236,7 @@ const BidPlans = () => {
                     )}
                 </div>
             </div>
-        </Container>
+        </div>
     );
 };
 

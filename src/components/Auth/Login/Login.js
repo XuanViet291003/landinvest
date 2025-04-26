@@ -38,7 +38,7 @@ const Login = () => {
                 localStorage.setItem('user_id', res.data.UserID);
                 document.cookie = `access_token_cookie=${res.data.access_token}; path=/`;
 
-                dispatch(doLoginAction(res.data));
+                dispatch(doLoginAction({ userData: res.data, Password: Password }));
                 dispatch(doLoginDataUser(res.data));
 
                 message.success('Đăng nhập tài khoản thành công!');

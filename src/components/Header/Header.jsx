@@ -61,6 +61,7 @@ const Header = () => {
     const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
     const datauser = useSelector((state) => state.account.dataUser);
     const user = useSelector((state) => state.account.Users);
+    const { Username, Password } = user;
     const [isShowModalLogin, setIsShowModalLogin] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState([]);
@@ -133,16 +134,27 @@ const Header = () => {
     };
 
     const handleLogOut = async () => {
+        console.log('User data:', user);
         const { Username, Password } = user;
-        const res = await callLogout(Username, Password);
-        if (res) {
-            dispatch(doLogoutAction());
-            navigate('/');
-            message.success('Đăng xuất thành công!');
-        } else {
+        console.log('day la mat khau va tai khoan', 'Username:', Username, 'Password:', Password); // Thêm dòng này
+        try {
+            const res = await callLogout(Username, Password);
+            if (res) {
+                dispatch(doLogoutAction());
+                navigate('/');
+                message.success('Đăng xuất thành công!');
+            } else {
+                notification.error({
+                    message: 'Có lỗi xáy ra',
+                    description: res.message && Array.isArray(res.message) ? res.message[0] : res.message[1],
+                    duration: 5,
+                });
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
             notification.error({
                 message: 'Có lỗi xáy ra',
-                description: res.message && Array.isArray(res.message) ? res.message[0] : res.message[1],
+                description: error.message || 'Đăng xuất không thành công',
                 duration: 5,
             });
         }
