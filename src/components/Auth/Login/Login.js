@@ -2,36 +2,35 @@ import './Login.scss';
 import { Button, Form, Input, message, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-
 import { callLogin } from '../../../services/api';
 import { doLoginAction, doLoginDataUser } from '../../../redux/account/accountSlice';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
+
 const Login = () => {
     const dispatch = useDispatch();
     const [isSubmit, setIsSubmit] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
     const navigate = useNavigate();
+
     const getLastLoginIP = async () => {
         try {
             const response = await axios.get('https://api64.ipify.org?format=json');
             return response.data.ip;
         } catch (error) {
             console.error('Lỗi khi lấy địa chỉ IP:', error);
-            return '127.0.0.1';
+            return null;
         }
     };
+
     const onFinish = async (values) => {
+        setIsSubmit(true);
         try {
             const { Username, Password } = values;
-            setIsSubmit(true);
-
             const LastLoginIP = await getLastLoginIP();
 
             const res = await callLogin(Username, Password, LastLoginIP);
-
-            setIsSubmit(false);
 
             if (res && res.data && res.data.msg === 'login successful') {
                 localStorage.setItem('access_token', res.data.access_token);
@@ -43,18 +42,18 @@ const Login = () => {
                 dispatch(doLoginDataUser(res.data));
 
                 message.success('Đăng nhập tài khoản thành công!');
-
                 navigate('/');
             } else {
-                message.error('Đăng nhập không thành công, vui lòng thử lại.');
+                message.error(res?.data?.message || 'Đăng nhập không thành công, vui lòng thử lại.'); // Hiển thị lỗi từ API
             }
         } catch (error) {
-            setIsSubmit(false);
             notification.error({
-                message: error.message,
-                description: error.message && Array.isArray(error.message) ? error.message[0] : error.message[1],
+                message: 'Có lỗi xảy ra',
+                description: error.message, 
                 duration: 5,
             });
+        } finally {
+            setIsSubmit(false); 
         }
     };
 
@@ -138,10 +137,10 @@ const Login = () => {
                             style={{
                                 height: '40px',
                                 width: '120px',
-                                left:'74px',
+                                left: '74px',
                             }}
                             type="primary"
-                            htmlType="Đăng nhập"
+                            htmlType="submit" // Sửa thành submit
                             loading={isSubmit}
                         >
                             Đăng nhập
@@ -153,7 +152,7 @@ const Login = () => {
                                 width: '120px',
                                 marginLeft: '74px',
                             }}
-                            htmlType="Đăng nhập"
+                            htmlType="button" // Sửa thành button
                             onClick={() => {
                                 navigate('/forgotPassword');
                             }}
@@ -185,4 +184,5 @@ const Login = () => {
         </>
     );
 };
+
 export default Login;

@@ -2,11 +2,23 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function (app) {
 
+
+    app.use(
+        '/api/thinkdiffus',
+        createProxyMiddleware({
+            target: 'https://thinkdiff.us/',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/api/thinkdiffus': '',
+            },
+        })
+    );
+
     // Proxy cho API https://thinkdiff.us/dotbien-hatang/<districtId>.json
     app.use(
         '/api/thinkdiff',
         createProxyMiddleware({
-            target: 'https://photo.thinkdiff.us',
+            target: 'https://photo.thinkdiff.us/',
             changeOrigin: true,
             pathRewrite: {
                 '^/api/thinkdiff': '', // Loại bỏ prefix /api/thinkdiff khi gọi API
@@ -18,13 +30,15 @@ module.exports = function (app) {
     app.use(
         '/api/landinvest',
         createProxyMiddleware({
-            target: 'https://landinvest.thinkdiff.us',
+            target: 'https://landinvest.thinkdiff.us/',
             changeOrigin: true,
             pathRewrite: {
                 '^/api/landinvest': '', // Loại bỏ prefix /api/landinvest khi gọi API
             },
         })
     );
+
+    
 
     app.use(
         '/api', // Đường dẫn proxy

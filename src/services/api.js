@@ -1,5 +1,5 @@
 import removeAccents from 'remove-accents';
-import instance, { payOsInstance,thinkDiffInstance  } from '../utils/axios-customize';
+import instance, { payOsInstance,thinkDiffInstance ,thinkDiffus } from '../utils/axios-customize';
 import { Await } from 'react-router-dom';
 import axios from 'axios';
 // api login, logout
@@ -9,14 +9,14 @@ export const callLogin = (Username, Password, LastLoginIP) => {
         Password: Password,
         LastLoginIP,
     };
-    return instance.post('/login', params);
+    return thinkDiffInstance.post('/login', params);
 };
 export const callLogout = (Username, Password) => {
     const params = {
         Username: Username,
         Password: Password,
     };
-    return instance.post('/logout', params);
+    return thinkDiffInstance.post('/logout', params);
 };
 
 // api register
@@ -559,7 +559,7 @@ export const getBidPlansByDistrictApi = async (districtId) => {
             throw new Error('Mã quận/huyện không hợp lệ');
         }
 
-        const res = await thinkDiffInstance.get(`/dotbien-hatang/${id}.json`);
+        const res = await thinkDiffus.get(`/dotbien-hatang/${id}.json`);
         console.log(`Raw bid plans response for district ${id}:`, res.data.projects);
 
         if (!res.data.projects) {
@@ -588,7 +588,6 @@ export const getBidPlansByDistrictApi = async (districtId) => {
 export const searchBidPlansByTextApi = async (searchText) => {
     try {
         const res = await instance.get(`/dbht_search_text/${searchText}`);
-        console.log('Raw search bid plans response:', res);
         return res.data;
 // =======
 // //text search dot bien ha tang

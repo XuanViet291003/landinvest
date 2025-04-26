@@ -4,17 +4,22 @@ const clientIdName = 'x-client-id';
 const apiKeyName = 'x-api-key';
 
 // --- Instance cho landinvest.thinkdiff.us (qua proxy) ---
-const instance = axios.create({
+export const instance = axios.create({
     // baseURL: '/', // Cách cũ: Phải gọi instance.get('/api/landinvest/...')
-    baseURL: '/api/landinvest', // Cách mới: Gọi instance.get('/...') là đủ
+    baseURL: 'https://landinvest.thinkdiff.us', // Cách mới: Gọi instance.get('/...') là đủ
 });
 
+export const thinkDiffus= axios.create({
+    // baseURL: '/', // Cách cũ: Phải gọi thinkDiffInstance.get('/api/thinkdiff/...')
+    baseURL: 'https://thinkdiff.us', // Cách mới: Gọi thinkDiffInstance.get('/...') là đủ
+});
 // --- Instance cho thinkdiff.us (qua proxy) ---
 // Export nếu cần dùng ở nơi khác
 export const thinkDiffInstance = axios.create({
     // baseURL: '/', // Cách cũ: Phải gọi thinkDiffInstance.get('/api/thinkdiff/...')
-    baseURL: '/api/thinkdiff', // Cách mới: Gọi thinkDiffInstance.get('/...') là đủ
+    baseURL: 'https://photo.thinkdiff.us', // Cách mới: Gọi thinkDiffInstance.get('/...') là đủ
 });
+
 
 // --- Instance cho PayOS (trực tiếp) ---
 export const payOsInstance = axios.create({
