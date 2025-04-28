@@ -9,14 +9,14 @@ export const callLogin = (Username, Password, LastLoginIP) => {
         Password: Password,
         LastLoginIP,
     };
-    return instance.post('/login', params);
+    return instance.post('/api/login', params);
 };
 export const callLogout = (Username, Password) => {
     const params = {
         Username: Username,
         Password: Password,
     };console.log('User pas:', params);
-    return instance.post('/logout', params);
+    return instance.post('/api/logout', params);
 };
 
 // api register
@@ -44,7 +44,7 @@ export const callRegister = (
     };
 
     return instance
-        .post('/register', payload)
+        .post('api/register', payload)
         .then((response) => response.data)
         .catch((error) => {
             if (error.response) {
@@ -60,7 +60,7 @@ export const callRefeshToken = () => {
 };
 
 export const callforgotPassword = (email) => {
-    return instance.post('/forgotPassword', {
+    return instance.post('api/forgotPassword', {
         Email: email,
     });
 };

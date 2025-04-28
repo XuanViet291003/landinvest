@@ -7,11 +7,11 @@ const ModalLogin = (props) => {
     const navigate = useNavigate();
     const handleClickLogin = () => {
         handleClose();
-        navigate('/api/login');
+        navigate('/Login');
     };
     const handleClickRegister = () => {
         handleClose();
-        navigate('/api/register');
+        navigate('/register');
     };
     return (
         <Modal

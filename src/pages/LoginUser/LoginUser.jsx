@@ -3,9 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import "./LoginUser.scss";
 
 const API_ENDPOINTS = {
-  today: "/api/landinvest/show_all_user_active_user_activity_today",
-  activeToday: "/api/landinvest/show_active_user_activity_today?page=",
-  activeTotal: "/api/landinvest/show_active_user_activity?page=",
+  today: "https://landinvest.thinkdiff.us//show_all_user_active_user_activity_today",
+  activeToday: "https://landinvest.thinkdiff.us/show_active_user_activity_today?page=",
+  activeTotal: "https://landinvest.thinkdiff.us//show_active_user_activity?page=",
 };
 
 // Hàm chuyển đổi giờ sang giờ Việt Nam
