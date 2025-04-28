@@ -4,6 +4,8 @@ import { Container } from 'react-bootstrap';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { formatToVND } from '../../../function/formatToVND';
 import instance from '../../../utils/axios-customize';
+// test
+import moment from 'moment';
 import './AuctionDetail.scss';
 import { getTimeLeft } from '../../../function/getTimeLeft';
 import { IoTimeOutline } from 'react-icons/io5';
@@ -13,6 +15,7 @@ import { calculateLocation } from '../../../function/calculateLocation';
 import fetchProvinceName from '../../../function/findProvince';
 import { useDispatch } from 'react-redux';
 import { setCurrentLocation } from '../../../redux/search/searchSlice';
+import Countdown from './CountDown';
 
 export default function AuctionDetail() {
     const { id } = useParams();
@@ -26,6 +29,31 @@ export default function AuctionDetail() {
     const navigate = useNavigate();
     const latIndex = 0;
     const lngIndex = 1;
+
+    // Update 
+    const [remainingTime, setRemainingTIme] = useState(countdown);
+    const now = moment();
+    const nowFormat = now.format('DD:MM:YYYY HH:mm:ss');
+    console.log("now: ", nowFormat);
+
+    const then = now.clone().add(countdown);
+    const thenFormat = then.format('DD:MM:YYYY HH:mm:ss')
+    console.log("then: ", thenFormat);
+
+    const day = then.date();          // Ngày (1-31)
+    const month = then.month() + 1;   // Tháng (0-11) => phải +1
+    const year = then.year();         // Năm (ví dụ 2025)
+    const hour = then.hour();         // Giờ (0-23)
+    const minute = then.minute();     // Phút (0-59)
+    const second = then.second();     // Giây (0-59)
+
+    useEffect(() => {
+        const timerId = setInterval(() => {
+            setRemainingTIme(countdown)
+        }, 1000);
+
+        return () => clearInterval(timerId);
+    }, [countdown]); //
 
     const handleGotoLocation = () => {
         navigate(`/?vitri=${location[latIndex]},${location[lngIndex]}&zoom=13`);
@@ -55,7 +83,7 @@ export default function AuctionDetail() {
                     ]);
                     const zoom = 13;
                     const info = await fetchProvinceName(lat, lng);
-                    
+
                     mapRef.current?.setView([lat, lng], zoom);
                     setLocation([lat, lng]);
                     dispatch(
@@ -85,6 +113,23 @@ export default function AuctionDetail() {
                 <div className="auction-detail_title">
                     <p className="auction-detail_title_text">Thông tin đấu giá</p>
                 </div>
+                {/* Update Test */}
+                {/* <div>
+                    {remainingTime ?
+                        <p>
+                            {`Còn ${countdown.days} ngày, ${countdown.hours} giờ, ${countdown.minutes} phút, ${countdown.seconds} để đăng ký`}
+                        </p> : 'Sự kiện đã bắt đầu'
+                    }
+                </div> */}
+                <div>
+                    {remainingTime ?
+                        <Countdown
+                            timeTillDate={`${day}:${month}:${year} ${hour}:${minute}:${second}`}
+                            timeFormat={'DD:MM:YYYY HH:mm:ss'} /> : <h3>'Sự kiện đã bắt đầu'</h3>
+                    }
+
+                </div>
+                {/* End */}
                 <h1 className="auction-detail_title-h1">{auction?.Title}</h1>
                 <div className="auction-detail-time-remaining">
                     <div>
