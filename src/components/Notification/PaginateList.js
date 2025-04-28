@@ -21,31 +21,43 @@ const PaginateList = () => {
     const [loading, setLoading] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
 
-    useEffect(() => {
-        if (!searchTerm) {
-            getApi(currentPage);
-        }
-    }, [currentPage, searchTerm, getApi]); // Thêm getApi vào dependency array
-
-    const getApi = useCallback(async (page) => {
-        setLoading(true);
-        try {
-            const res = await fetchAllListProject(page);
-            if (res) {
-                setListItems(res.data);
-                setTotalPage(Math.ceil(+res.page_numer));
-            } else {
-                setListItems([]);
-                setTotalPage(0);
+    const PaginateList = () => {
+        const [totalPage, setTotalPage] = useState(0);
+        const [visibleItems, setVisibleItems] = useState(5); // Mặc định hiển thị 5 phần tử
+        const [currentPage, setCurrentPage] = useState(parseInt(useSearchParams()[0].get('page') || '1'));
+        const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
+        const [searchResults, setSearchResults] = useState([]); // Kết quả tìm kiếm
+        const [searchParms, setSearchParam] = useSearchParams();
+        const [loading, setLoading] = useState(false);
+        const [searchLoading, setSearchLoading] = useState(false);
+        const [listItems, setListItems] = useState([]);
+    
+        useEffect(() => {
+            const fetchData = async () => {
+                setLoading(true);
+                try {
+                    const res = await fetchAllListProject(currentPage);
+                    if (res) {
+                        setListItems(res.data);
+                        setTotalPage(Math.ceil(+res.page_numer));
+                    } else {
+                        setListItems([]);
+                        setTotalPage(0);
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi lấy danh sách dự án:', error);
+                    setListItems([]);
+                    setTotalPage(0);
+                } finally {
+                    setLoading(false);
+                }
+            };
+    
+            if (!searchTerm) {
+                fetchData();
             }
-        } catch (error) {
-            console.error('Lỗi khi lấy danh sách dự án:', error);
-            setListItems([]);
-            setTotalPage(0);
-        } finally {
-            setLoading(false);
-        }
-    }, [fetchAllListProject]); // Thêm fetchAllListProject vào dependency array
+        }, [currentPage, searchTerm, fetchAllListProject]);
+    };
 
     const getSearchResults = useCallback(async (query) => {
         setSearchLoading(true);
