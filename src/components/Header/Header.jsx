@@ -40,7 +40,7 @@ import { ActionIcon, HomeIcon, NewsIcon, NotificationIcon, SearchIcon, SearchNav
 import './Header.scss';
 
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search?';
-const SEARCH_BASE_URL = '/api/landinvest/search_diachi';
+const SEARCH_BASE_URL = 'https://landinvest.thinkdiff.us/search_diachi';
 const params = {
     format: 'json',
     addressdetails: 1,
@@ -61,7 +61,6 @@ const Header = () => {
     const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
     const datauser = useSelector((state) => state.account.dataUser);
     const user = useSelector((state) => state.account.Users);
-    const { Username, Password } = user;
     const [isShowModalLogin, setIsShowModalLogin] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState([]);

@@ -9,14 +9,14 @@ export const callLogin = (Username, Password, LastLoginIP) => {
         Password: Password,
         LastLoginIP,
     };
-    return instance.post('/api/login', params);
+    return instance.post('/login', params);
 };
 export const callLogout = (Username, Password) => {
     const params = {
         Username: Username,
         Password: Password,
-    };
-    return instance.post('/api/logout', params);
+    };console.log('User pas:', params);
+    return instance.post('/logout', params);
 };
 
 // api register
