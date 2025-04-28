@@ -1,4 +1,5 @@
 // src/components/BidPlans/BidPlansColumns.js
+import { spanAll } from 'ip-address/dist/v6/helpers';
 import BidPlansDescription from './BidPlansDescription';
 import { Space,Button } from 'antd';
 
@@ -6,13 +7,13 @@ export const columns = (onViewDetail) => [
   {
     title: 'STT',
     key: 'STT',
-    width: 50,
+    width: 10,
     render: (text, record, index) => index + 1, // Tạo STT tự động
   },
   {
-    title: 'Chi tiết dự án',
+    title: <span className="table-title">Chi tiết dự án</span>,
     key: 'action',
-    width: 170,
+    width: 80,
     render: (text, record) => (
       <Space size="middle">
         <Button 
@@ -21,55 +22,56 @@ export const columns = (onViewDetail) => [
           style={{ padding: '0' }}
         >
           Xem chi tiết
+          
         </Button>
       </Space>
     ),
   },
   {
-    title: 'Tên dự án',
+    title: <span className="table-title">Tên dự án</span>,
     dataIndex: 'projectName',
     key: 'projectName',
     render: (text) => <BidPlansDescription description={text} maxLines={3} />,
     width: 300,
   },
   {
-    title: 'Đột biến hạ tầng',
+    title: <span className="table-title">Đột biến hạ tầng</span>,
     dataIndex: 'dotbien_hatang',
     key: 'dotbien_hatang',
-    width: 260,
+    width: 160,
   },
   {
-    title: 'Chủ đầu tư',
+    title: <span className="table-title">Chủ đầu tư</span>,
     dataIndex: 'chudautu',
     key: 'chudautu',
     width: 300,
     render: (text) => <BidPlansDescription description={text} maxLines={3} />,
   },
   {
-    title: 'Tổng mức đầu tư (VNĐ)',
+    title: <span className="table-title">Tổng mức đầu tư (VNĐ)</span>,
     dataIndex: 'tongmuc_dautu',
     key: 'tongmuc_dautu',
     width: 150,
     render: (text) => (text ? text.toLocaleString() : 'N/A'),
   },
   {
-    title: 'Ngày công khai',
+    title: <span className="table-title">Ngày công khai</span>,
     dataIndex: 'publicDate',
     key: 'publicDate',
     width: 150,
     render: (text) => (text ? new Date(text).toLocaleDateString() : 'N/A'),
   },
   {
-    title: 'Ngày đóng thầu',
+    title: <span className="table-title">Ngày đóng thầu</span>,
     dataIndex: 'bidCloseDate',
     key: 'bidCloseDate',
     width: 150,
     render: (text) => (text ? new Date(text).toLocaleDateString() : 'N/A'),
   },
   {
-    title: 'Tên gói thầu',
-    dataIndex: 'bidNamePlanNew',
-    key: 'bidNamePlanNew',
+    title: <span className="table-title">Tên gói thầu</span>,
+    dataIndex: 'bidName',
+    key: 'bidName',
     width: 100,
     render: (bidNames) => {
       if (!Array.isArray(bidNames) || bidNames.length === 0) return 'N/A';

@@ -166,17 +166,18 @@
     color: #f0f8ff;
 }
 .land-cost-description {
-    display: -webkit-box !important; /* Cho các trình duyệt WebKit */
-    -webkit-box-orient: vertical; /* Định hướng khối dọc cho WebKit */
-    overflow: hidden; /* Ẩn phần text thừa */
+    display: -webkit-box !important; 
+    -webkit-box-orient: vertical;
+    color: white;
+    overflow: hidden; 
     line-clamp: 3;
     line-height: 20px;
-    -webkit-line-clamp: 3; /* Giới hạn hiển thị 3 dòng */
-    width: 100%; /* Đảm bảo có chiều rộng xác định */
+    -webkit-line-clamp: 3; 
+    width: 100%; 
     font-size: 0.9rem;
     &.one-line {
         line-clamp: 1;
-        -webkit-line-clamp: 1; /* Giới hạn hiển thị 3 dòng */
+        -webkit-line-clamp: 1; 
     }
 }
 
@@ -379,11 +380,7 @@
             color: #fff;
         }
 
-        .table-title {
-            font-weight: 600;
-            font-size: 1rem;
-            line-height: 1.563rem;
-        }
+        table-title
         .table-source {
             font-weight: 500;
             font-size: 0.8rem;
