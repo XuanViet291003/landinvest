@@ -7,8 +7,6 @@ import { Empty } from 'antd';
 const BidPlansTable = ({ data }) => {
     const [selectedRecord, setSelectedRecord] = useState(null);
 
-    console.log('BidPlansTable data:', data);
-
     const handleViewDetail = (record) => {
         setSelectedRecord(record);
     };

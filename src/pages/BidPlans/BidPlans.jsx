@@ -40,17 +40,16 @@ const BidPlans = () => {
     } = bidPlansState;
     const { provinces: provincesStatus, districts: districtsStatus, bidPlans: bidPlansStatus } = status;
 
-    useEffect(() => {
-        dispatch(getAllProvincesApi()).then((result) => {
-            if (result.error) {
-                message.error('Không thể tải danh sách tỉnh/thành phố');
-            } else {
-                console.log('Provinces from API:', result.payload);
-                const hoaBinh = result.payload.find((p) => p.ProvinceName === 'Hòa Bình');
-                console.log('Tìm Hòa Bình:', hoaBinh);
-            }
-        });
-    }, [dispatch]);
+    // useEffect(() => {
+    //     dispatch(getAllProvincesApi()).then((result) => {
+    //         if (result.error) {
+    //             message.error('Không thể tải danh sách tỉnh/thành phố');
+    //         } else {
+    //             console.log('Provinces from API:', result.payload);
+    //             const hoaBinh = result.payload.find((p) => p.ProvinceName === 'Hòa Bình');
+    //         }
+    //     });
+    // }, [dispatch]);
 
     useEffect(() => {
         // Chỉ cập nhật searchResultText khi có selectedDistrict
