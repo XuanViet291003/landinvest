@@ -44,7 +44,7 @@ export const callRegister = (
     };
 
     return instance
-        .post('api/register', payload)
+        .post('/api/register', payload)
         .then((response) => response.data)
         .catch((error) => {
             if (error.response) {
@@ -60,7 +60,7 @@ export const callRefeshToken = () => {
 };
 
 export const callforgotPassword = (email) => {
-    return instance.post('api/forgotPassword', {
+    return instance.post('/api/forgotPassword', {
         Email: email,
     });
 };

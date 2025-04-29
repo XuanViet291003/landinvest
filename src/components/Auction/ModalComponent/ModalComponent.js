@@ -11,25 +11,25 @@ const ModalComponent = ({ CloseModal, IDAuction }) => {
     const [apiUser, setApiUser] = useState([]);
     const dataUserID = useSelector((state) => state.account.dataUser);
     const userId = dataUserID?.UserID; // userid
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-    //             if (dataUserID?.UserID) {
-    //                 const response = await fetchAccount();
-    //                 const fetchedUser = response.find((user) => user?.userid === dataUserID?.UserID);
-    //                 fetchedUser && setApiUser(fetchedUser);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching user data:', error);
-    //             notification.error({
-    //                 message: 'Error',
-    //                 description: 'Failed to fetch user data',
-    //             });
-    //         }
-    //     };
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                if (dataUserID?.UserID) {
+                    const response = await fetchAccount();
+                    const fetchedUser = response.find((user) => user?.userid === dataUserID?.UserID);
+                    fetchedUser && setApiUser(fetchedUser);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                notification.error({
+                    message: 'Error',
+                    description: 'Failed to fetch user data',
+                });
+            }
+        };
 
-    //     fetchUserData();
-    // }, [dataUserID]);
+        fetchUserData();
+    }, [dataUserID]);
 
     const handleCommentChange = (e) => {
         setComment(e.target.value);

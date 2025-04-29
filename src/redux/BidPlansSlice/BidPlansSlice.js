@@ -40,9 +40,7 @@ export const getBidPlansByDistrictApi = createAsyncThunk(
     'api/getBidPlansByDistrict',
     async (districtId, { rejectWithValue }) => {
         try {
-            console.log('District ID:', districtId);
             const response = await fetchBidPlansByDistrict(districtId);
-            console.log('response :', response);
             if (!response) {
                 throw new Error('Không nhận được phản hồi từ API');
             }

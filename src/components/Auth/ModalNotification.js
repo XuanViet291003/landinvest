@@ -7,7 +7,7 @@ const ModalLogin = (props) => {
     const navigate = useNavigate();
     const handleClickLogin = () => {
         handleClose();
-        navigate('/Login');
+        navigate('/login');
     };
     const handleClickRegister = () => {
         handleClose();

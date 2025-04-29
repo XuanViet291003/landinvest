@@ -133,27 +133,16 @@ const Header = () => {
     };
 
     const handleLogOut = async () => {
-        console.log('User data:', user);
         const { Username, Password } = user;
-        console.log('day la mat khau va tai khoan', 'Username:', Username, 'Password:', Password); // Thêm dòng này
-        try {
-            const res = await callLogout(Username, Password);
-            if (res) {
-                dispatch(doLogoutAction());
-                navigate('/');
-                message.success('Đăng xuất thành công!');
-            } else {
-                notification.error({
-                    message: 'Có lỗi xáy ra',
-                    description: res.message && Array.isArray(res.message) ? res.message[0] : res.message[1],
-                    duration: 5,
-                });
-            }
-        } catch (error) {
-            console.error('Logout error:', error);
+        const res = await callLogout(Username, Password);
+        if (res) {
+            dispatch(doLogoutAction());
+            navigate('/');
+            message.success('Đăng xuất thành công!');
+        } else {
             notification.error({
                 message: 'Có lỗi xáy ra',
-                description: error.message || 'Đăng xuất không thành công',
+                description: res.message && Array.isArray(res.message) ? res.message[0] : res.message[1],
                 duration: 5,
             });
         }
@@ -181,6 +170,7 @@ const Header = () => {
             setIsLoading(false);
         }
     };
+
     // Search
     // const handleSearchDispatch = async (item) => {
     //     if (!item) return;
