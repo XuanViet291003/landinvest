@@ -39,7 +39,7 @@ const LandCost = () => {
     const fetchData = async (term) => {
         try {
             const response = await axios.get(
-                `/api/landinvest/search_bang_gia_dat/${encodeURIComponent(term)}`
+                `https://landinvest.thinkdiff.us/search_bang_gia_dat/${encodeURIComponent(term)}`
             );
             if (response.data.dulieu && response.data.dulieu.length > 0) {
                 setSearchResults(response.data.dulieu);
