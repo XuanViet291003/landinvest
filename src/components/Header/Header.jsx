@@ -502,10 +502,10 @@ const Header = () => {
                                     <IoIosNotifications size={24} style={{ color: "white" }} />
                                 </NavLink>
                                 {/* Upadte */}
-                                <NavLink to="/thinkdiff" className="nav-link" style={{ marginLeft: "14px" }}>
-                                    <img src={icons.bookMarkIcon} alt="" width={24} height={24} style={{ alignItems: "center", marginLeft: "1px" }} />  
+                                {/* <NavLink to="/thinkdiff" className="nav-link" style={{ marginLeft: "14px" }}> */}
+                                    {/* <img src={icons.bookMarkIcon} alt="" width={24} height={24} style={{ alignItems: "center", marginLeft: "1px" }} />   */}
                                     {/* Icon bổ sung */}
-                                </NavLink>
+                                {/* </NavLink> */}
                             </Nav>
                             <form
                                 className="header-search"
