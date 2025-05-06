@@ -1,0 +1,11 @@
+.custom-marker-wrapper {
+    position: absolute !important;
+    z-index: 9999 !important;
+    pointer-events: auto;
+}
+
+.custom-marker svg {
+    width: 30px;
+    height: 30px;
+    display: block;
+}

@@ -36,11 +36,9 @@ import {
     postPolyGonForDuAn,
 } from '../../services/api';
 import DrawerView from '../Home/DrawerView';
-// import useGetParams from '../Hooks/useGetParams';
 import { CloseOutlined } from '@ant-design/icons';
 import * as turf from '@turf/turf';
 import { Tooltip } from 'antd';
-import axios from 'axios';
 import _ from 'lodash';
 import ReactDOMServer from 'react-dom/server';
 import { FaList, FaLocationDot } from 'react-icons/fa6';
@@ -72,30 +70,24 @@ import { Button } from 'react-bootstrap';
 import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
 import EstatePricePopUp from '../Home/EstatePricePopUp/EstatePricePopUp';
 
-import './index.scss'
-import MarkerPaneSetup from './MarkerPaneSetup';
-
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
     iconSize: [15, 15],
     iconAnchor: [7.5, 7.5],
     popupAnchor: [-3, -38],
 });
-
 const iconDuAn = new L.Icon({
     iconUrl: require('../../assets/du_an.png'),
     iconSize: [38, 38],
     iconAnchor: [22, 38],
     popupAnchor: [-3, -38],
 });
-
 const iconDuAnNoPlygon = new L.Icon({
     iconUrl: require('../../assets/icons8-home-48.png'),
     iconSize: [38, 38],
     iconAnchor: [22, 38],
     popupAnchor: [-3, -38],
 });
-
 const dotIcon = new L.DivIcon({
     className: 'custom-dot-icon',
     html: `<div></div>`,
@@ -103,35 +95,26 @@ const dotIcon = new L.DivIcon({
     iconAnchor: [7.5, 7.5],
 });
 const iconHtml = ReactDOMServer.renderToStaticMarkup(
-    <div style={{
-        color: 'red',
-        fontSize: '30px',
-        position: 'absolute', // BẮT BUỘC nếu không dùng class mặc định
-        zIndex: 10000, // Optional – Leaflet vẫn ưu tiên zIndexOffset
-    }}>
+    <div style={{ color: 'red', fontSize: '30px' }}>
         <FaLocationDot />
     </div>,
 );
-
 const iconSavePolygon = L.divIcon({
     className: 'custom-icon',
     html: `<button style="background: #007bff; color: white;z-index : 1000; border: none; padding: 5px 10px; border-radius: 5px;">Lưu</button>`,
     iconSize: [50, 30],
 });
-
-// Tạo DivIcon với HTML                 *
+// Tạo DivIcon với HTML
 const iconLocation = L.divIcon({
     html: iconHtml,
-    className: 'leaflet-marker-icon custom-marker-wrapper', // Loại bỏ class mặc định
+    className: '', // Loại bỏ class mặc định
     iconSize: [30, 30],
     iconAnchor: [15, 30], // Tâm của icon
 });
-
 const Map = forwardRef(
     (
         {
             opacity,
-            setSelectedPosition,
             setIdDistrict,
             idDistrict,
             isSelectedMeasure,
@@ -179,11 +162,8 @@ const Map = forwardRef(
         const [isShowListRegulation, setisShowListRegulation] = useState(true);
         const [processedRegions, setProcessedRegions] = useState([]);
         const [markerPosition, setMarkerPosition] = useState(null);
-        const [popupInfo, setPopupInfo] = useState(null);
-        const markerRef = useRef(null);
         const [undoStack, setUndoStack] = useState([]);
         const [redoStack, setRedoStack] = useState([]);
-        const [trigger, setTrigger] = useState(false);
         const [polygonArea, setPolygonArea] = useState({ distances: [], polygon: [] });
         const [polygonDuAnArea, setPolygonDuAnArea] = useState({ polygon: [] });
         const [isShowModalArea, setIsShowModalArea] = useState(false);
@@ -195,8 +175,6 @@ const Map = forwardRef(
 
         let polygonOnSearch = [];
         polygonOnSearch = itemSearch?.coordinates?.map(([lng, lat]) => [lat, lng]);
-
-        // console.log(itemSearch)
         const [location, setLocation] = useState([0, 0]); // Vị trí hiện tại
         const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false); // Thông tin vị trí có mở không
         const [isLongClick, setIsLongClick] = useState(false); // Kiểm tra click dài
@@ -208,11 +186,8 @@ const Map = forwardRef(
         const [heatRegionalPrice, setHeatRegionalPrice] = useState(null)
         const activeLayer = useSelector((state) => state.mapLayer.activeLayer);
         const userAgent = navigator.userAgent;
-        // const [firstTime, setFirstTime] = useState(true);
-
         const [infraMutation, setInfraMutation] = useState(null);
 
-        // const [id, setId] = useState(searchParams.get('id'));
         const [isDrawPolygon, setIsDrawPolygon] = useState(false);
         const id = searchParams.get('id');
         const type = searchParams.get('type');
@@ -235,7 +210,6 @@ const Map = forwardRef(
             try {
                 const newMarkers = [...markers, markers[0]].map((item) => [item.lat, item.lng]);
                 const formData = new FormData();
-                // console.log(typeof JSON.stringify(newMarkers));
                 formData.append('polygon', JSON.stringify(newMarkers));
                 await postPolyGonForDuAn(idDuAn, formData);
                 message.success('Bạn đã lưu thành công !');
@@ -279,7 +253,6 @@ const Map = forwardRef(
                 return device;
             };
 
-
             const fetchLocation = async () => {
                 try {
                     // Lấy vị trí từ Cloudflare API
@@ -301,7 +274,6 @@ const Map = forwardRef(
                     formData.append('lon', longitude);
                     formData.append('device_active', detectDevice(userAgent));
                     formData.append('he_dieu_hanh', detectOs(userAgent));
-
                     try {
                         const responseUser = await instance.post(
                             '/add_active_user_activity', // Sử dụng tiền tố proxy
@@ -313,35 +285,18 @@ const Map = forwardRef(
                             }
                         );
                         const dataUser = responseUser.data;
-                        // console.log('Response:', dataUser);
                     } catch (error) {
                         console.error('Lỗi khi gửi dữ liệu người dùng:', error);
                         // Xử lý lỗi khi gửi dữ liệu người dùng
                     }
-
-                    // Gọi API lấy thông tin quy hoạch bằng instance.get
-                    // Lưu ý: Bạn cần xác định endpoint chính xác cho API này
-                    // Ví dụ (có thể cần điều chỉnh):
-                    // try {
-                    //     const resQuyHoach = await instance.get(`/api/landinvest/thongtin_district/${latitude}/${longitude}`);
-                    //     const dataQuyHoach = resQuyHoach.data;
-                    //     // Xử lý dữ liệu quy hoạch
-                    //     console.log('Dữ liệu quy hoạch:', dataQuyHoach);
-                    // } catch (error) {
-                    //     console.error('Lỗi khi lấy dữ liệu quy hoạch:', error);
-                    //     // Xử lý lỗi khi lấy dữ liệu quy hoạch
-                    // }
-
                 } catch (error) {
                     console.error('Lỗi trong quá trình fetchLocation:', error);
                     // Xử lý lỗi chung cho toàn bộ quá trình fetchLocation
                 }
             };
-
             fetchLocation();
         }, []);
 
-        const [polygonPoint, setPolygonPoint] = useState(null);
         const [isShowLandAdministration, setIsShowLandAdministration] = useState(false);
         const [landAdministrationData, setLandAdministrationData] = useState({
             quanhuyen: '',
@@ -390,23 +345,7 @@ const Map = forwardRef(
                 setArea(newArea);
             }
         }, []);
-        const fetchReverseGeocode = async (lat, lon) => {
-            const url = `https://nominatim.openstreetmap.org/reverse.php?lat=${lat}&lon=${lon}&zoom=18&format=jsonv2`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data && data.display_name) {
-                    return data.display_name;
-                } else {
-                    console.error('Không tìm thấy thông tin vị trí');
-                    return null;
-                }
-            } catch (error) {
-                console.error('Lỗi khi gọi API Nominatim:', error);
-                return null;
-            }
-        };
-        const [isLoading, setIsLoaing] = useState(false);
+        
         const [locationData, setLocationData] = useState({
             description: '',
             idDistrict: 0,
@@ -418,12 +357,7 @@ const Map = forwardRef(
         });
         const allPlannings = useSelector((state) => state.allPlannings.allPlannings);
         const [RegulationImages, setRegulationImages] = useState(null);
-        const [selectedBounds, setSelectedBounds] = useState(null);
-        const [imageOverlay, setImageOverlay] = useState(null);
         const [showPopup, setShowPopup] = useState(false);
-
-        // const mapRef = useRef();
-        // const sharing = searchParams.get('ups');
 
         const onCloseLocationInfo = () => {
             setIsLocationInfoOpen(false);
@@ -476,11 +410,8 @@ const Map = forwardRef(
                         isBoundingBoxChanged &&
                         boundingboxStatus !== THUNK_API_STATUS.PENDING
                     ) {
-                        // console.log(southWest);
-                        // console.log(northEast);
 
                         dispatch(getBoundingboxData({ southWest: southWest, northEast: northEast }));
-
                         dispatch(
                             setCurrentBoundingBox({
                                 minLat: southWest.lat,
@@ -548,11 +479,9 @@ const Map = forwardRef(
                     let vitri = '';
                     if (searchParams.get('vitri')) {
                         vitri = searchParams.get('vitri').split(',');
-
                         // Gọi API lấy thông tin tỉnh/thành phố
                         dataProvinceCurrent = await fetchProvinceName(vitri[0], vitri[1]);
                     }
-
                     if (
                         zoom >= 19 &&
                         (!RegulationImages || RegulationImages[0].idProvince != dataProvinceCurrent?.provinceId)
@@ -562,13 +491,11 @@ const Map = forwardRef(
                         const tile = [dataByType["QUYHOACH_DIACHINH"][dataByType["QUYHOACH_DIACHINH"].length - 1]];
                         setRegulationImages(tile);
                     }
-
                     if (zoom >= 13) {
                         debouncedHandleGetDistrict(center.lat, center.lng);
                     }
                     if (zoom >= 16) {
                         debouncedHandleBoundingBox(_southWest, _northEast);
-
                         try {
                             const responseDuan = await instance.get(
                                 `/get_du_an_location/${_southWest?.lng}/${_southWest?.lat}/${_northEast?.lng}/${_northEast?.lat}`
@@ -683,7 +610,6 @@ const Map = forwardRef(
                     }
                     // Cập nhật danh sách vùng đã xử lý
                     setProcessedRegions((prev) => [...prev, regionKey]);
-                    // setisShowListRegulation(true);
                     // Gửi thông tin vùng lên Redux store
                     dispatch(fetchListRegulations({ southWest: _southWest, northEast: _northEast }));
                 } catch (error) {
@@ -708,7 +634,6 @@ const Map = forwardRef(
             const vitri = searchParams.get('vitri') ? searchParams.get('vitri').split(',') : "";
             const { boundingbox, type, map_type } = item;
             const sharing = searchParams.get('ups');
-            const currentBounds = ref?.current?.getBounds();
 
             // Normalize the bounding box
             const targetBoundingBox = normalizeBoundingBox(boundingbox);
@@ -773,33 +698,9 @@ const Map = forwardRef(
                 const record = data.find(item => item.id == id);
                 if (record) {
                     handleItemClick(record);
-                    // handleItemClick(
-                    //     data.boundingbox,
-                    //     data.type,
-                    //     data.nam_het_han,
-                    // );
                 } else {
                     console.error('No valid data received from API');
                 }
-                // axios
-                //     .get(`https://landinvest.thinkdiff.us/thongtin_quyhoach/${type}/${id}`)
-                //     .then((response) => {
-                //         const data = response.data;
-
-                //         if (data && data.dulieu) {
-                //             handleItemClick(data.dulieu[0]);
-                //             handleItemClick(
-                //                 data.dulieu[0].boundingbox,
-                //                 data.dulieu[0].type,
-                //                 data.dulieu[0].nam_het_han,
-                //             );
-                //         } else {
-                //             console.error('No valid data received from API');
-                //         }
-                //     })
-                //     .catch((error) => {
-                //         console.error('Error fetching data from API:', error);
-                //     });
             }
         }, [id, type]);
 
@@ -810,8 +711,6 @@ const Map = forwardRef(
                 dispatch(doGetQuyHoach(null));
             }
         }, [itemQuyHoach]);
-
-        // Debounce the function to avoid calling it too frequently
 
         const toggleList = () => {
             setisShowListRegulation((prevState) => !prevState); // Chuyển đổi trạng thái
@@ -994,24 +893,6 @@ const Map = forwardRef(
             return null;
         };
 
-        const fetchBoundData = async (lat, lng) => {
-            try {
-                const response = await axios.get('/api/get-bound-2', {
-                    params: {
-                        marker_lat: lat,
-                        marker_lng: lng,
-                    },
-                    headers: {
-                        'User-Agent': userAgent,
-                    },
-                });
-
-                return response.data;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
         const MapEventArea = () => {
             const clickCountRef = useRef(0);
             const clickTimeout = useRef(null);
@@ -1044,19 +925,12 @@ const Map = forwardRef(
                     setIsLandAdministationLoading(true);
                     setIsShowLandAdministration(true);
 
-                    const startTime = Date.now();
                     const res = await getAreaLocation(newLocation.lat, newLocation.lng);
-                    const endTime = Date.now();
-
-                    // console.log('Data địa chính: ' + res.dulieu);
-
-                    // console.log(`Thời gian lấy data địa chính: ${endTime - startTime} ms`);
 
                     setIsLandAdministationLoading(false);
                     setLandAdministrationData(res.dulieu);
 
                     if (res) {
-                        const startTimeAfter = Date.now();
                         const getAddress = await getLocationInBoudingBox(newLocation.lat, newLocation.lng);
                         if (getAddress.diachi) {
                             setAddress(getAddress.diachi);
@@ -1110,31 +984,13 @@ const Map = forwardRef(
                                 </Marker>
                             ),
                         };
-                        // console.log('Data Polygon: ' + newPolygonArea);
                         setPolygonArea(newPolygonArea);
-                        const endTimeAfter = Date.now();
-
-                        // console.log(
-                        //     `Thời gian vẽ Polygon(sau khi có thông tin địa chính): ${endTimeAfter - startTimeAfter} ms`,
-                        // );
                     } else {
                         setPolygonArea({ ...polygonArea, address: 'Không có dữ liệu ...' });
                     }
                 },
             });
 
-            return null;
-        };
-
-        const GetMarkerInboundingBox = () => {
-            const map = useMap();
-            const zoom = map.getZoom();
-            const { _northEast, _southWest } = map.getBounds();
-            useEffect(() => {
-                if (zoom >= 1 && boundingboxDataLocation.link_image?.length < 0) {
-                    dispatch(getBoundingboxData(_southWest, _northEast));
-                }
-            }, []);
             return null;
         };
 
@@ -1208,7 +1064,6 @@ const Map = forwardRef(
             fetchData();
         }, [listenDblClick]);
         const handleUndo = useCallback(() => {
-            // console.log('ctrl z');
             if (undoStack.length > 0) {
                 const previousState = undoStack[undoStack.length - 1];
                 handleUpdateDistance(previousState);
@@ -1244,8 +1099,6 @@ const Map = forwardRef(
                     let center = [];
                     const childrenboundingboxData = [];
                     const firstPlanningIndex = 0;
-
-                    // dispatch(setInitialBoundingBox())
 
                     if (quyhoachProvinceIds.length > 0) {
                         const [, provincesResponse] = await getAllPlansDetails();
@@ -1352,7 +1205,6 @@ const Map = forwardRef(
                                 }
                                 return false;
                             });
-                        // .map((item) => item);
 
                         //  Mấy đoạn tương tự thế này lặp nhiều lần nhưng chưa có thời gian refactor lại
                         const currentPlansFilltered = plansFiltered
@@ -1508,45 +1360,10 @@ const Map = forwardRef(
             }
         }, []);
 
-        // Hàm tính toán lại giá trị Y
-        const getTileUrl = (baseUrl, x, y, z) => {
-            let flippedY = Math.pow(2, z) - 1 - y;
-            return `${baseUrl}/${z}/${x}/${flippedY}`;
-        };
-
-        // // Hàm render các TileLayer
-        const renderTileLayers = () => {
-            if (
-                !RegulationImages ||
-                RegulationImages.length === 0 ||
-                ((searchParams.get('zoom') < 18 || searchParams.get('zoom') > 22) &&
-                    searchParams.get('draw') === 'auto' &&
-                    RegulationImages)
-            ) {
-                return <div></div>;
-            }
-
-            return RegulationImages.map((item, index) => {
-                return (
-                    <TileLayer
-                        key={index}
-                        url={getTileUrl(item.link_server, '{x}', '{y}', '{z}')} // Gọi hàm với x, y, z từ tileCoords
-                        pane="overlayPane"
-                        minNativeZoom={item.min_zoom ? item.min_zoom : 12}
-                        maxNativeZoom={item.zoom ? item.zoom : 22}
-                        minZoom={item.min_zoom ? item.min_zoom - 2 : 9}
-                        maxZoom={25}
-                        opacity={opacity}
-                    />
-                );
-            });
-        };
-
         const handleWikiClick = async (location) => {
             if (location && location.length > 0) {
                 // Gọi Api lấy thông tin thành phố
                 const res = await getLocationInBoudingBox(location[0], location[1]);
-                // navigate(`/administrative-maps/${res.district}`);
                 navigate(`administrative-maps/?provinceId=${res.provinces}`);
             }
         };
@@ -1594,7 +1411,6 @@ const Map = forwardRef(
                 if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
                     convertedCoords.push(convertedCoords[0]);
                 }
-
                 const geoJsonPolygon = turf.polygon([convertedCoords]);
                 const center = turf.center(geoJsonPolygon).geometry.coordinates;
 
@@ -1731,7 +1547,6 @@ const Map = forwardRef(
                 if (id) {
                     try {
                         const response = await instance.get(`/detail_du_an/${id}`);
-
                         setRegionalPrice(response.data?.data?.gia_cung_khu_vuc);
 
                         if (response.data?.data?.polygon) {
@@ -1752,7 +1567,6 @@ const Map = forwardRef(
                     }
                 }
             };
-
             fetchData();
             setShowPopup(true);
         }, [searchParams, polygonArea]); // Lưu ý: Thêm polygonArea vào dependency array nếu bạn sử dụng nó trong state cập nhật
@@ -1822,7 +1636,6 @@ const Map = forwardRef(
 
                 const allPolygons = jsonData
                     .flatMap(item => convertToPolygonArray(item[0].geom))
-                // .flat(1);
 
                 // Ngưỡng diện tích nhỏ nhất 
                 const MIN_AREA = 50000;
@@ -1845,29 +1658,9 @@ const Map = forwardRef(
         };
 
         const handleInfraMutationClick = async () => {
-            // try {
-            //     const response = await fetch("/badinh.json");
-            //     const res = await response.json();
-            //     const formatPolygon = res.data?.map(item => convertToPolygonArray(item));
-            //     const processedPolygons = [];
-            //     // console.log(formatPolygon)
-            //     formatPolygon.forEach((group, groupIndex) => {
-            //         group.forEach((polygon, polygonIndex) => {
-            //             processedPolygons.push({
-            //                 id: `group-${groupIndex}-polygon-${polygonIndex}`,
-            //                 coordinates: polygon
-            //             });
-            //         });
-            //     });
-            //     // console.log("Dữ liệu polygon:", processedPolygons);
-            //     setInfraMutation(processedPolygons);
-            // } catch (error) {
-            //     console.error("Lỗi khi fetch API:", error);
-            // }
             if (!regionPolygon) {
                 await fetchAllJSON();
             }
-
             if (searchParams.get("regionPolygon")) {
                 searchParams.delete("regionPolygon");
                 setSearchParams(searchParams);
@@ -1936,21 +1729,6 @@ const Map = forwardRef(
                 {isShowListRegulation && (
                     <ListRegulations handleItemClick={handleItemClick} RegulationsImagesList={RegulationsImagesList} />
                 )}
-                {/* <Modal
-                title="Khu vực này có nhiều quy hoạch, vui lòng chọn quy hoạch để xem!"
-                open={planOption.length > 1}
-                onOk={() => setPlanOption([])}
-                onCancel={() => setPlanOption([])}
-                centered
-            >
-                <Radio.Group onChange={(e) => setSelectedIDQuyHoach(e.target.value)} value={selectedIDQuyHoach}>
-                    {planOption.map((plan) => (
-                        <Radio key={plan.id} value={plan.id}>
-                            {plan.description}
-                        </Radio>
-                    ))}
-                </Radio.Group>
-            </Modal> */}
 
                 {/* show bounding box data button */}
                 {!antDrawOpen && (
@@ -1977,8 +1755,6 @@ const Map = forwardRef(
                     />
                 </div>
 
-                {/* Images list when travel to district */}
-
                 {/* {isShowImagesList && ( */}
                 <ImageList isShowImagesList={isShowImagesList} mapZoom={mapZoom}>
                     <div
@@ -1997,11 +1773,8 @@ const Map = forwardRef(
                     {searchParams.get('ups') === 'history-cost' && (
                         <ChartCostHistory lat={latHistoryCost} lon={lonHistoryCost} />
                     )}
-
                     {showRegionalPrice && regionalPrice && <RegionalPriceChart setShowRegionalPrice={setShowRegionalPrice} regionalPrice={regionalPrice} />}
-
                     {(searchParams.get("heat-view") === "chart" && heatRegionalPrice) && <RegionalPriceChart regionalPrice={heatRegionalPrice} />}
-
                     {estatePrice && <EstatePricePopUp estatePrice={estatePrice} />}
                 </div>
 
@@ -2016,8 +1789,6 @@ const Map = forwardRef(
                     ref={ref}
                     zoomControl={false}
                 >
-                    <MarkerPaneSetup />
-
                     {duAn.map((duAnItem) => {
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
                         const hasPolygon = duAnItem.polygon === "CO_POLYGON";
@@ -2154,16 +1925,6 @@ const Map = forwardRef(
                             </>
                         ))}
 
-                    {/* {polygonPoint?.points?.length > 0 && (
-                        <Polygon
-                            positions={polygonPoint.points.map((point) => [point.lat, point.lng])}
-                            pathOptions={{
-                                color: 'blue',
-                                fillColor: 'rgba(0, 0, 255, 0.2)',
-                                weight: 2,
-                            }}
-                        />
-                    )} */}
                     <ZoomControl position="bottomright" />
                     <UserLocationMarker />
                     {!isSelectedMeasure && <MapEvents />}
@@ -2173,11 +1934,6 @@ const Map = forwardRef(
                     <LayersControl>
                         {windowSize.windowWidth < 768 && (
                             <LayersControl.BaseLayer checked name="Map vệ tinh">
-                                {/* <TileLayer
-                                url={`https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoidHVhbmFuaDMxaiIsImEiOiJjbTMzMmo2d3AxZ2g0Mmlwejl1YzM0czRoIn0.vCpAJx2b_FVhC3LDfmdLTA`}
-                                attribution='&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> contributors'
-                                maxZoom={22}
-                            /> */}
                                 <TileLayer
                                     url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
                                     subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
@@ -2242,37 +1998,8 @@ const Map = forwardRef(
                                 );
                             })}
 
-                        {/* {renderTileLayers()} */}
                         {renderedLayers}
                     </Pane>
-                    {/* {currentLocation && currentLocation.lat && currentLocation.lon && (
-                    <Marker position={[currentLocation.lat, currentLocation.lon]} icon={customIcon}>
-                        <Popup>
-                            <div>
-                                <h3 style={{ fontWeight: 600 }}>
-                                    Tỉnh {currentLocation?.provinceName}, Huyện {currentLocation?.districtName}
-                                </h3>
-                                <p>
-                                    Vị trí: {currentLocation?.lat}, {currentLocation?.lon}
-                                </p>
-                                <button
-                                    className="button--share"
-                                    onClick={() => handleShareClick(currentLocation?.lat, currentLocation?.lon)}
-                                >
-                                    <FaShareAlt />
-                                    Chia sẻ
-                                </button>
-                            </div>
-                        </Popup>
-                    </Marker>
-                )} */}
-                    {/* {initialCenter && (
-                    <>
-                        <Marker position={initialCenter} icon={customIcon}>
-                            <Popup>Vị trí trung tâm</Popup>
-                        </Marker>
-                    </>
-                )} */}
 
                     {/* Marker in location now */}
                     {mapZoom >= 16 && boundingboxDataLocation?.list_image?.length > 0 && (
@@ -2316,7 +2043,6 @@ const Map = forwardRef(
                         </Marker>
                     ))}
 
-                    {/* {polygon && <Polygon pathOptions={{ fillColor: 'transparent' }} positions={polygon} />} */}
                     {selectedMarker && (
                         <DrawerView
                             isDrawerVisible={isDrawerVisible}
@@ -2354,49 +2080,6 @@ const Map = forwardRef(
                     />
                     <DrawerLandUsePlan />
 
-                    {/* {polygonSessionStorage.length > 0 &&
-                    isOverview &&
-                    polygonSessionStorage.map((polygon, index) => {
-                        return (
-                            <Polygon
-                                key={index}
-                                positions={polygon.geometry.coordinates[0].map((coord) => [coord[1], coord[0]])}
-                                color="pink"
-                                fillOpacity={0.5}
-                                fillColor="pink"
-                            />
-                        );
-                    })} */}
-                    {/* <Polygon
-                    positions={polygon.geometry.coordinates[0].map((coord) => [coord[1], coord[0]])}
-                    color="pink"
-                    fillOpacity={0.5}
-                    fillColor="pink"
-                /> */}
-                    {/* {isOverview &&
-                    polygonsData.map((item) => {
-                        if (item.type === 'Polygon') {
-                            return (
-                                <Polygon
-                                    positions={item.polygons[0].map((coord) => [coord[1], coord[0]])}
-                                    color="pink"
-                                    fillOpacity={0.5}
-                                    fillColor="pink"
-                                />
-                            );
-                        } else if (item.type === 'MultiPolygon') {
-                            return item.polygons.map((coordinates) => (
-                                <Polygon
-                                    positions={coordinates[0].map((coord) => [coord[1], coord[0]])}
-                                    color="pink"
-                                    fillOpacity={0.5}
-                                    fillColor="pink"
-                                />
-                            ));
-                        } else {
-                            return null;
-                        }
-                    })} */}
                     {markers.length >= 2 && (
                         <Polygon positions={markers} color="blue">
                             <TooltipLeaflet sticky>
@@ -2405,10 +2088,6 @@ const Map = forwardRef(
                             </TooltipLeaflet>
                         </Polygon>
                     )}
-                    {/* {console.log(
-                        turf.centroid(turf.polygon([[...markers, markers[0]].map((item) => [item?.lng, item?.lat])]))
-                            .geometry.coordinates,
-                    )} */}
                     {isSelectedMeasure && <MapClickHandler />}
                     {isSelectedMeasure && isDrawPolygon && markers.length >= 3 && (
                         <Marker
@@ -2494,14 +2173,7 @@ const Map = forwardRef(
                         );
                     })}
 
-                    {location.length > 0 && (
-                        <Marker
-                            position={location}
-                            icon={iconLocation}
-                            zIndexOffset={1000}
-                            pane="markerTopPane"
-                        />
-                    )}
+                    {location.length > 0 && <Marker position={location} icon={iconLocation} />}
                     {!isSelectedMeasure && <MapEventArea />}
                     {polygonArea?.area}
                     <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)" />
@@ -2509,7 +2181,6 @@ const Map = forwardRef(
                 </MapContainer>
                 {/* loading */}
                 {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen />}
-                {/* {isShowLandAdministration && ( */}
                 {isShowLandAdministration && (
                     <LandAdministrationModal
                         landAdministrationData={landAdministrationData}
