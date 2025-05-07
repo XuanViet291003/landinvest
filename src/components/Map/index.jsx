@@ -73,7 +73,7 @@ import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
 import EstatePricePopUp from '../Home/EstatePricePopUp/EstatePricePopUp';
 
 import './index.scss'
-import MarkerPaneSetup from './MarkerPaneSetup';
+import{ MarkerPaneSetup,MeasurePaneCreator } from './MarkerPaneSetup';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -2397,9 +2397,11 @@ const Map = forwardRef(
                             return null;
                         }
                     })} */}
+                    <MeasurePaneCreator />
+
                     {markers.length >= 2 && (
-                        <Polygon positions={markers} color="blue">
-                            <TooltipLeaflet sticky>
+                        <Polygon positions={markers} color="blue" pane="measurePane">
+                            <TooltipLeaflet sticky pane="measurePane">
                                 {area?.toFixed(2)} m<sup>2</sup> |{' '}
                                 {distances.reduce((acc, cur) => acc + cur.distance, 0).toFixed(2)} m
                             </TooltipLeaflet>
@@ -2412,6 +2414,7 @@ const Map = forwardRef(
                     {isSelectedMeasure && <MapClickHandler />}
                     {isSelectedMeasure && isDrawPolygon && markers.length >= 3 && (
                         <Marker
+                        pane="measurePane"
                             eventHandlers={{
                                 click: (e) => {
                                     e.originalEvent.stopPropagation();
@@ -2435,6 +2438,7 @@ const Map = forwardRef(
                             key={index}
                             position={position}
                             icon={dotIcon}
+                            pane="measurePane"
                             eventHandlers={{
                                 dragstart: (e) => {
                                     setUndoStack([...undoStack, markers]);
@@ -2464,7 +2468,7 @@ const Map = forwardRef(
                             (distance.start.lng + distance.end.lng) / 2,
                         );
                         return (
-                            <Marker position={middleLatLng} icon={icon}>
+                            <Marker position={middleLatLng} icon={icon} pane="measurePane">
                                 <Tooltip key={index} direction="top" offset={[0, -10]} permanent>
                                     {`${distance.distance?.toFixed(2)} m`}
                                     <Marker position={middleLatLng} icon={icon} />
@@ -2487,7 +2491,7 @@ const Map = forwardRef(
                         );
                         return (
                             <>
-                                <Marker position={middleLatLng} icon={icon}>
+                                <Marker position={middleLatLng} icon={icon} pane="measurePane">
                                     {`${distance.distance?.toFixed(2)} m`}
                                 </Marker>
                             </>
@@ -2502,13 +2506,13 @@ const Map = forwardRef(
                             pane="markerTopPane"
                         />
                     )}
-                    {!isSelectedMeasure && <MapEventArea />}
+                    {!isSelectedMeasure &&  <MapEventArea />}
                     {polygonArea?.area}
                     <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)" />
                     <Polygon positions={polygonArea?.polygon} color="darkred" />
                 </MapContainer>
                 {/* loading */}
-                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen />}
+                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen /> }
                 {/* {isShowLandAdministration && ( */}
                 {isShowLandAdministration && (
                     <LandAdministrationModal

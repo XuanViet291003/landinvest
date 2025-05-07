@@ -25,7 +25,6 @@ export const LandCostTable = ({ tableType, searchValue, data, type }) => {
         try {
             const response = await fetch(`https://landinvest.thinkdiff.us/bang_gia_dat_district/${districtId}?page=${page}`);
             const data = await response.json();
-            console.log("Dữ liệu từ API:", data);// kiem tra
     
             setLandCostData(Array.isArray(data.dulieu) ? data.dulieu : []);
     
@@ -86,7 +85,8 @@ export const LandCostTable = ({ tableType, searchValue, data, type }) => {
                         }
                         return true;
                     })}
-                    loading={allLandCostStatus === THUNK_API_STATUS.PENDING}
+                    // loading={allLandCostStatus === THUNK_API_STATUS.PENDING}
+                    loading = {false}
                     rowKey="id"
                     dataSource={Array.isArray(landCostData) ? landCostData.map((item, index) => ({
                         key: item.id,

@@ -1,17 +1,29 @@
-import React, { useEffect } from 'react'
+// PaneSetup.tsx
+import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 
-const MarkerPaneSetup = () => {
+export const MarkerPaneSetup = () => {
     const map = useMap();
 
     useEffect(() => {
         if (!map.getPane('markerTopPane')) {
-            map.createPane('markerTopPane');
-            map.getPane('markerTopPane').style.zIndex = 1000;
+            const pane = map.createPane('markerTopPane');
+            pane.style.zIndex = 1000;
         }
-    }, [map])
+    }, [map]);
 
     return null;
-}
+};
 
-export default MarkerPaneSetup
+export const MeasurePaneCreator = () => {
+    const map = useMap();
+
+    useEffect(() => {
+        if (!map.getPane('measurePane')) {
+            const pane = map.createPane('measurePane');
+            pane.style.zIndex = 650;
+        }
+    }, [map]);
+
+    return null;
+};

@@ -1,33 +1,32 @@
-/* eslint-disable eqeqeq */
-import React, { useEffect, useState } from 'react';
-import { Carousel, Container } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Table, Spin, Select } from 'antd';
+import { useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import instance from '../../utils/axios-customize';
-import './landUsePlan.scss';
-import { ConfigProvider, Pagination, Spin, Table } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { getLandUsePlan } from '../../redux/landUsePlanSlice/lanUsePlanSlice';
-import { THUNK_API_STATUS } from '../../constants/thunkApiStatus';
-import TableDescription from '../../components/elements/TableDescription';
-import { arrayBannerImage } from '../../assets/banner/image';
+import { setDistrictId } from '../../redux/landCostSlice/landCostSlice'; // Giả định
+
+const { Option } = Select;
 
 export default function LandUsePlan() {
-    // PARAMS
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    // COMPONENTS STATE
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [province, setProvince] = useState([]);
     const [districAvailble, setDistrictAvailble] = useState([]);
-    const [selectedProvinceId, setSelectedProvinceID] = useState(searchParams.get('idProvince') || 24);
+    const [searchParams] = useSearchParams();
+    const [selectedProvinceId, setSelectedProvinceID] = useState(searchParams.get('idProvince') || '');
+    const dispatch = useDispatch();
+
+    // Lấy danh sách tỉnh
     useEffect(() => {
         (async () => {
             try {
                 setLoading(true);
-                const { data } = await instance.get(`/list_quan_huyen_co_khsdd`);
-                setProvince(data.list_kehoach);
-                const findIndexProvince = data.list_kehoach.find((item) => item.province_id === 24);
-                setDistrictAvailble(findIndexProvince.kehoach);
+                const { data } = await instance.get('/all_provinces');
+                setProvince(data.data); // Giả định data là mảng tỉnh
+                // Nếu chưa chọn tỉnh, đặt tỉnh đầu tiên làm mặc định
+                if (!selectedProvinceId && data.length > 0) {
+                    setSelectedProvinceID(data[0].province_id);
+                }
                 setLoading(false);
             } catch (error) {
                 console.log(error);
@@ -35,35 +34,43 @@ export default function LandUsePlan() {
             }
         })();
     }, []);
-    const currentProvince = province.find((item) => item.province_id === selectedProvinceId);
+
+    // Lấy danh sách huyện khi chọn tỉnh
+    useEffect(() => {
+        if (selectedProvinceId) {
+            (async () => {
+                try {
+                    setLoading(true);
+                    const { data } = await instance.get(`/list_districts_in_provinces/${selectedProvinceId}`);
+                    setDistrictAvailble(data.data); // Giả định data là mảng huyện
+                    setLoading(false);
+                } catch (error) {
+                    console.log(error);
+                    setDistrictAvailble([]);
+                    setLoading(false);
+                }
+            })();
+        }
+    }, [selectedProvinceId]);
+
+    // Xử lý thay đổi tỉnh
+    const handleProvinceChange = (value) => {
+        setSelectedProvinceID(value);
+    };
+
     const columns = [
         {
-            title: 'STT',
-            dataIndex: 'STT',
-            key: 'STT',
-            render: (text) => <span>{text}</span>,
-            with: '10%',
+            title: <span className="table-title">STT</span>,
+            dataIndex: 'index',
+            key: 'index',
+            width: '5%',
+            render: (item, record, index) => index + 1,
         },
         {
-            title: <span className="table-title">Tên Huyện</span>,
-            dataIndex: 'ten_huyen',
-            key: 'ten_huyen',
-            render: (text) => <span>{text || 'Chưa cập nhật'}</span>,
+            title: <span className="table-title">Huyện</span>,
+            dataIndex: 'name',
+            key: 'name',
             width: '30%',
-        },
-        {
-            title: <span className="table-title">Tên Thành Phố</span>,
-            dataIndex: 'city',
-            key: 'city',
-            render: (text) => <span>{text || 'Chưa cập nhật'}</span>,
-            width: '30%',
-        },
-        {
-            title: <span className="table-title">Năm hết hạn</span>,
-            dataIndex: 'nam_het_han',
-            key: 'nam_het_han',
-            render: (item) => <span className="land-cost-address">{item || 'Chưa cập nhật'}</span>,
-            width: '15%',
         },
         {
             title: <span className="table-title">Thao tác</span>,
@@ -73,6 +80,7 @@ export default function LandUsePlan() {
                 <Link
                     to={`/landuseplan/${selectedProvinceId}?idDistrict=${record.id}&name=${record.name}`}
                     style={{ color: '#3DB700', textDecoration: 'none' }}
+                    onClick={() => dispatch(setDistrictId(record.id))}
                 >
                     Xem chi tiết
                 </Link>
@@ -80,78 +88,41 @@ export default function LandUsePlan() {
             width: '15%',
         },
     ];
+
     return (
-        <Container className="landplan-container">
-            <Carousel style={{ marginTop: '15px' }} controls={false} interval={5000}>
-                {arrayBannerImage.map((image, index) => (
-                    <Carousel.Item key={index}>
-                        <div>
-                            <img className="image-banner" src={image} alt="" />
-                        </div>
-                    </Carousel.Item>
-                ))}
-            </Carousel>
-            <div style={{marginTop: '15px'}}>
-                <Link to={`/`} style={{ color: '#3DB700', marginTop: '25px', textDecoration: 'none' }}>
-                    Quay về trang chủ
-                </Link>
+        <div style={{ padding: '20px', backgroundColor: '#f0f2f5' }}>
+            <h2>Kế hoạch sử dụng đất</h2>
+            <div style={{ marginBottom: '20px' }}>
+                <Select
+                    className="information-location-select"
+                    value={selectedProvinceId}
+                    onChange={handleProvinceChange}
+                    placeholder="Tỉnh, thành phố"
+                    style={{ width: 200 }}
+                    loading={loading}
+                >
+                    <Option value="">Chọn tỉnh</Option>
+                    {Array.isArray(province) &&
+    province.map((prov) => (
+        <Option key={prov.province_id} value={prov.province_id}>
+            {prov.name}
+        </Option>
+    ))
+}
+                </Select>
             </div>
-            <div>
-                <h3 style={{ color: 'white' }}>Kế hoạch sử dụng đất</h3>
-                <div style={{ display: 'flex' }}>
-                    <select
-                        className="information-location-select"
-                        value={selectedProvinceId}
-                        placeholder="Tỉnh, thành phố"
-                    >
-                        <option value="">Chọn tỉnh</option>
-                        {province.map((province) => {
-                            return (
-                                <option key={province.province_id} value={province.province_id}>
-                                    {province.name}
-                                </option>
-                            );
-                        })}
-                    </select>
-                </div>
-                <p className="land-cost__container--notice">Giữ shift + lăn chuột để xem các cột tiếp theo</p>
-                <div className="land-plan__container-table">
-                    <ConfigProvider
-                        theme={{
-                            components: {
-                                Table: {
-                                    headerBg: '#3DB700',
-                                    headerColor: '#fff',
-                                    headerSplitColor: '#000',
-                                    footerBg: '#1E252B',
-                                    tableBorderColor: '#1890ff',
-                                    rowHoverBg: '#1E252B',
-                                },
-                            },
-                        }}
-                    >
-                        <Table
-                            columns={columns}
-                            loading={loading}
-                            rowKey={(record) => record.key}
-                            dataSource={districAvailble.map((item, index) => ({
-                                STT: index + 1,
-                                ten_huyen: item.ten_huyen,
-                                nam_het_han: item.nam_het_han,
-                                id: item.id_district,
-                                city: currentProvince.name,
-                                name: item.ten_huyen,
-                            }))}
-                            showSizeChanger={false}
-                            scroll={{
-                                scrollToFirstRowOnChange: true,
-                                x: 'max-content',
-                            }}
-                            pagination={false}
-                        />
-                    </ConfigProvider>
-                </div>
-            </div>
-        </Container>
+            {loading ? (
+                <Spin />
+            ) : (
+                <Table
+                    columns={columns}
+                    dataSource={districAvailble}
+                    pagination={false}
+                    rowKey="id"
+                    style={{ backgroundColor: 'white' }}
+                    locale={{ emptyText: 'Không có huyện nào cho tỉnh này' }}
+                />
+            )}
+        </div>
     );
 }

@@ -97,6 +97,8 @@ function Home() {
     const [messageApi, contextHolder] = message.useMessage();
     const { districtName, provinceName, lat, lon } = useSelector((state) => state.searchQuery.searchResult);
     const isOpenDrawerLandPlan = useSelector((state) => state.landUsePlan.isDrawerOpen);
+    const LandUsePlan = useSelector((state) => state.landUsePlan.LandUsePlan);
+    const LandUsePlan2 = useSelector((state) => state.landUsePlan.LandUsePlan2);
     const mapRef = useRef(null);
     const location = useLocation();
     const windowSize = useWindowSize();
@@ -119,7 +121,6 @@ function Home() {
         QUAN_HUYEN: [],
         QUYHOACH_DIACHINH: [],
         QUYHOACH_TINH: [],
-        // QUYHOACH_XAYDUNG: [],
         QUYHOACH_PHANKHU: [],
     });
     const [buttonLabels, setButtonLabels] = useState([]);
@@ -187,27 +188,7 @@ function Home() {
     const handleSelectLocationOk = useCallback(() => {
         setIsOpenBidding(false);
     }, []);
-    // useEffect(() => {
-    //     const searchParams = new URLSearchParams(location.search);
-    //     const vitriParam = searchParams.get('vitri');
-    //     const vitri = vitriParam ? vitriParam.split(',').map(Number) : [];
-    //     if (vitri.length === 2) {
-    //       const fetchData = async () => {
-    //         try {
-    //           const data = await fetchProvinceName(vitri[0], vitri[1]);
-    //           if (data) {
-    //             setPosition(data);
-    //           }
-    //         } catch (error) {
-    //           console.error('Error fetching province data:', error);
-    //         }
-    //       };
 
-    //       fetchData();
-    //     }
-    //   }, [location.search]);
-
-    // const {  displayName } = useSelector((state) => state.searchQuery.searchResult);
     const doRefreshTreeData = (value) => {
         if (value) {
             setIsRefreshTreeData(!isRefreshTreeData);
@@ -298,11 +279,7 @@ function Home() {
     const handleClosePrice = () => {
         setIsShowModalPrice(false);
     };
-    // const handleCloseQuyHoach = () => {
-    //     setIsShowModalQuyhoach(false);
-    //     setActiveItem(0);
-    // };
-    // const searchParams = new URLSearchParams(location.search);
+
     const handleBackToMyLocation = async () => {
         const map = mapRef.current;
         if (myLoca.lat && myLoca.lng && map) {
@@ -322,8 +299,6 @@ function Home() {
                 searchParams.set('vitri', `${myLoca.lat},${myLoca.lng}`);
                 setSearchParams(searchParams);
             } else {
-                // message.error('Không thể xác định vị trí của bạn');
-
                 setOpenShareLoCationPopup(true);
             }
         } catch (error) {
@@ -339,24 +314,6 @@ function Home() {
         });
     };
     const isPhoneSize = windowSize.windowWidth < 768;
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const data = await fetchAllQuyHoach();
-
-    //             const processedList = data.map((qh) => ({
-    //                 ...qh,
-    //                 boundingbox: processBoundingBox(qh.boundingbox),
-    //             }));
-
-    //             setListQuyHoach(processedList);
-    //         } catch (error) {
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, []);
 
     useEffect(() => {
         dispatch(getAllPlannings());
@@ -385,42 +342,6 @@ function Home() {
             showAuctionModal();
         }
     }, []);
-
-    // useEffect(() => {
-    //     const vitriParam = searchParams.get('vitri');
-
-    //     if (vitriParam) {
-    //         const [lat, lon] = vitriParam.split(',').map(Number);
-
-    //         if (lat && lon) {
-    //             const apiUrl = `/api/landinvest/thongtin_district/${lat}/${lon}`;
-
-    //             const fetchData = async () => {
-    //                 try {
-    //                     const response = await fetch(apiUrl);
-    //                     if (!response.ok) {
-    //                         throw new Error('Network response was not ok');
-    //                     }
-    //                     const data = await response.json();
-
-    //                     const categorizedData = {
-    //                         QUAN_HUYEN: data.dulieu.filter((item) => item.type === 'QUAN_HUYEN'),
-    //                         QUYHOACH_DIACHINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_DIACHINH'),
-    //                         QUYHOACH_TINH: data.dulieu.filter((item) => item.type === 'QUYHOACH_TINH'),
-    //                         QUYHOACH_XAYDUNG: data.dulieu.filter((item) => item.type === 'QUYHOACH_XAYDUNG'),
-    //                         QUYHOACH_PHANKHU: data.dulieu.filter((item) => item.type === 'QUYHOACH_PHANKHU'),
-    //                     };
-    //                     console.log(categorizedData)
-    //                     // setDataByType(categorizedData);
-    //                 } catch (error) {
-    //                     console.error('Error fetching data:', error);
-    //                 }
-    //             };
-
-    //             fetchData();
-    //         }
-    //     }
-    // }, [searchParams]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -493,11 +414,8 @@ function Home() {
             { key: 'QUAN_HUYEN', label: 'QH Quận Huyện', type: 1 },
             { key: 'QUYHOACH_DIACHINH', label: 'QH Địa Chính', type: 2 },
             { key: 'QUYHOACH_TINH', label: 'QH Tỉnh', type: 3 },
-            // { key: 'QUYHOACH_XAYDUNG', label: 'QH Xây Dựng', type: 5 },
             { key: 'QUYHOACH_PHANKHU', label: 'QH Phân Khu', type: 4 },
         ];
-
-        // const mergedData = [...dataByType.QUYHOACH_XAYDUNG, ...dataByType.QUYHOACH_PHANKHU];
 
         const mergedData = [...dataByType.QUYHOACH_PHANKHU];
 
@@ -516,7 +434,6 @@ function Home() {
                 { label: 'QH Quận Huyện', type: 1 },
                 { label: 'QH Địa Chính', type: 2 },
                 { label: 'QH Tỉnh', type: 3 },
-                // { label: 'QH Khác', type: 6 },
                 { label: 'QH Phân Khu', type: 6 }
             );
         } else {
@@ -553,11 +470,7 @@ function Home() {
             case 4:
                 filteredData = dataByType.QUYHOACH_PHANKHU;
                 break;
-            // case 5:
-            //     filteredData = dataByType.QUYHOACH_XAYDUNG;
-            //     break;
             case 6:
-                // filteredData = [...dataByType.QUYHOACH_PHANKHU, ...dataByType.QUYHOACH_XAYDUNG];
                 filteredData = [...dataByType.QUYHOACH_PHANKHU];
                 break;
             default:
@@ -572,9 +485,14 @@ function Home() {
         setButtonMoRong(button);
     };
 
-    const LandUsePlan = useSelector((state) => state.landUsePlan.LandUsePlan);
+    // Debug hiển thị nút KHSDD 2025
+    // useEffect(() => {
+    //     console.log('LandUsePlan:', LandUsePlan);
+    //     console.log('LandUsePlan2:', LandUsePlan2);
+    //     console.log('Show KHSDD 2025:', (LandUsePlan?.list_kehoach?.length > 0 || LandUsePlan2?.projects?.length > 0));
+    // }, [LandUsePlan, LandUsePlan2]);
 
-    if (!LandUsePlan || (LandUsePlan && LandUsePlan?.list_kehoach?.length === 0)) {
+    if (!LandUsePlan || (LandUsePlan && LandUsePlan?.list_kehoach?.length && LandUsePlan2?.projects?.length === 0 )) {
         dispatch(onChangeDrawer(false));
     }
 
@@ -612,14 +530,12 @@ function Home() {
             );
     };
 
-    // Hàm tính tâm của polygon
     const getPolygonCenter = (polygon) => {
-        if (!polygon || polygon.length < 3) return null; // Đảm bảo là đa giác hợp lệ
+        if (!polygon || polygon.length < 3) return null;
 
         try {
-            const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]); // Chuyển đổi thành định dạng [lng, lat]
+            const convertedCoords = polygon.map(([lng, lat]) => [lng, lat]);
 
-            // Đóng vòng lặp polygon nếu điểm đầu và cuối không trùng
             if (JSON.stringify(convertedCoords[0]) !== JSON.stringify(convertedCoords[convertedCoords.length - 1])) {
                 convertedCoords.push(convertedCoords[0]);
             }
@@ -627,7 +543,7 @@ function Home() {
             const geoJsonPolygon = turf.polygon([convertedCoords]);
             const center = turf.center(geoJsonPolygon).geometry.coordinates;
 
-            return L.latLng(center[1], center[0]); // Chuyển về lat, lng
+            return L.latLng(center[1], center[0]);
         } catch (error) {
             console.error("Lỗi khi tính toán tâm đa giác:", error);
             return null;
@@ -826,7 +742,7 @@ function Home() {
                         position: 'fixed',
                         top: 120,
                         right: 10,
-                        zIndex: 1000,
+                        zIndex: 1000000,
                         padding: 10,
                         borderRadius: 4,
                         marginTop: isPhoneSize ? 40 : 0,
@@ -874,13 +790,6 @@ function Home() {
                                     <BiShapePolygon size={20} />
                                 </Tooltip>
                             </div>
-                            {/* <div className="nav-icon-arrow" onClick={handleLocationArrowClick}>
-                                <FaLocationArrow size={18} />
-                            </div> */}
-                            {/* <div className="nav-icon-flag-delete">
-                                <GiGolfFlag size={24} />
-                                <MdDeleteForever size={22} />
-                            </div> */}
                             <div className="nav-icon-arrow">
                                 <Tooltip title="Do đạc" placement="left">
                                     <Button
@@ -911,9 +820,6 @@ function Home() {
                                     </Button>
                                 </Tooltip>
                             </div>
-                            {/* <div className="nav-icon-arrow" onClick={handleShareClick}>
-                                <LuShare2 size={20} />
-                            </div> */}
                             <div className="nav-icon-arrow" onClick={handleBackToMyLocation}>
                                 <Tooltip title="Vị trí hiện tại" placement="left">
                                     <AimOutlined size={20} />
@@ -966,7 +872,7 @@ function Home() {
                     >
                         Danh sách quy hoạch
                     </div>
-                    {LandUsePlan && LandUsePlan?.list_kehoach?.length > 0 && (
+                    {(LandUsePlan?.list_kehoach?.length > 0 || LandUsePlan2?.projects?.length > 0) && (
                         <div
                             onClick={() => dispatch(onChangeDrawer(!isOpenDrawerLandPlan))}
                             ref={buttonRef}
@@ -1031,8 +937,6 @@ function Home() {
                 />
                 <ModalPriceFilter showPrice={isShowModalPrice} handleClosePrice={handleClosePrice} />
 
-                {/* upload Image */}
-
                 <ModalDistance
                     isShowModalDistance={isShowModalDistance}
                     setIsShowModalDistance={setIsShowModalDistance}
@@ -1040,11 +944,6 @@ function Home() {
                     setMarkers={setMarkers}
                     setDistances={setDistances}
                 />
-                {/* <ModalQuyHoach
-                    isShowModalQuyHoach={isShowModalQuyhoach}
-                    handleCloseQuyHoach={handleCloseQuyHoach}
-                    idDistrict={idDistrict}
-                /> */}
                 <ModalUploadImages isShowModalUpload={isShowModalUpload} setIsShowModalUpload={setIsShowModalUpload} />
                 <ModalInstruction
                     isShowModalInstruction={isShowModalInstruction}
