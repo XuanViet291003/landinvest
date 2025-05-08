@@ -4,6 +4,7 @@ import { GiPathDistance } from 'react-icons/gi';
 import { MdIntegrationInstructions } from 'react-icons/md';
 import { RiSubtractLine } from 'react-icons/ri';
 import { BiShapePolygon } from "react-icons/bi";
+import { AiOutlineExpand } from "react-icons/ai";
 import './Home.scss';
 
 import ios1 from '../../assets/shareLocationPopup/ios-1.png';
@@ -74,6 +75,9 @@ import SelectLocationModal from '../SelectLocationModal/SelectLocationModal';
 import { onChangeDrawer } from '../../redux/landUsePlanSlice/lanUsePlanSlice';
 import * as turf from '@turf/turf';
 import { NULL } from 'sass';
+import { MapContainer, TileLayer, LayersControl } from "react-leaflet";
+
+
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -99,7 +103,6 @@ function Home() {
     const isOpenDrawerLandPlan = useSelector((state) => state.landUsePlan.isDrawerOpen);
     const LandUsePlan = useSelector((state) => state.landUsePlan.LandUsePlan);
     const LandUsePlan2 = useSelector((state) => state.landUsePlan.LandUsePlan2);
-    const mapRef = useRef(null);
     const location = useLocation();
     const windowSize = useWindowSize();
     const [isRefreshTreeData, setIsRefreshTreeData] = useState(false);
@@ -135,6 +138,14 @@ function Home() {
     const [openShareLoCationPopup, setOpenShareLoCationPopup] = useState(false);
 
     const [isModalPoygonVisible, setIsModalPolygonVisible] = useState(false);
+
+    const [isModalSearch, setIsModalSearch] = useState(false);
+
+    const [tempPolygonSearch, setTempPolygonSearch] = useState(""); 
+
+    const [locationSearch, setLocation] = useState([0, 0]);
+    const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false);
+
     const [polygon, setPolygon] = useState("");
     const [tempPolygon, setTempPolygon] = useState("");
 
@@ -262,6 +273,8 @@ function Home() {
     const handleCloseModal = () => {
         setIsModalUploadVisible(false);
     };
+
+    const mapRef = useRef(null);
 
     const handleClick = useCallback((index) => {
         setActiveItem(index);
@@ -447,7 +460,7 @@ function Home() {
             });
         }
         if (mapZoom && mapZoom >= 13) {
-            const landCostBtn = { label: 'Bảng giá', type: 7 };
+            const landCostBtn = { label: 'Bảng giá', type: 7 }; 
             newButtonLabels.push(landCostBtn);
         }
         setButtonLabels(newButtonLabels);
@@ -500,6 +513,11 @@ function Home() {
         setIsModalPolygonVisible(true);
     };
 
+    const handleTypeSearch = () => {
+        setIsModalSearch(true);
+    };
+
+    
     const mergePolygonArray = (data) => {
         return data
             .replace(/[()]/g, "")
@@ -573,6 +591,37 @@ function Home() {
         setTempPolygon(polygon);
         setIsModalPolygonVisible(false);
     };
+
+    const handlePolygonOkSearch = () => {
+        setIsModalSearch(false);
+    
+        const regex = /(-?\d+(\.\d+)?)[,\s]+(-?\d+(\.\d+)?)/;
+        const match = tempPolygonSearch.match(regex);
+    
+        if (match) {
+            const lat = parseFloat(match[1]);
+            const lng = parseFloat(match[3]);
+    
+            
+            if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                
+                setLocation([lat, lng]);
+                setIsLocationInfoOpen(true);
+    
+                if (mapRef.current) {
+                    mapRef.current.flyTo([lat, lng], 16);
+                }
+    
+                searchParams.set('vitri', `${lat},${lng}`);
+                setSearchParams(searchParams);
+            } else {
+                message.error('Tọa độ không hợp lệ. Vui lòng nhập lại.');
+            }
+        } else {
+            message.error('Không tìm thấy tọa độ hợp lệ trong liên kết.');
+        }
+    };
+    
 
     console.log(dataByType)
 
@@ -742,7 +791,7 @@ function Home() {
                         position: 'fixed',
                         top: 120,
                         right: 10,
-                        zIndex: 1000000,
+                        zIndex: 1000,
                         padding: 10,
                         borderRadius: 4,
                         marginTop: isPhoneSize ? 40 : 0,
@@ -788,6 +837,11 @@ function Home() {
                             <div className="nav-icon-arrow" onClick={handleTypePolygon}>
                                 <Tooltip title="Nhập text polygon" placement="left">
                                     <BiShapePolygon size={20} />
+                                </Tooltip>
+                            </div>
+                            <div className="nav-icon-arrow" onClick={() => setIsModalSearch(true)}>
+                                <Tooltip title="Nhập toạ độ" placement="left">
+                                    <AiOutlineExpand size={20} />
                                 </Tooltip>
                             </div>
                             <div className="nav-icon-arrow">
@@ -856,6 +910,22 @@ function Home() {
                         onChange={(e) => setTempPolygon(e.target.value)}
                     />
                 </Modal>
+
+                <Modal
+                    title="Nhập link hoặc vị trí địa điểm"
+                    open={isModalSearch}
+                    onOk={handlePolygonOkSearch}
+                    onCancel={() => setIsModalSearch(false)}
+                    okText="Xác nhận"
+                    cancelText="Hủy"
+                >
+                    <Input
+                        placeholder="Nhập link Google Maps hoặc toạ độ (ví dụ: 21.0285, 105.8542)"
+                        value={tempPolygonSearch}
+                        onChange={(e) => setTempPolygonSearch(e.target.value)}
+                    />
+                </Modal>
+
 
                 {/* Header Container */}
                 <div className="menu-overlay_index">
@@ -926,6 +996,8 @@ function Home() {
                             setIsShowModalUpload={setIsShowModalUpload}
                             polygonCoords={polygon ? convertToPolygonArray(polygon) : ""}
                             dataByType={dataByType}
+                            location={locationSearch}
+                            isLocationInfoOpen={isLocationInfoOpen}
                         />
                     )}
 

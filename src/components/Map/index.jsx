@@ -142,7 +142,9 @@ const Map = forwardRef(
             setDistances,
             setIsShowModalUpload,
             polygonCoords,
-            dataByType
+            dataByType,
+            locationS,
+            
         },
         ref,
     ) => {
@@ -2401,7 +2403,7 @@ const Map = forwardRef(
 
                     {markers.length >= 2 && (
                         <Polygon positions={markers} color="blue" pane="measurePane">
-                            <TooltipLeaflet sticky pane="measurePane">
+                            <TooltipLeaflet sticky  pane="measurePane">
                                 {area?.toFixed(2)} m<sup>2</sup> |{' '}
                                 {distances.reduce((acc, cur) => acc + cur.distance, 0).toFixed(2)} m
                             </TooltipLeaflet>
