@@ -621,6 +621,11 @@ function Home() {
             message.error('Không tìm thấy tọa độ hợp lệ trong liên kết.');
         }
     };
+    useEffect(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('opacity', parseFloat(opacity).toFixed(2));
+        window.history.replaceState(null, '', url.toString());
+      }, [opacity]);
     
 
     console.log(dataByType)
