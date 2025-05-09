@@ -1,65 +1,14 @@
-// import { useMapEvent, useMap } from 'react-leaflet';
-// import axios from 'axios';
-// import PopupInfo from './PopupInfo';
-
-
-// const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef  }) => {
-//     const map = useMap();
-
-//     useMapEvent({
-//         click: async (e) => {
-//             const { lat, lng } = e.latlng;
-//             console.log('[CLICK] lat:', lat, 'lng:', lng);
-
-//             // Gọi Nominatim để lấy tên địa điểm (có thể thay bằng API khác)
-//             try {
-//                 // https://nominatim.openstreetmap.org/reverse
-//                 const res = await axios.get(`https://nominatim.openstreetmap.org/reverse.php?lat=${lat}&lon=${lng}&zoom=18&format=jsonv2&addressdetails=1`, {
-//                     params: {
-//                         lat,
-//                         lon: lng,
-//                         format: 'json',
-//                     },
-//                 });
-
-//                 const placeName = res.data.name || res.data.display_name?.split(',')[0] || 'Vị trí không rõ';
-//                 const address = res.data.display_name || '';
-
-//                 setPopupInfo({
-//                     name: placeName,
-//                     address,
-//                     lat,
-//                     lng,
-//                 });
-//             } catch (error) {
-//                 setPopupInfo({
-//                     name: "Vị trí không rõ",
-//                     address: '',
-//                     lat,
-//                     lng,
-//                 });
-//                 console.log('Lỗi lấy thông tin địa điểm:', error);
-//             }            
-//         },
-//     });
-
-//     return <PopupInfo info={popupInfo} onClose={() => setPopupInfo(null)} shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef} />;
-// }
-
-// export default LocationInfoBoard;
-
-
 import { useMapEvent } from 'react-leaflet';
 import axios from 'axios';
 import PopupInfo from './PopupInfo';
+import { useRef } from 'react'
+import debounce from 'lodash/debounce';
 
 const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef }) => {
-    useMapEvent({
-        click: async (e) => {
-            const { lat, lng } = e.latlng;
-
-            // Không làm tròn, không xử lý lại
-            console.log('[CLICK] lat:', lat, 'lng:', lng);
+    const debouncedSetPopupInfo = useRef(
+        debounce(async (lat, lng) => {
+            // Reset popupInfo trước khi lấy thông tin mới
+            setPopupInfo(null); // Reset trước khi cập nhật thông tin mới
 
             try {
                 const res = await axios.get('https://nominatim.openstreetmap.org/reverse.php', {
@@ -71,15 +20,13 @@ const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef 
                         addressdetails: 1,
                     },
                 });
-
                 const placeName = res.data.name || res.data.display_name?.split(',')[0] || 'Vị trí không rõ';
                 const address = res.data.display_name || '';
-
                 setPopupInfo({
                     name: placeName,
                     address,
                     lat,
-                    lng, // ⚠️ giữ số gốc không làm tròn
+                    lng,
                 });
             } catch (error) {
                 console.warn('Lỗi lấy thông tin địa điểm:', error);
@@ -87,25 +34,20 @@ const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef 
                     name: 'Vị trí không rõ',
                     address: '',
                     lat,
-                    lng, // vẫn giữ tọa độ gốc
+                    lng,
                 });
             }
+        }, 200) // Đặt thời gian debounce, ví dụ 100ms
+    ).current;
 
-            // Nếu đang dùng flag để bỏ qua set lại (ví dụ khi vừa click + share)
-            if (shouldIgnoreNextEffectRef?.current) {
-                console.log('[LocationInfoBoard] Đã bỏ qua set lại do flag');
-                shouldIgnoreNextEffectRef.current = false;
-            }
+    useMapEvent({
+        click: (e) => {
+            const { lat, lng } = e.latlng;
+            debouncedSetPopupInfo(lat, lng);
         },
     });
 
-    return (
-        <PopupInfo
-            info={popupInfo}
-            onClose={() => setPopupInfo(null)}
-            shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef}
-        />
-    );
+    return <PopupInfo info={popupInfo} onClose={() => setPopupInfo(null)} />;
 };
 
 export default LocationInfoBoard;

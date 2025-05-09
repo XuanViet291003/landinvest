@@ -78,6 +78,7 @@ import LocationInfoBoard from './LocationInfoBoard';
 import MapView from './MapView';
 import MapLocationHandler from './MapLocationHandler';
 import PopupInfo from './PopupInfo';
+import MarkerComponent from './MarkerComponent';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -146,7 +147,7 @@ const Map = forwardRef(
             polygonCoords,
             dataByType,
             locationS,
-            
+
         },
         ref,
     ) => {
@@ -2030,6 +2031,22 @@ const Map = forwardRef(
                         setPopupInfo={setPopupInfo}
                         shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef}
                     />
+                    {/* Sử dụng MarkerComponent thay vì Marker trực tiếp */}
+                    {popupInfo && (
+                        <MarkerComponent
+                            position={[popupInfo.lat, popupInfo.lng]}
+                            icon={iconLocation} // icon bạn đã khai báo cho con trỏ đỏ
+                        />
+                    )}
+                    {/* {popupInfo && (
+                        <Marker
+                            key={`${popupInfo.lat},${popupInfo.lng}`} // bắt buộc remount marker khi vị trí thay đổi
+                            position={[popupInfo.lat, popupInfo.lng]}
+                            icon={iconLocation} // icon bạn đã khai báo cho con trỏ đỏ
+                            zIndexOffset={1000}
+                            pane="markerTopPane"
+                        />
+                    )} */}
                     {/* <MapLocationHandler
                         isOpen={isLocationInfoOpen}
                         onClose={onCloseLocationInfo}
@@ -2422,7 +2439,7 @@ const Map = forwardRef(
 
                     {markers.length >= 2 && (
                         <Polygon positions={markers} color="blue" pane="measurePane">
-                            <TooltipLeaflet sticky  pane="measurePane">
+                            <TooltipLeaflet sticky pane="measurePane">
                                 {area?.toFixed(2)} m<sup>2</sup> |{' '}
                                 {distances.reduce((acc, cur) => acc + cur.distance, 0).toFixed(2)} m
                             </TooltipLeaflet>
