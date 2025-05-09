@@ -1,5 +1,5 @@
 import { message, notification, Radio } from 'antd';
-import L, { icon } from 'leaflet';
+import L from 'leaflet';
 import instance from '../../utils/axios-customize';
 import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaMapMarkedAlt } from 'react-icons/fa';
@@ -73,7 +73,11 @@ import RegionalPriceChart from '../Home/RegionalPriceChart/RegionalPriceChart';
 import EstatePricePopUp from '../Home/EstatePricePopUp/EstatePricePopUp';
 
 import './index.scss'
-import{ MarkerPaneSetup,MeasurePaneCreator } from './MarkerPaneSetup';
+import { MarkerPaneSetup, MeasurePaneCreator } from './MarkerPaneSetup';
+import LocationInfoBoard from './LocationInfoBoard';
+import MapView from './MapView';
+import MapLocationHandler from './MapLocationHandler';
+import PopupInfo from './PopupInfo';
 
 const customIcon = new L.Icon({
     iconUrl: require('../../assets/marker.png'),
@@ -106,8 +110,6 @@ const iconHtml = ReactDOMServer.renderToStaticMarkup(
     <div style={{
         color: 'red',
         fontSize: '30px',
-        position: 'absolute', // BẮT BUỘC nếu không dùng class mặc định
-        zIndex: 10000, // Optional – Leaflet vẫn ưu tiên zIndexOffset
     }}>
         <FaLocationDot />
     </div>,
@@ -122,7 +124,7 @@ const iconSavePolygon = L.divIcon({
 // Tạo DivIcon với HTML                 *
 const iconLocation = L.divIcon({
     html: iconHtml,
-    className: 'leaflet-marker-icon custom-marker-wrapper', // Loại bỏ class mặc định
+    className: '', // Loại bỏ class mặc định
     iconSize: [30, 30],
     iconAnchor: [15, 30], // Tâm của icon
 });
@@ -250,6 +252,9 @@ const Map = forwardRef(
                 console.log(e);
             }
         };
+        // Test Update **
+        const shouldIgnoreNextEffectRef = useRef(false);
+
         useEffect(() => {
             // Hàm lấy thông tin hệ điều hành
             const detectOs = (userAgent) => {
@@ -2018,8 +2023,22 @@ const Map = forwardRef(
                     ref={ref}
                     zoomControl={false}
                 >
-                    <MarkerPaneSetup />
+                    {/* *********************** Update ************************ */}
+                    <MapView setPopupInfo={setPopupInfo} shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef} />
+                    <LocationInfoBoard
+                        popupInfo={popupInfo}
+                        setPopupInfo={setPopupInfo}
+                        shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef}
+                    />
+                    {/* <MapLocationHandler
+                        isOpen={isLocationInfoOpen}
+                        onClose={onCloseLocationInfo}
+                        locationData={locationData}
+                        location={location}
+                    /> */}
+                    {/* */}
 
+                    <MarkerPaneSetup location={location} />
                     {duAn.map((duAnItem) => {
                         const [lat, lng] = duAnItem.toaDo.split(',').map(Number);
                         const hasPolygon = duAnItem.polygon === "CO_POLYGON";
@@ -2416,7 +2435,7 @@ const Map = forwardRef(
                     {isSelectedMeasure && <MapClickHandler />}
                     {isSelectedMeasure && isDrawPolygon && markers.length >= 3 && (
                         <Marker
-                        pane="measurePane"
+                            pane="measurePane"
                             eventHandlers={{
                                 click: (e) => {
                                     e.originalEvent.stopPropagation();
@@ -2508,13 +2527,13 @@ const Map = forwardRef(
                             pane="markerTopPane"
                         />
                     )}
-                    {!isSelectedMeasure &&  <MapEventArea />}
+                    {!isSelectedMeasure && <MapEventArea />}
                     {polygonArea?.area}
                     <Polygon positions={polygonDuAnArea?.polygon} color="rgb(255,204,51)" />
                     <Polygon positions={polygonArea?.polygon} color="darkred" />
                 </MapContainer>
                 {/* loading */}
-                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen /> }
+                {boundingboxStatus === THUNK_API_STATUS.PENDING && <LoadingScreen />}
                 {/* {isShowLandAdministration && ( */}
                 {isShowLandAdministration && (
                     <LandAdministrationModal
