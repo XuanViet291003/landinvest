@@ -44,11 +44,11 @@ const PopupInfo = ({ info, onClose, shouldIgnoreNextEffectRef }) => {
                     alt="thumbnail"
                     style={{ width: '90px', height: '105px', marginRight: '9px' }}
                 />
-                <div style={{ width: '225px', height: '100px', marginTop: '-35px', marginRight: '5px' }}>
+                <div className='popupText'>
                     <div>
                         <div className="title">{info.name}</div>
                         <div className="address">{getDetailAddress(info.name, info.address)}</div>
-                        <hr style={{ marginTop: '2.5px' }} />
+                        <hr style={{ marginTop: '2.5px' }} className='line'/>
                         <div className="coords">
                             {info.lat.toFixed(6)}, {info.lng.toFixed(6)}
                         </div>

@@ -1,8 +1,7 @@
 .fixed-popup {
   position: fixed;
   bottom: 99px;
-  left: 83.1%;
-  transform: translateX(-50%);
+  right: 51.5px; // dùng right thay vì left + transform
   z-index: 9999;
   background: white;
   border-radius: 12px;
@@ -22,66 +21,73 @@
   width: 100%;
 }
 
+.popupText {
+  width: 225px;
+  height: 100px;
+  margin-top: -35px;
+  margin-right: 5px;
+}
+
 .title {
-    font-weight: bold;
-    margin-left: 3.5px;
-    font-size: 8px;
-    line-height: 1.2;
+  font-weight: bold;
+  margin-left: 3.5px;
+  font-size: 8px;
+  line-height: 1.2;
 }
 
 .address {
-    font-size: 11px;
-    color: #555;
-    margin-left: 3.5px;
+  font-size: 11px;
+  color: #555;
+  margin-left: 3.5px;
 }
 
 .coords {
-    font-size: 10px;
-    color: #777;
-    margin-top: -12px;
-    margin-left: 3.5px;
+  font-size: 10px;
+  color: #777;
+  margin-top: -12px;
+  margin-left: 3.5px;
 }
 
 .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-right: -10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-right: -10px;
 }
 
 .share,
 .close {
-    background-color: rgba(0, 0, 0, 0.05);
-    border: none;
-    border-radius: 50%;
-    width: 18px;
-    height: 27px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.6;
-    transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
-    cursor: pointer;
-    margin-right: 7px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+  margin-right: 7px;
 }
 
 .share:hover,
 .close:hover {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.1);
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .share:active,
 .close:active {
-    background-color: rgba(0, 0, 0, 0.15);
-    transform: scale(0.95);
+  background-color: rgba(0, 0, 0, 0.15);
+  transform: scale(0.95);
 }
 
 .share svg,
 .close svg {
-    width: 18px;
-    height: 18px;
-    color: #333;
+  width: 18px;
+  height: 18px;
+  color: #333;
 }
 
 @keyframes slideUp {
@@ -89,8 +95,204 @@
     transform: translate(-50%, 20px);
     opacity: 0;
   }
+
   to {
     transform: translate(-50%, 0);
     opacity: 1;
+  }
+}
+
+// Responsive
+@media screen and (max-width: 768px) {
+  .fixed-popup {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 800px) and (max-width: 800px) {
+  .fixed-popup {
+    margin-right: -18px;
+    margin-bottom: 40px;
+    width: 293px;
+    height: 116px;
+  }
+
+  .popup-content {
+    margin-left: -3.5px;
+    margin-top: 20px;
+    width: 320px;
+  }
+
+  .popupText {
+    width: 238px;
+    margin-left: 4px;
+  }
+
+  .popup-content img {
+    display: none;
+  }
+
+  .actions {
+    margin-top: -20px;
+    margin-left: -3px;
+  }
+
+  .share {
+    margin-bottom: 2.5px;
+    width: 16px;
+    height: 25px;
+  }
+
+  .close {
+    width: 16px;
+    height: 25px;
+  }
+
+  .address {
+    margin-top: 4px;
+  }
+
+  .line {
+    display: none;
+  }
+
+  .coords {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 900px) and (max-width: 900px) {
+  .fixed-popup {
+    margin-right: 30px;
+    margin-bottom: 38px;
+    width: 300px;
+    height: 118px;
+  }
+
+  .popup-content {
+    margin-top: 20px;
+    width: 320px;
+    margin-left: -4px;
+  }
+
+  .popupText {
+    width: 244px;
+    margin-left: 3px;
+  }
+
+  .popup-content img {
+    display: none;
+  }
+
+  .actions {
+    margin-top: -20px;
+    margin-left: -2.5px;
+  }
+
+  .share {
+    margin-bottom: 3px;
+    width: 16px;
+    height: 25px;
+  }
+
+  .close {
+    width: 16px;
+    height: 25px;
+  }
+
+  .address {
+    margin-top: 4px;
+  }
+
+  .line {
+    display: none;
+  }
+
+  .coords {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 915px) and (max-width: 915px) {
+  .fixed-popup {
+    margin-right: 37px;
+    margin-bottom: 98px;
+    width: 304px;
+    height: 116px;
+  }
+
+  .popup-content {
+    margin-top: 20px;
+    width: 295px;
+  }
+
+  .popupText {
+    width: 244px;
+    margin-left: 1px;
+  }
+
+  .popup-content img {
+    display: none;
+  }
+
+  .actions {
+    margin-top: -20px;
+  }
+
+  .share {
+    margin-bottom: 3px;
+    width: 16px;
+    height: 25px;
+  }
+
+  .close {
+    width: 16px;
+    height: 25px;
+  }
+
+  .address {
+    margin-top: 4px;
+  }
+
+  .line {
+    display: none;
+  }
+
+  .coords {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 1024px) and (max-width: 1024px) {
+  .fixed-popup {
+    margin-right: 44px;
+    margin-bottom: 46px;
+    width: 304px;
+    height: 120px;
+  }
+
+  .popup-content {
+    margin-top: 20px;
+    width: 320px;
+  }
+
+  .popupText {
+    width: 242px;
+  }
+
+  .popup-content img {
+    display: none;
+  }
+
+  .actions {
+    margin-top: -20px;
+  }
+
+  .share {
+    margin-bottom: 2px;
   }
 }
