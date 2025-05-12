@@ -151,6 +151,8 @@ const Map = forwardRef(
         },
         ref,
     ) => {
+        const markerRefs = useRef({});
+        const [selectedDuAnId, setSelectedDuAnId] = useState(null);
         const [isOverview, setIsOverview] = useState(false);
         const [listenDblClick, setListenDblClick] = useState(false);
         const [idProvince, setIdProvince] = useState();
@@ -810,6 +812,19 @@ const Map = forwardRef(
                 //     });
             }
         }, [id, type]);
+
+        useEffect(() => {
+            const idFromURL = searchParams.get("id-duan");
+            if (idFromURL) {
+                setSelectedDuAnId(idFromURL);
+                        setTimeout(() => {
+                        const ref = markerRefs.current[idFromURL];
+                        if (ref) {
+                            ref.openPopup();
+                        }
+                    }, 3000);
+                }
+            }, [searchParams]);
 
         useEffect(() => {
             if (itemQuyHoach) {
@@ -1579,6 +1594,7 @@ const Map = forwardRef(
         const handleClickDuAnIcon = (id) => {
             searchParams.set('id-duan', id);
             setSearchParams(searchParams);
+            setSelectedDuAnId(id);
         };
 
         const handleHeatMapSwitch = () => {
@@ -2066,8 +2082,14 @@ const Map = forwardRef(
                                 key={duAnItem.id}
                                 position={[lat, lng]}
                                 icon={markerIcon}
+                                ref={(ref) => {
+                                    if (ref) markerRefs.current[duAnItem.id] = ref;
+                                }}
                                 eventHandlers={{
-                                    click: () => handleClickDuAnIcon(duAnItem.id),
+                                    click: () => {
+                                        handleClickDuAnIcon(duAnItem.id);
+                                        setSelectedDuAnId(duAnItem.id);
+                                    },
                                 }}
                             >
                                 {showPopup && (
