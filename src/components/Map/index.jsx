@@ -817,14 +817,14 @@ const Map = forwardRef(
             const idFromURL = searchParams.get("id-duan");
             if (idFromURL) {
                 setSelectedDuAnId(idFromURL);
-                        setTimeout(() => {
-                        const ref = markerRefs.current[idFromURL];
-                        if (ref) {
-                            ref.openPopup();
-                        }
-                    }, 3000);
-                }
-            }, [searchParams]);
+                setTimeout(() => {
+                    const ref = markerRefs.current[idFromURL];
+                    if (ref) {
+                        ref.openPopup();
+                    }
+                }, 3000);
+            }
+        }, [searchParams]);
 
         useEffect(() => {
             if (itemQuyHoach) {
@@ -1629,7 +1629,93 @@ const Map = forwardRef(
             }
         };
 
-        const fetchHeatMapData = async (id, heatType) => {
+        // Test code
+        // const fetchHeatMapData = async (id, heatType) => {
+        //     setHeatMapLoading(true);
+        //     try {
+        //         const now = new Date();
+        //         const month = now.getMonth() + 1;
+        //         const year = now.getFullYear();
+
+        //         const responseHeat = await instance.get(
+        //             `/ban_do_nhiet_district/${id}/${month}/${year}`
+        //         );
+
+        //         const data = responseHeat.data;
+
+        //         // Lọc và chuyển đổi danh sách polygons
+        //         const priceHeatMap = [];
+
+        //         const polygonsByColor = data[heatType]?.map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
+        //             const obj = {
+        //                 name: name_xaphuong,
+        //                 value: avg,
+        //                 color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#8884d8"
+        //             };
+
+        //             priceHeatMap.push(obj);
+
+        //             const relatedPolygon = data.list_polygon?.find(({ WandID }) => WandID === xaphuong_id);
+
+        //             if (!relatedPolygon) return null;
+
+        //             const errors = [];
+
+        //             const polygons = relatedPolygon.polygon?.[0]?.map((coords) => {
+        //                 if (!Array.isArray(coords) || coords.length !== 2) {
+        //                     errors.push({ name: name_xaphuong });
+        //                     return null;
+        //                 }
+
+        //                 const [lng, lat] = coords;
+
+        //                 if (typeof lng !== "number" || typeof lat !== "number") {
+        //                     errors.push({ name: name_xaphuong });
+        //                     return null;
+        //                 }
+
+        //                 return { lat, lng };
+        //             }).filter(Boolean);
+
+        //             return {
+        //                 color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#ccc",
+        //                 polygons: polygons,
+        //                 center: getPolygonCenter(relatedPolygon.polygon[0]),
+        //                 max,
+        //                 avg,
+        //                 min,
+        //                 name_xaphuong,
+        //             };
+        //         }).filter(Boolean) || []; // Đảm bảo là một mảng nếu data[heatType] không tồn tại
+
+        //         if (!polygonsByColor || polygonsByColor.length === 0 || priceHeatMap.length === 0) {
+        //             messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+        //         }
+
+        //         if (priceHeatMap.length > 0) {
+        //             setHeatRegionalPrice(priceHeatMap);
+        //         } else {
+        //             setHeatRegionalPrice(null);
+        //         }
+
+        //         setPolygonHeatMap(polygonsByColor);
+
+        //         searchParams.set("id-district", id);
+        //         searchParams.set("heat-type", heatType);
+        //         setSearchParams(searchParams);
+
+        //     } catch (error) {
+        //         console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
+        //         messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+        //         setPolygonHeatMap(null);
+        //         setHeatRegionalPrice(null);
+        //     } finally {
+        //         setHeatMapLoading(false);
+        //     }
+        // };
+        const fetchHeatMapData = async (id, heatTypeRaw) => {           // Update code
+            const heatType = (!heatTypeRaw || heatTypeRaw === 'undefined') ? 'tho_cu' : heatTypeRaw;
+
             setHeatMapLoading(true);
             try {
                 const now = new Date();
@@ -1642,10 +1728,16 @@ const Map = forwardRef(
 
                 const data = responseHeat.data;
 
-                // Lọc và chuyển đổi danh sách polygons
+                if (!data || !data[heatType] || data[heatType].length === 0) {
+                    messageApi.info(`Chưa có dữ liệu bản đồ nhiệt cho loại "${heatType}"!`);
+                    setPolygonHeatMap(null);
+                    setHeatRegionalPrice(null);
+                    return;
+                }
+
                 const priceHeatMap = [];
 
-                const polygonsByColor = data[heatType]?.map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
+                const polygonsByColor = data[heatType].map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
                     const obj = {
                         name: name_xaphuong,
                         value: avg,
@@ -1655,57 +1747,43 @@ const Map = forwardRef(
                     priceHeatMap.push(obj);
 
                     const relatedPolygon = data.list_polygon?.find(({ WandID }) => WandID === xaphuong_id);
-
                     if (!relatedPolygon) return null;
 
-                    const errors = [];
-
                     const polygons = relatedPolygon.polygon?.[0]?.map((coords) => {
-                        if (!Array.isArray(coords) || coords.length !== 2) {
-                            errors.push({ name: name_xaphuong });
-                            return null;
-                        }
-
+                        if (!Array.isArray(coords) || coords.length !== 2) return null;
                         const [lng, lat] = coords;
-
-                        if (typeof lng !== "number" || typeof lat !== "number") {
-                            errors.push({ name: name_xaphuong });
-                            return null;
-                        }
-
+                        if (typeof lng !== "number" || typeof lat !== "number") return null;
                         return { lat, lng };
                     }).filter(Boolean);
 
                     return {
                         color: color ? `rgb(${color.red}, ${color.green}, ${color.blue})` : "#ccc",
-                        polygons: polygons,
+                        polygons,
                         center: getPolygonCenter(relatedPolygon.polygon[0]),
                         max,
                         avg,
                         min,
                         name_xaphuong,
                     };
-                }).filter(Boolean) || []; // Đảm bảo là một mảng nếu data[heatType] không tồn tại
+                }).filter(Boolean);
 
-                if (!polygonsByColor || polygonsByColor.length === 0 || priceHeatMap.length === 0) {
-                    messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
-                }
-
-                if (priceHeatMap.length > 0) {
-                    setHeatRegionalPrice(priceHeatMap);
-                } else {
+                if (priceHeatMap.length === 0 || polygonsByColor.length === 0) {
+                    messageApi.info(`Không tìm thấy dữ liệu phù hợp cho "${heatType}".`);
+                    setPolygonHeatMap(null);
                     setHeatRegionalPrice(null);
+                    return;
                 }
 
+                setHeatRegionalPrice(priceHeatMap);
                 setPolygonHeatMap(polygonsByColor);
 
+                // Cập nhật lại searchParams
                 searchParams.set("id-district", id);
                 searchParams.set("heat-type", heatType);
                 setSearchParams(searchParams);
-
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
-                messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+                messageApi.info("Lỗi khi tải dữ liệu bản đồ nhiệt!");
                 setPolygonHeatMap(null);
                 setHeatRegionalPrice(null);
             } finally {
@@ -1713,40 +1791,64 @@ const Map = forwardRef(
             }
         };
 
-        const loadHeatMap = async () => {
-            setHeatMapLoading(true);
-            const vitri = searchParams.get("vitri").split(",");
-            if (!vitri || vitri.length < 2) {
-                throw new Error("Vị trí không hợp lệ!");
-            }
+        // const loadHeatMap = async () => {
+        //     setHeatMapLoading(true);
+        //     const vitri = searchParams.get("vitri").split(",");
+        //     if (!vitri || vitri.length < 2) {
+        //         throw new Error("Vị trí không hợp lệ!");
+        //     }
 
-            const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
-            if (!resLocation) {
-                throw new Error("Không lấy được vị trí từ bounding box!");
-            }
+        //     const resLocation = await getLocationInBoudingBox(vitri[0], vitri[1]);
+        //     if (!resLocation) {
+        //         throw new Error("Không lấy được vị trí từ bounding box!");
+        //     }
 
-            const currentDistrict = searchParams.get("id-district");
-            const heatType = searchParams.get("heat-type") || "tho_cu";
+        //     const currentDistrict = searchParams.get("id-district");
+        //     const heatType = searchParams.get("heat-type") || "tho_cu";
 
-            if (resLocation.district === currentDistrict) {
+        //     if (resLocation.district === currentDistrict) {
+        //         return;
+        //     }
+
+        //     await fetchHeatMapData(resLocation.district, heatType);
+
+        //     setHeatMapLoading(false);
+        // }
+        const loadHeatMap = async () => {                               // Update code
+            const id = searchParams.get("id-district");
+            const heatTypeRaw = searchParams.get("heat-type");
+            const heatType = (!heatTypeRaw || heatTypeRaw === 'undefined') ? 'tho_cu' : heatTypeRaw;
+
+            if (!id) {
+                console.warn("Thiếu tham số id-district");
                 return;
             }
 
-            await fetchHeatMapData(resLocation.district, heatType);
-
-            setHeatMapLoading(false);
-        }
+            await fetchHeatMapData(id, heatType);
+            console.log("heat-type from URL:", searchParams.get("heat-type"));
+        };
 
         const handleHeatMapClick = async () => {
             await loadHeatMap();
         };
 
-        useEffect(() => {
-            const id = searchParams.get('id-district');
-            if (searchParams.get('id-district')) {
-                fetchHeatMapData(id);
+        // useEffect(() => {
+        //     const id = searchParams.get('id-district');
+        //     const heatType = searchParams.get('heat-type') || 'tho_cu'; // Update code
+        //     if (id && heatType) {
+        //         fetchHeatMapData(id, heatType);
+        //     }
+        // }, []);
+        useEffect(() => {                                               // Update code
+            const heatView = searchParams.get("heat-view");
+            const idDistrict = searchParams.get("id-district");
+
+            if (heatView === "map" && idDistrict) {
+                loadHeatMap();
             }
         }, []);
+        
+        //
 
         useEffect(() => {
             const fetchData = async () => {
