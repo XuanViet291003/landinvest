@@ -15,7 +15,8 @@ const PopupInfo = ({ info, onClose, shouldIgnoreNextEffectRef }) => {
         const lng = info.lng;
         const zoom = 17;
 
-        const shareUrl = `http://landinvest.com.vn/?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
+        // const shareUrl = `http://landinvest.com.vn/?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
+        const shareUrl = `http://localhost:4000/?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
 
         navigator.clipboard.writeText(shareUrl).then(() => {
             // Hiển thị thông báo toast khi sao chép liên kết
