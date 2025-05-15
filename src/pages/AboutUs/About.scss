@@ -78,17 +78,22 @@ $xl: 1280px; // Kích thước màn hình rất lớn (ví dụ: laptop lớn ho
     .section_five {
         margin: 45px 0px;
         .team-images {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); // 2 ảnh mỗi hàng
             gap: 25px;
-            @media (max-width: $lg) {
-                gap: 5px;
+            justify-items: center;
+        
+            @media (max-width: $md) {
+                grid-template-columns: 1fr; // Với màn hình nhỏ, 1 ảnh mỗi hàng
             }
         }
+        
     }
 }
 .image-about {
-    height: 650px;
+    width: 100%;
+    max-width: 600px;
+    height: 300px;
+    object-fit: cover;
     border-radius: 5px;
 }

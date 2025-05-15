@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css?family=Lato');
 
 * {
@@ -23,7 +22,7 @@ h1 {
 }
 
 .countdown-item {
-    color: #111;
+    color: #06e906;
     font-size: 40px;
     display: flex;
     align-items: center;
@@ -38,7 +37,7 @@ h1 {
 }
 
 .countdown-item span {
-    color: #333;
+    color: #06e906;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -50,4 +49,13 @@ h1 {
     left: 0;
     width: 100px;
     height: 100px;
+}
+
+/*Khi hết giờ, đổi sang màu đỏ */
+.countdown-item.expired {
+    color: #ff0000;
+}
+
+.countdown-item.expired span {
+    color: #ff0000;
 }

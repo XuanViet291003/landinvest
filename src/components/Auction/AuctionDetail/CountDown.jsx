@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import "./CountDown.scss"
+import './CountDown.scss';
 
 const CountDown = ({ timeTillDate, timeFormat }) => {
     const [timeLeft, setTimeLeft] = useState({
         days: undefined,
         hours: undefined,
         minutes: undefined,
-        seconds: undefined
+        seconds: undefined,
     });
 
     useEffect(() => {
@@ -40,7 +40,7 @@ const CountDown = ({ timeTillDate, timeFormat }) => {
 
     return (
         <div>
-            <h1 style={{color: "#FF6347"}}>Thời gian còn lại:</h1>
+            <h1 style={{ color: '#FF6347' }}>Thời gian còn lại:</h1>
             <div className="countdown-wrapper">
                 {days !== undefined && (
                     <div className="countdown-item">
@@ -77,12 +77,7 @@ const CountDown = ({ timeTillDate, timeFormat }) => {
 
 const SVGCircle = ({ radius }) => (
     <svg className="countdown-svg">
-        <path
-            fill="none"
-            stroke="#333"
-            strokeWidth="4"
-            d={describeArc(50, 50, 48, 0, radius)}
-        />
+        <path fill="none" stroke="#06e906" strokeWidth="4" d={describeArc(50, 50, 48, 0, radius)} />
     </svg>
 );
 
@@ -90,7 +85,7 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
         x: centerX + radius * Math.cos(angleInRadians),
-        y: centerY + radius * Math.sin(angleInRadians)
+        y: centerY + radius * Math.sin(angleInRadians),
     };
 }
 
@@ -98,10 +93,7 @@ function describeArc(x, y, radius, startAngle, endAngle) {
     const start = polarToCartesian(x, y, radius, endAngle);
     const end = polarToCartesian(x, y, radius, startAngle);
     const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-    const d = [
-        'M', start.x, start.y,
-        'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
-    ].join(' ');
+    const d = ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(' ');
 
     return d;
 }

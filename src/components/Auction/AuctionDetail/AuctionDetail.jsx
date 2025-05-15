@@ -30,26 +30,26 @@ export default function AuctionDetail() {
     const latIndex = 0;
     const lngIndex = 1;
 
-    // Update 
+    // Update
     const [remainingTime, setRemainingTIme] = useState(countdown);
     const now = moment();
     const nowFormat = now.format('DD:MM:YYYY HH:mm:ss');
-    console.log("now: ", nowFormat);
+    console.log('now: ', nowFormat);
 
     const then = now.clone().add(countdown);
-    const thenFormat = then.format('DD:MM:YYYY HH:mm:ss')
-    console.log("then: ", thenFormat);
+    const thenFormat = then.format('DD:MM:YYYY HH:mm:ss');
+    console.log('then: ', thenFormat);
 
-    const day = then.date();          // Ngày (1-31)
-    const month = then.month() + 1;   // Tháng (0-11) => phải +1
-    const year = then.year();         // Năm (ví dụ 2025)
-    const hour = then.hour();         // Giờ (0-23)
-    const minute = then.minute();     // Phút (0-59)
-    const second = then.second();     // Giây (0-59)
+    const day = then.date(); // Ngày (1-31)
+    const month = then.month() + 1; // Tháng (0-11) => phải +1
+    const year = then.year(); // Năm (ví dụ 2025)
+    const hour = then.hour(); // Giờ (0-23)
+    const minute = then.minute(); // Phút (0-59)
+    const second = then.second(); // Giây (0-59)
 
     useEffect(() => {
         const timerId = setInterval(() => {
-            setRemainingTIme(countdown)
+            setRemainingTIme(countdown);
         }, 1000);
 
         return () => clearInterval(timerId);
@@ -122,12 +122,14 @@ export default function AuctionDetail() {
                     }
                 </div> */}
                 <div>
-                    {remainingTime ?
+                    {remainingTime ? (
                         <Countdown
                             timeTillDate={`${day}:${month}:${year} ${hour}:${minute}:${second}`}
-                            timeFormat={'DD:MM:YYYY HH:mm:ss'} /> : <h3>'Sự kiện đã bắt đầu'</h3>
-                    }
-
+                            timeFormat={'DD:MM:YYYY HH:mm:ss'}
+                        />
+                    ) : (
+                        <h3>'Sự kiện đã bắt đầu'</h3>
+                    )}
                 </div>
                 {/* End */}
                 <h1 className="auction-detail_title-h1">{auction?.Title}</h1>
