@@ -141,7 +141,7 @@ function Home() {
 
     const [isModalSearch, setIsModalSearch] = useState(false);
 
-    const [tempPolygonSearch, setTempPolygonSearch] = useState(""); 
+    const [tempPolygonSearch, setTempPolygonSearch] = useState("");
 
     const [locationSearch, setLocation] = useState([0, 0]);
     const [isLocationInfoOpen, setIsLocationInfoOpen] = useState(false);
@@ -151,6 +151,16 @@ function Home() {
 
     const dataCache = useRef(null);
     const [rawQuyHoachData, setRawQuyHoachData] = useState(null);
+
+
+    // Update Test
+    // const mapRefShow = useRef(null);
+    // const layerGroupQuyHoachRef = useRef(null);
+    // const layerGroupHeatmapRef = useRef(null);
+
+    // const dispatchShow = useDispatch();
+    const heatmapActive = useSelector((state) => state.map.heatmapActive);
+    const quyhoachVisible = useSelector((state) => state.map.quyhoachVisible);
 
     // Device = 1: IOS, Device = 2: Android
     const [device, setDevice] = useState(1);
@@ -460,11 +470,35 @@ function Home() {
             });
         }
         if (mapZoom && mapZoom >= 13) {
-            const landCostBtn = { label: 'Bảng giá', type: 7 }; 
+            const landCostBtn = { label: 'Bảng giá', type: 7 };
             newButtonLabels.push(landCostBtn);
         }
         setButtonLabels(newButtonLabels);
     }, [dataByType, searchParams]);
+
+    // Update test
+    // --- useEffect xử lý ẩn quy hoạch khi bật bản đồ nhiệt ---
+//   useEffect(() => {
+//     if (!mapRef.current) return;
+
+//     const map = mapRef.current;
+
+//     if (heatmapActive) {
+//       // Tắt lớp quy hoạch khi bật heatmap
+//       if (layerGroupQuyHoachRef.current && map.hasLayer(layerGroupQuyHoachRef.current)) {
+//         map.removeLayer(layerGroupQuyHoachRef.current);
+//       }
+//       // Nếu bạn có action setQuyHoachVisible trong Redux thì mở lại dòng này
+//       // if (quyHoachVisible) {
+//       //   dispatch(setQuyHoachVisible(false));
+//       // }
+//     } else {
+//       // Khi tắt heatmap thì có thể bật lại quy hoạch nếu trước đó nó được bật
+//       if (!map.hasLayer(layerGroupQuyHoachRef.current) && layerGroupQuyHoachRef.current) {
+//         map.addLayer(layerGroupQuyHoachRef.current);
+//       }
+//     }
+//   }, [heatmapActive]);
 
     const handleButtonClick = (buttonType) => {
         setSelectedButton(buttonType);
@@ -505,7 +539,7 @@ function Home() {
     //     console.log('Show KHSDD 2025:', (LandUsePlan?.list_kehoach?.length > 0 || LandUsePlan2?.projects?.length > 0));
     // }, [LandUsePlan, LandUsePlan2]);
 
-    if (!LandUsePlan || (LandUsePlan && LandUsePlan?.list_kehoach?.length && LandUsePlan2?.projects?.length === 0 )) {
+    if (!LandUsePlan || (LandUsePlan && LandUsePlan?.list_kehoach?.length && LandUsePlan2?.projects?.length === 0)) {
         dispatch(onChangeDrawer(false));
     }
 
@@ -517,7 +551,7 @@ function Home() {
         setIsModalSearch(true);
     };
 
-    
+
     const mergePolygonArray = (data) => {
         return data
             .replace(/[()]/g, "")
@@ -594,24 +628,24 @@ function Home() {
 
     const handlePolygonOkSearch = () => {
         setIsModalSearch(false);
-    
+
         const regex = /(-?\d+(\.\d+)?)[,\s]+(-?\d+(\.\d+)?)/;
         const match = tempPolygonSearch.match(regex);
-    
+
         if (match) {
             const lat = parseFloat(match[1]);
             const lng = parseFloat(match[3]);
-    
-            
+
+
             if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-                
+
                 setLocation([lat, lng]);
                 setIsLocationInfoOpen(true);
-    
+
                 if (mapRef.current) {
                     mapRef.current.flyTo([lat, lng], 16);
                 }
-    
+
                 searchParams.set('vitri', `${lat},${lng}`);
                 setSearchParams(searchParams);
             } else {
@@ -625,8 +659,8 @@ function Home() {
         const url = new URL(window.location.href);
         url.searchParams.set('opacity', parseFloat(opacity).toFixed(2));
         window.history.replaceState(null, '', url.toString());
-      }, [opacity]);
-    
+    }, [opacity]);
+
 
     console.log(dataByType)
 
