@@ -76,6 +76,8 @@ import { onChangeDrawer } from '../../redux/landUsePlanSlice/lanUsePlanSlice';
 import * as turf from '@turf/turf';
 import { NULL } from 'sass';
 import { MapContainer, TileLayer, LayersControl } from "react-leaflet";
+import ReactDOMServer from 'react-dom/server';
+import { FaLocationDot } from 'react-icons/fa6';
 
 
 
@@ -636,13 +638,39 @@ function Home() {
             const lat = parseFloat(match[1]);
             const lng = parseFloat(match[3]);
 
-
             if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                // Tạo icon cho marker
+                const iconHtml = ReactDOMServer.renderToStaticMarkup(
+                    <div style={{
+                        color: 'red',
+                        fontSize: '30px',
+                    }}>
+                        <FaLocationDot />
+                    </div>
+                );
 
+                const iconLocation = L.divIcon({
+                    html: iconHtml,
+                    className: '',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 30],
+                });
+
+                // Cập nhật state và URL
                 setLocation([lat, lng]);
                 setIsLocationInfoOpen(true);
 
+                // Di chuyển map đến vị trí mới và thêm marker
                 if (mapRef.current) {
+                    // Xóa marker cũ nếu có
+                    mapRef.current.eachLayer((layer) => {
+                        if (layer instanceof L.Marker) {
+                            mapRef.current.removeLayer(layer);
+                        }
+                    });
+
+                    // Thêm marker mới
+                    const marker = L.marker([lat, lng], { icon: iconLocation }).addTo(mapRef.current);
                     mapRef.current.flyTo([lat, lng], 16);
                 }
 

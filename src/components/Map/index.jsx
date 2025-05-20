@@ -107,7 +107,8 @@ const dotIcon = new L.DivIcon({
     iconSize: [15, 15],
     iconAnchor: [7.5, 7.5],
 });
-const iconHtml = ReactDOMServer.renderToStaticMarkup(
+
+ const iconHtml = ReactDOMServer.renderToStaticMarkup(
     <div style={{
         color: 'red',
         fontSize: '30px',
@@ -1040,26 +1041,33 @@ const Map = forwardRef(
             const clickTimeout = useRef(null);
 
             useMapEvents({
-                click: async (e) => {
-                    clickCountRef.current += 1;
+                click: (e) => {
                     const map = e.target;
-
-                    searchParams.set('vitri', `${e.latlng.lat},${e.latlng.lng}`);
-
-                    setSearchParams(searchParams);
-
-                    if (clickTimeout.current) clearTimeout(clickTimeout.current);
-
-                    clickTimeout.current = setTimeout(() => {
-                        clickCountRef.current = 0; // Reset sau khi xử lý
-                    }, 400);
-
-                    setIsLocationInfoOpen(true);
-
                     const newLocation = e.latlng;
-                    setLocation([newLocation.lat, newLocation.lng]);
-                },
 
+                    // Xóa marker tìm kiếm nếu có
+                    map.eachLayer((layer) => {
+                        if (layer instanceof L.Marker) {
+                            map.removeLayer(layer);
+                        }
+                    });
+
+                    // Cập nhật state và URL cùng lúc
+                    setLocation([newLocation.lat, newLocation.lng]);
+                    setIsLocationInfoOpen(true);
+                    
+                    const newSearchParams = new URLSearchParams(searchParams);
+                    newSearchParams.set('vitri', `${newLocation.lat},${newLocation.lng}`);
+                    setSearchParams(newSearchParams);
+
+                    // Reset click count sau 400ms
+                    if (clickTimeout.current) {
+                        clearTimeout(clickTimeout.current);
+                    }
+                    clickTimeout.current = setTimeout(() => {
+                        clickCountRef.current = 0;
+                    }, 100);
+                },
                 dblclick: async (e) => {
                     setIsShowModalArea(true);
                     const newLocation = e.latlng;
@@ -2209,6 +2217,19 @@ const Map = forwardRef(
                                         icon={textIcon(
                                             `${item.name_xaphuong} <br> Max: ${item.max} triệu/m² <br> Min: ${item.min} triệu/m² <br> Trung Bình: ${item.avg} triệu/m²`,
                                         )}
+                                        eventHandlers={{
+                                            click: () => {
+                                                // Cập nhật vị trí trong URL params
+                                                const newSearchParams = new URLSearchParams(searchParams);
+                                                newSearchParams.set('vitri', `${item.center.lat},${item.center.lng}`);
+                                                newSearchParams.set('ups', 'history-cost');
+                                                setSearchParams(newSearchParams);
+                                                
+                                                // Cập nhật state để hiển thị biểu đồ
+                                                setLatHistoryCost(item.center.lat);
+                                                setLonHistoryCost(item.center.lng);
+                                            }
+                                        }}
                                     />
                                 )}
                             </>
