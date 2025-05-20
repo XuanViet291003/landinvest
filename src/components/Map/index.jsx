@@ -2049,11 +2049,10 @@ const Map = forwardRef(
                     zoomControl={false}
                 >
                     {/* *********************** Update ************************ */}
-                    <MapView setPopupInfo={setPopupInfo} shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef} />
+                    <MapView setPopupInfo={setPopupInfo} />
                     <LocationInfoBoard
                         popupInfo={popupInfo}
                         setPopupInfo={setPopupInfo}
-                        shouldIgnoreNextEffectRef={shouldIgnoreNextEffectRef}
                     />
                     {/* Sử dụng MarkerComponent thay vì Marker trực tiếp */}
                     {popupInfo && (

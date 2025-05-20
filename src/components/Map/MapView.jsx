@@ -1,21 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import axios from 'axios';
 
-const MapView = ({ setPopupInfo, shouldIgnoreNextEffectRef }) => {
+const MapView = ({ setPopupInfo }) => {
     const map = useMap();
-    const initialized = useRef(false);
 
-    useEffect(() => {
-        if (shouldIgnoreNextEffectRef?.current) {
-            console.log('[MapView] Bỏ qua effect do vừa Share');
-            shouldIgnoreNextEffectRef.current = false;
-            return;
-        }
-
-        if (initialized.current) return;
-        initialized.current = true;
-
+    const updateMapFromURL = () => {
         const params = new URLSearchParams(window.location.search);
         const vitri = params.get('vitri');
         const zoom = parseInt(params.get('zoom')) || 18;
@@ -23,11 +13,11 @@ const MapView = ({ setPopupInfo, shouldIgnoreNextEffectRef }) => {
         if (vitri) {
             const [lat, lng] = vitri.split(',').map((v) => parseFloat(v));
             console.log('[PARSE URL] lat:', lat, 'lng:', lng);
-
             if (!isNaN(lat) && !isNaN(lng)) {
-                map.setView([lat, lng], zoom);
+                // Chờ map đã sẵn sàng rồi mới gọi flyTo
+                map.flyTo([lat, lng], zoom, { animate: true, duration: 1.5 });
 
-                // Gọi Nominatim API để lấy tên địa điểm và địa chỉ đầy đủ
+                // Gọi API Nominatim để lấy thông tin địa điểm
                 (async () => {
                     try {
                         const res = await axios.get('https://nominatim.openstreetmap.org/reverse.php', {
@@ -39,7 +29,10 @@ const MapView = ({ setPopupInfo, shouldIgnoreNextEffectRef }) => {
                                 addressdetails: 1,
                             },
                         });
-                        const placeName = res.data.name || res.data.display_name?.split(',')[0] || 'Vị trí không rõ';
+                        const placeName =
+                            res.data.name ||
+                            res.data.display_name?.split(',')[0] ||
+                            'Vị trí không rõ';
                         const address = res.data.display_name || '';
                         setPopupInfo({
                             name: placeName,
@@ -59,7 +52,13 @@ const MapView = ({ setPopupInfo, shouldIgnoreNextEffectRef }) => {
                 })();
             }
         }
-    }, [map, setPopupInfo, shouldIgnoreNextEffectRef]);
+    };
+
+    useEffect(() => {
+        // Thêm delay 500ms để đảm bảo map đã sẵn sàng
+        const timer = setTimeout(updateMapFromURL, 500);
+        return () => clearTimeout(timer);
+    }, [map, setPopupInfo]);
 
     return null;
 };

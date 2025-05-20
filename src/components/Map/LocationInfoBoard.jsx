@@ -1,15 +1,14 @@
 import { useMapEvent } from 'react-leaflet';
 import axios from 'axios';
 import PopupInfo from './PopupInfo';
-import { useRef } from 'react'
+import { useRef } from 'react';
 import debounce from 'lodash/debounce';
 
-const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef }) => {
+const LocationInfoBoard = ({ popupInfo, setPopupInfo }) => {
     const debouncedSetPopupInfo = useRef(
         debounce(async (lat, lng) => {
-            // Reset popupInfo trước khi lấy thông tin mới
-            setPopupInfo(null); // Reset trước khi cập nhật thông tin mới
-
+            // Reset popup trước khi cập nhật thông tin mới
+            setPopupInfo(null);
             try {
                 const res = await axios.get('https://nominatim.openstreetmap.org/reverse.php', {
                     params: {
@@ -20,7 +19,8 @@ const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef 
                         addressdetails: 1,
                     },
                 });
-                const placeName = res.data.name || res.data.display_name?.split(',')[0] || 'Vị trí không rõ';
+                const placeName =
+                    res.data.name || res.data.display_name?.split(',')[0] || 'Vị trí không rõ';
                 const address = res.data.display_name || '';
                 setPopupInfo({
                     name: placeName,
@@ -37,7 +37,7 @@ const LocationInfoBoard = ({ popupInfo, setPopupInfo, shouldIgnoreNextEffectRef 
                     lng,
                 });
             }
-        }, 200) // Đặt thời gian debounce, ví dụ 100ms
+        }, 200)
     ).current;
 
     useMapEvent({
