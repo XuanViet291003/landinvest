@@ -1,7 +1,7 @@
 import { RightOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { Container } from 'react-bootstrap';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { formatToVND } from '../../../function/formatToVND';
 import instance from '../../../utils/axios-customize';
 // test
@@ -9,7 +9,7 @@ import moment from 'moment';
 import './AuctionDetail.scss';
 import { getTimeLeft } from '../../../function/getTimeLeft';
 import { IoTimeOutline } from 'react-icons/io5';
-import { LayersControl, MapContainer, TileLayer } from 'react-leaflet';
+import { LayersControl, MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { getLocationByDistrict } from '../../../services/api';
 import { calculateLocation } from '../../../function/calculateLocation';
 import fetchProvinceName from '../../../function/findProvince';
@@ -20,7 +20,6 @@ import Countdown from './CountDown';
 export default function AuctionDetail() {
     const { id } = useParams();
     const [auction, setAuction] = useState({});
-    const hanoiCoordinate = [21.0285, 105.8542];
     const dispatch = useDispatch();
     const countdown = getTimeLeft(auction?.RegistrationEndTime);
     const mapRef = useRef(null);
@@ -28,13 +27,13 @@ export default function AuctionDetail() {
     const [location, setLocation] = useState([21.0285, 105.8542]);
     const navigate = useNavigate();
     const latIndex = 0;
-    const lngIndex = 1;
-
-    // Update
+    const lngIndex = 1; // Update
     const [remainingTime, setRemainingTIme] = useState(countdown);
     const now = moment();
     const nowFormat = now.format('DD:MM:YYYY HH:mm:ss');
     console.log('now: ', nowFormat);
+    const locationHook = useLocation();
+    const [showMarker, setShowMarker] = useState(false);
 
     const then = now.clone().add(countdown);
     const thenFormat = then.format('DD:MM:YYYY HH:mm:ss');
@@ -48,15 +47,24 @@ export default function AuctionDetail() {
     const second = then.second(); // Giây (0-59)
 
     useEffect(() => {
-        const timerId = setInterval(() => {
-            setRemainingTIme(countdown);
-        }, 1000);
+        const searchParams = new URLSearchParams(locationHook.search);
+        const vitri = searchParams.get('vitri');
+        const showMarkerParam = searchParams.get('showMarker');
 
-        return () => clearInterval(timerId);
-    }, [countdown]); //
+        if (vitri) {
+            const [latStr, lngStr] = vitri.split(',');
+            const lat = parseFloat(latStr);
+            const lng = parseFloat(lngStr);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                setLocation([lat, lng]);
+            }
+        }
+
+        setShowMarker(showMarkerParam === 'true');
+    }, [locationHook.search]);
 
     const handleGotoLocation = () => {
-        navigate(`/?vitri=${location[latIndex]},${location[lngIndex]}&zoom=13`);
+        navigate(`/?vitri=${location[0]},${location[1]}&zoom=13&showMarker=true`);
     };
 
     // API EFFECT
@@ -65,6 +73,13 @@ export default function AuctionDetail() {
             try {
                 const { data } = await instance.get(`/detail_info_daugia/${id}`);
                 setAuction(data.data);
+                console.log('object', data.data.bbox_location);
+                const bbox = data.data.bbox_location;
+                // Tính trung điểm latitude, longitude
+                const centerLat = (bbox.north + bbox.south) / 2;
+                const centerLng = (bbox.east + bbox.west) / 2;
+
+                setLocation([centerLat, centerLng]);
             } catch (error) {
                 console.log(error);
             }
@@ -76,29 +91,52 @@ export default function AuctionDetail() {
             try {
                 if (auction.DistrictID) {
                     const res = await getLocationByDistrict(auction.DistrictID);
-                    const polygonData = res.districts_data.multipolygon?.[0];
-                    const boundingBox = JSON.parse(res.districts_data.bounding_box);
-                    const [lng, lat] = calculateLocation([
-                        [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
-                    ]);
-                    const zoom = 13;
-                    const info = await fetchProvinceName(lat, lng);
 
-                    mapRef.current?.setView([lat, lng], zoom);
-                    setLocation([lat, lng]);
-                    dispatch(
-                        setCurrentLocation({
-                            provinceName: info?.provinceName,
-                            districtName: info?.districtName,
-                            coordinates: polygonData ? polygonData : [],
-                        }),
-                    );
+                    const polygonData = res.districts_data.multipolygon?.[0];
+                    const boundingBox = res.districts_data.bbox_location;
+
+                    if (
+                        boundingBox &&
+                        boundingBox.west !== undefined &&
+                        boundingBox.east !== undefined &&
+                        boundingBox.south !== undefined &&
+                        boundingBox.north !== undefined
+                    ) {
+                        const [lng, lat] = calculateLocation([
+                            [boundingBox.west, boundingBox.south, boundingBox.east, boundingBox.north],
+                        ]);
+                        const zoom = 13;
+                        const info = await fetchProvinceName(lat, lng);
+
+                        mapRef.current?.setView([lat, lng], zoom);
+                        setLocation([lat, lng]); // 👉 Truyền giá trị này vào center của MapContainer
+
+                        dispatch(
+                            setCurrentLocation({
+                                provinceName: info?.provinceName,
+                                districtName: info?.districtName,
+                                coordinates: polygonData || [],
+                            }),
+                        );
+                    }
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         })();
-    }, [auction]);
+    }, [auction.DistrictID, dispatch]);
+
+    function MapFlyTo({ location }) {
+        const map = useMap();
+
+        useEffect(() => {
+            if (location) {
+                map.flyTo(location, 13);
+            }
+        }, [location]);
+
+        return null;
+    }
 
     return (
         <div className="auction-detail">
@@ -330,7 +368,7 @@ export default function AuctionDetail() {
                         </div>
                         <div className="auction-map" onClick={handleGotoLocation}>
                             <MapContainer
-                                center={hanoiCoordinate}
+                                center={location}
                                 zoom={13}
                                 ref={mapRef}
                                 style={{ height: '100%', width: '100%' }}
@@ -350,6 +388,12 @@ export default function AuctionDetail() {
                                         />
                                     </BaseLayer>
                                 </LayersControl>
+
+                                <Marker position={location}>
+                                    <Popup>Vị trí trung tâm đấu giá</Popup>
+                                </Marker>
+
+                                <MapFlyTo location={location} />
                             </MapContainer>
                             <span className="auction-map__notify">Nhấn để tới vị trí này</span>
                         </div>
