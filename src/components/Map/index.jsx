@@ -231,6 +231,22 @@ const Map = forwardRef(
 
         const [showRegionalPrice, setShowRegionalPrice] = useState(false);
 
+        const [heatType, setHeatType] = useState(searchParams.get('heat-type') || 'tho_cu');
+
+        useEffect(() => {
+            // Set default heat type if not exists
+            if (!searchParams.get('heat-type')) {
+                searchParams.set('heat-type', 'tho_cu');
+                setSearchParams(searchParams);
+            }
+        }, []);
+
+        const handleHeatTypeChange = (value) => {
+            searchParams.set('heat-type', value);
+            setSearchParams(searchParams);
+            setHeatType(value);
+        };
+
         const handleDrawPolygon = (id) => {
             setMarkers([]);
             setDistances([]);
@@ -1047,7 +1063,7 @@ const Map = forwardRef(
 
                     // Xóa marker tìm kiếm nếu có
                     map.eachLayer((layer) => {
-                        if (layer instanceof L.Marker) {
+                        if (layer instanceof L.Marker &&  L.marker===iconLocation) {
                             map.removeLayer(layer);
                         }
                     });
@@ -1276,8 +1292,29 @@ const Map = forwardRef(
                     const childrenboundingboxData = [];
                     const firstPlanningIndex = 0;
 
-                    // dispatch(setInitialBoundingBox())
+                    // Kiểm tra và ưu tiên vị trí bản đồ nhiệt
+                    const heatMapPosition = searchParams.get('heat-map-position');
+                    const id = searchParams.get('id-district');
+                    const heatType = searchParams.get('heat-type') || 'tho_cu';
+                    const isHeatMapEnabled = searchParams.get('heat-map') !== 'off';
 
+                    if (heatMapPosition && id && heatType && isHeatMapEnabled) {
+                        const [lat, lng] = heatMapPosition.split(',');
+                        setLocation([parseFloat(lat), parseFloat(lng)]);
+                        const info = await fetchProvinceName(lat, lng);
+                        dispatch(
+                            setCurrentLocation({
+                                lat: parseFloat(lat),
+                                lon: parseFloat(lng),
+                                provinceName: info?.provinceName,
+                                districtName: info?.districtName,
+                            }),
+                        );
+                        await fetchHeatMapData(id, heatType);
+                        return; // Dừng xử lý các logic khác nếu đã khôi phục vị trí bản đồ nhiệt
+                    }
+
+                    // Các logic xử lý khác giữ nguyên
                     if (quyhoachProvinceIds.length > 0) {
                         const [, provincesResponse] = await getAllPlansDetails();
 
@@ -1638,6 +1675,10 @@ const Map = forwardRef(
         };
 
         const fetchHeatMapData = async (id, heatType) => {
+            if (!id || !heatType) {
+                return;
+            }
+
             setHeatMapLoading(true);
             try {
                 const now = new Date();
@@ -1649,10 +1690,7 @@ const Map = forwardRef(
                 );
 
                 const data = responseHeat.data;
-
-                // Lọc và chuyển đổi danh sách polygons
                 const priceHeatMap = [];
-
                 const polygonsByColor = data[heatType]?.map(({ xaphuong_id, name_xaphuong, color, max, avg, min }) => {
                     const obj = {
                         name: name_xaphuong,
@@ -1667,7 +1705,6 @@ const Map = forwardRef(
                     if (!relatedPolygon) return null;
 
                     const errors = [];
-
                     const polygons = relatedPolygon.polygon?.[0]?.map((coords) => {
                         if (!Array.isArray(coords) || coords.length !== 2) {
                             errors.push({ name: name_xaphuong });
@@ -1675,7 +1712,6 @@ const Map = forwardRef(
                         }
 
                         const [lng, lat] = coords;
-
                         if (typeof lng !== "number" || typeof lat !== "number") {
                             errors.push({ name: name_xaphuong });
                             return null;
@@ -1693,10 +1729,13 @@ const Map = forwardRef(
                         min,
                         name_xaphuong,
                     };
-                }).filter(Boolean) || []; // Đảm bảo là một mảng nếu data[heatType] không tồn tại
+                }).filter(Boolean) || [];
 
                 if (!polygonsByColor || polygonsByColor.length === 0 || priceHeatMap.length === 0) {
-                    messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+                    if (searchParams.get('heat-map') !== 'off') {
+                        messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+                    }
+                    return;
                 }
 
                 if (priceHeatMap.length > 0) {
@@ -1707,19 +1746,38 @@ const Map = forwardRef(
 
                 setPolygonHeatMap(polygonsByColor);
 
+                // Lưu vị trí bản đồ nhiệt vào URL parameters
+                const vitri = searchParams.get('vitri');
+                if (vitri) {
+                    searchParams.set('heat-map-position', vitri);
+                }
                 searchParams.set("id-district", id);
                 searchParams.set("heat-type", heatType);
                 setSearchParams(searchParams);
 
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu bản đồ nhiệt:", error.message);
-                messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+                // Only show message if heat map is enabled
+                if (searchParams.get('heat-map') !== 'off') {
+                    messageApi.info('Chưa có dữ liệu bản đồ nhiệt!');
+                }
                 setPolygonHeatMap(null);
                 setHeatRegionalPrice(null);
             } finally {
                 setHeatMapLoading(false);
             }
         };
+
+        // Only fetch heat map when explicitly enabled
+        useEffect(() => {
+            const id = searchParams.get('id-district');
+            const heatType = searchParams.get('heat-type') || 'tho_cu';
+            const isHeatMapEnabled = searchParams.get('heat-map') !== 'off';
+            
+            if (id && heatType && isHeatMapEnabled) {
+                fetchHeatMapData(id, heatType);
+            }
+        }, [searchParams.get('id-district'), searchParams.get('heat-type'), searchParams.get('heat-map')]);
 
         const loadHeatMap = async () => {
             setHeatMapLoading(true);
@@ -1960,6 +2018,20 @@ const Map = forwardRef(
                 setLonHistoryCost(vitri[1]);
             }
         }, [])
+
+        // Thêm useEffect mới để khôi phục vị trí bản đồ nhiệt khi reload
+        useEffect(() => {
+            const heatMapPosition = searchParams.get('heat-map-position');
+            const id = searchParams.get('id-district');
+            const heatType = searchParams.get('heat-type') || 'tho_cu';
+            const isHeatMapEnabled = searchParams.get('heat-map') !== 'off';
+            
+            if (heatMapPosition && id && heatType && isHeatMapEnabled) {
+                const [lat, lng] = heatMapPosition.split(',');
+                setLocation([parseFloat(lat), parseFloat(lng)]);
+                fetchHeatMapData(id, heatType);
+            }
+        }, []);
 
         return (
             <>
