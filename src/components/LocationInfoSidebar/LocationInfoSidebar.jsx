@@ -134,7 +134,7 @@ const LocationInfoSidebar = ({
             searchParams.set('heat-view', 'map');
             setSearchParams(searchParams);
         }
-    }, []);
+    }, [searchParams]);
 
     const handleViewChange = (key) => {
         let currentView = searchParams.get('heat-view') || '';
