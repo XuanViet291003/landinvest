@@ -1,12 +1,9 @@
 import { createPortal } from 'react-dom';
-import { MdOutlineShare, MdClose } from 'react-icons/md';
-import { message } from 'antd';
-import { useMap } from 'react-leaflet';
+import { MdOutlineShare, MdClose } from "react-icons/md";
+import { message } from 'antd'; // Thêm import message
 import './index.scss';
 
-const PopupInfo = ({ info, onClose }) => {
-    // Lấy map instance từ context
-    const map = useMap();
+const PopupInfo = ({ info, onClose, shouldIgnoreNextEffectRef }) => {
     if (!info) return null;
 
     const handleShare = (e) => {
@@ -14,24 +11,27 @@ const PopupInfo = ({ info, onClose }) => {
         e.stopPropagation();
         if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
 
-        const { lat, lng } = info;
+        const lat = info.lat;
+        const lng = info.lng;
         const zoom = 17;
-        // const shareUrl = `http://localhost:4000/?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
-        const shareUrl = `https://landinvest.com.vn//?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
 
-        // Copy link share và thông báo cho người dùng
+        const shareUrl = `http://landinvest.com.vn/?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
+        // const shareUrl = `http://localhost:4000/?heat-view=map&vitri=${lat},${lng}&zoom=${zoom}`;
+
         navigator.clipboard.writeText(shareUrl).then(() => {
-            message.success('Đã sao chép liên kết!', 1.5);
+            // Hiển thị thông báo toast khi sao chép liên kết
+            message.success('Đã sao chép liên kết!', 1.5); // Thời gian hiển thị 1.5 giây
         });
 
-        // Cập nhật URL mới vào history và di chuyển map tới vị trí đó
-        window.history.pushState({}, '', shareUrl);
-        map.flyTo([lat, lng], zoom, { animate: true, duration: 1.5 });
+        if (shouldIgnoreNextEffectRef?.current !== undefined) {
+            shouldIgnoreNextEffectRef.current = true;
+            console.log('[SHARE] Đã bật flag shouldIgnoreNextEffectRef');
+        }
     };
 
     const getDetailAddress = (name, address) => {
         let detail = address;
-        if (address.startsWith(name + ',')) {
+        if (address.startsWith(name + ",")) {
             detail = address.slice(name.length + 2);
         }
         return detail.replace(/\d{5,6}(, )?/g, '').trim();
@@ -45,11 +45,11 @@ const PopupInfo = ({ info, onClose }) => {
                     alt="thumbnail"
                     style={{ width: '90px', height: '105px', marginRight: '9px' }}
                 />
-                <div className="popupText">
+                <div className='popupText'>
                     <div>
                         <div className="title">{info.name}</div>
                         <div className="address">{getDetailAddress(info.name, info.address)}</div>
-                        <hr style={{ marginTop: '2.5px' }} className="line" />
+                        <hr style={{ marginTop: '2.5px' }} className='line'/>
                         <div className="coords">
                             {info.lat.toFixed(6)}, {info.lng.toFixed(6)}
                         </div>
@@ -65,7 +65,7 @@ const PopupInfo = ({ info, onClose }) => {
                 </div>
             </div>
         </div>,
-        document.body // Render Portal bên ngoài MapContainer
+        document.body // Portal ra ngoài <MapContainer />
     );
 };
 

@@ -103,11 +103,11 @@ export default function LandUsePlan() {
                 >
                     <Option value="">Chọn tỉnh</Option>
                     {Array.isArray(province) &&
-    province.map((prov) => (
-        <Option key={prov.province_id} value={prov.province_id}>
-            {prov.name}
-        </Option>
-    ))
+                        province.map((prov) => (
+                            <Option key={prov.province_id} value={prov.province_id}>
+                                {prov.name}
+                            </Option>
+                        ))
 }
                 </Select>
             </div>

@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import './ModalNotification.scss';
+import './ModalNotification.scss';          
 import { useNavigate } from 'react-router-dom';
 const ModalLogin = (props) => {
     const { handleClose, show } = props;

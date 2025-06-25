@@ -30,6 +30,7 @@ const BidPlans = () => {
     const [selectedDistrict, setSelectedDistrict] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [searchResultText, setSearchResultText] = useState('');
+    const [visibleCount, setVisibleCount] = useState(20);
 
     const bidPlansState = useSelector((state) => state.bidPlans) || {};
     const {
@@ -40,6 +41,12 @@ const BidPlans = () => {
     } = bidPlansState;
     const { provinces: provincesStatus, districts: districtsStatus, bidPlans: bidPlansStatus } = status;
 
+    const handleScroll = (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        if (scrollHeight - scrollTop <= clientHeight + 100) {
+            setVisibleCount((prevCount) => prevCount + 20);
+        }
+    };
     // useEffect(() => {
     //     dispatch(getAllProvincesApi()).then((result) => {
     //         if (result.error) {
@@ -146,7 +153,7 @@ const BidPlans = () => {
     };
 
     return (
-        <div  className="bid-plans-container">
+        <Container  className="bid-plans-container">
             <Banner />
             <div className="bid-plans-content">
                 <h2 className="bid-plans-title">Tìm kiếm Kế hoạch đấu thầu</h2>
@@ -224,18 +231,21 @@ const BidPlans = () => {
                     </Row>
                 </div>
 
-                <div className="results-section">
+                <div className="results-section"
+                    style={{ maxHeight: 1000, overflowY: 'auto' }}
+                    onScroll={handleScroll}
+                >
                     {searchResultText && <p className="search-result-text">{searchResultText}</p>}
                     {bidPlansStatus === 'PENDING' ? (
                         <Spin size="large" className="loading-spinner" />
                     ) : bidPlans.length === 0 ? (
                         <Empty description="Không có kế hoạch nào" className="empty-state" />
                     ) : (
-                        <BidPlansTable data={bidPlans} className="bid-plans-table" />
+                        <BidPlansTable data={bidPlans.slice(0, visibleCount)} className="bid-plans-table" />
                     )}
                 </div>
             </div>
-        </div>
+        </Container>
     );
 };
 

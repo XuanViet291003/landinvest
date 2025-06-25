@@ -5,7 +5,7 @@ const apiKeyName = 'x-api-key';
 
 export const instance = axios.create({
 
-    baseURL: 'https://landinvest.thinkdiff.us', 
+    baseURL: 'https://landinvest.thinkdiff.us',
 });
 
 export const thinkDiffus= axios.create({

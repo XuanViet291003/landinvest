@@ -32,7 +32,6 @@ export default function DrawerLandUsePlan() {
 
     const [isExtend, setExtend] = useState(false);
 
-    // --- Nội dung bên trong Drawer ---
     let content = null;
 
     const isLoading = landUsePlanStatus === THUNK_API_STATUS.PENDING || landUsePlan2Status === THUNK_API_STATUS.PENDING;
@@ -60,7 +59,7 @@ export default function DrawerLandUsePlan() {
             </div>
         );
     } else if (landUsePlan?.list_kehoach && Array.isArray(landUsePlan.list_kehoach) && landUsePlan.list_kehoach.length > 0) {
-        // Hiển thị LandUsePlan.list_kehoach nếu LandUsePlan2.projects không có dữ liệu
+
         content = (
             <div
                 className="hidden-scroll"
@@ -113,7 +112,7 @@ export default function DrawerLandUsePlan() {
         );
     }
     else if (landUsePlan2?.projects && Array.isArray(landUsePlan2.projects) && landUsePlan2.projects.length > 0) {
-        // Ưu tiên hiển thị LandUsePlan2.projects nếu có dữ liệu
+        
         content = (
             <div
                 className="hidden-scroll"
@@ -169,7 +168,7 @@ export default function DrawerLandUsePlan() {
             </div>
         );
     }  else {
-        // Không có dữ liệu từ cả hai API
+        
         content = (
             <div style={{ color: 'grey', textAlign: 'center', padding: '20px', backgroundColor: '#2c353d', height: '100%' }}>
                 Không có dữ liệu kế hoạch sử dụng đất để hiển thị.
